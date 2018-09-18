@@ -70,8 +70,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'pyJac'
-copyright = '2016, Kyle Niemeyer, Nicholas Curtis'
-author = 'Kyle Niemeyer, Nicholas Curtis'
+copyright = '2018, Nicholas Curtis, Kyle Niemeyer'
+author = 'Nicholas Curtis, Kyle Niemeyer'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -264,7 +264,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'pyJac.tex', 'pyJac Documentation',
-     'Kyle Niemeyer, Nicholas Curtis', 'manual'),
+     'Nicholas Curtis', 'Kyle Niemeyer', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of

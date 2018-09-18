@@ -6,7 +6,6 @@ Submodules
 
 .. toctree::
 
-   pyjac.pywrap.parallel_compiler
    pyjac.pywrap.pywrap_gen
 
 Module contents
