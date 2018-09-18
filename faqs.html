@@ -1,0 +1,131 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Frequently asked Questions &#8212; pyJac 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="prev" title="Overview" href="overview.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="frequently-asked-questions">
+<h1>Frequently asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="common-issues">
+<h2>Common Issues<a class="headerlink" href="#common-issues" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="static-tls-errors">
+<h3>Static TLS errors<a class="headerlink" href="#static-tls-errors" title="Permalink to this headline">¶</a></h3>
+<p>I get an error stating:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="ne">OSError</span><span class="p">:</span> <span class="n">dlopen</span><span class="p">:</span> <span class="n">cannot</span> <span class="n">load</span> <span class="nb">any</span> <span class="n">more</span> <span class="nb">object</span> <span class="k">with</span> <span class="n">static</span> <span class="n">TLS</span>
+</pre></div>
+</div>
+<p>when running validation testing.</p>
+<p>This has been known to occur in SLURM or related job-batch systems when loading the Adept library for auto-differentiation execution. To work around this, you should set the <a class="reference external" href="https://stackoverflow.com/a/45640803/1667311">environment variable LD_PRELOAD</a>, e.g.:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">LD_PRELOAD</span><span class="o">=/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">adept</span><span class="o">/</span><span class="n">install</span><span class="o">/</span><span class="n">lib</span><span class="o">/</span><span class="n">libadept</span><span class="o">.</span><span class="n">so</span> <span class="n">python</span> <span class="o">-</span><span class="n">m</span> <span class="n">pyjac</span><span class="o">.</span><span class="n">functional_tester</span> <span class="o">...</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="i-get-an-error-complaining-that-the-function-timersub-doesn-t-exist">
+<h3>I get an error complaining that the function <code class="xref any docutils literal notranslate"><span class="pre">timersub</span></code> doesn’t exist!<a class="headerlink" href="#i-get-an-error-complaining-that-the-function-timersub-doesn-t-exist" title="Permalink to this headline">¶</a></h3>
+<p>To fix this, add the following to your <code class="docutils literal notranslate"><span class="pre">siteconf.py</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">CC_FLAGS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;-D_BSD_SOURCE -D_SVID_SOURCE -D_POSIX_C_SOURCE=200809&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">pyJac</a></h1>
+
+
+
+<p class="blurb">Python-based generator of analytical Jacobians for chemical kinetics</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=kyleniemeyer&repo=pyjac&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Frequently asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="src/index.html">pyJac API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Nicholas Curtis, Kyle Niemeyer.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/faqs.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/kyleniemeyer/pyjac" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>

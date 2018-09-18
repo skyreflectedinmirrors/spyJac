@@ -1,38 +1,28 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pyjac.core.mech_interpret &mdash; pyJac 1.0.0 documentation</title>
-    
+    <title>pyjac.core.mech_interpret &#8212; pyJac 2.0.0 documentation</title>
     <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../../',
-        VERSION:     '1.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../../../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-    <link rel="top" title="pyJac 1.0.0 documentation" href="../../../index.html" />
-    <link rel="up" title="Module code" href="../../index.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
    
   <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
   
+  
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
+  </head><body>
   
 
     <div class="document">
@@ -46,28 +36,35 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="c1"># Python 2 compatibility</span>
-<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">division</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">division</span>
 
 <span class="c1"># Standard libraries</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="c1"># Local imports</span>
-<span class="kn">from</span> <span class="nn">..</span> <span class="kn">import</span> <span class="n">utils</span>
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">chem_utilities</span> <span class="k">as</span> <span class="n">chem</span>
+<span class="kn">from</span> <span class="nn">pyjac</span> <span class="k">import</span> <span class="n">utils</span>
+<span class="kn">from</span> <span class="nn">pyjac.core</span> <span class="k">import</span> <span class="n">chem_model</span> <span class="k">as</span> <span class="n">chem</span>
 
 <span class="c1"># Related module</span>
-<span class="n">CANTERA_FLAG</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="n">CANTERA_FLAG</span> <span class="o">=</span> <span class="kc">False</span>
 <span class="k">try</span><span class="p">:</span>
-    <span class="kn">import</span> <span class="nn">cantera</span> <span class="kn">as</span> <span class="nn">ct</span>
-
-    <span class="n">CANTERA_FLAG</span> <span class="o">=</span> <span class="bp">True</span>
+    <span class="kn">import</span> <span class="nn">cantera</span> <span class="k">as</span> <span class="nn">ct</span>
+    <span class="n">version</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">__version__</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">int</span><span class="p">(</span><span class="n">version</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">2</span> <span class="ow">or</span> <span class="nb">int</span><span class="p">(</span><span class="n">version</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&lt;</span> <span class="mi">3</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Parsing of Cantera mechanisms requires at least version 2.3.0&#39;</span>
+                     <span class="s1">&#39;in order to access species thermo properties. Detected version&#39;</span>
+                     <span class="s1">&#39; is only </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ct</span><span class="o">.</span><span class="n">__version__</span><span class="p">))</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">CANTERA_FLAG</span> <span class="o">=</span> <span class="kc">True</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-    <span class="n">CANTERA_FLAG</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="n">CANTERA_FLAG</span> <span class="o">=</span> <span class="kc">False</span>
 
 <span class="n">pre_units</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;moles&#39;</span><span class="p">,</span> <span class="s1">&#39;molecules&#39;</span><span class="p">]</span>
 <span class="sd">&quot;&quot;&quot;list(`str`): Supported units list for pre-exponential factor&quot;&quot;&quot;</span>
@@ -91,7 +88,52 @@
 <span class="n">elem_wt</span> <span class="o">=</span> <span class="n">chem</span><span class="o">.</span><span class="n">get_elem_wt</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="read_mech"><a class="viewcode-back" href="../../../src/pyjac.core.mech_interpret.html#pyjac.core.mech_interpret.read_mech">[docs]</a><span class="k">def</span> <span class="nf">read_mech</span><span class="p">(</span><span class="n">mech_filename</span><span class="p">,</span> <span class="n">therm_filename</span><span class="p">):</span>
+<div class="viewcode-block" id="sort_reactions"><a class="viewcode-back" href="../../../src/pyjac.core.mech_interpret.html#pyjac.core.sort_reactions">[docs]</a><span class="k">def</span> <span class="nf">sort_reactions</span><span class="p">(</span><span class="n">reacs</span><span class="p">,</span> <span class="n">sort_type</span><span class="p">,</span> <span class="n">return_order</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    reacs : list of `ReacInfo`</span>
+<span class="sd">        List of reactions in mechanism to be sorted.</span>
+<span class="sd">    sort_type : :class:`enum_types.reaction_sorting`</span>
+<span class="sd">        If not None, sort the reactions in this mechanism according to the supplied</span>
+<span class="sd">        scheme</span>
+<span class="sd">    return_order : bool [False]</span>
+<span class="sd">        If True, return new order of sorted reactions, if false, return the sorted</span>
+<span class="sd">        reactions themselves</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="kn">from</span> <span class="nn">pyjac.core.enum_types</span> <span class="k">import</span> <span class="p">(</span>
+        <span class="n">reaction_type</span><span class="p">,</span> <span class="n">falloff_form</span><span class="p">,</span> <span class="n">reversible_type</span><span class="p">,</span> <span class="n">thd_body_type</span><span class="p">)</span>
+
+    <span class="c1"># we consider the following enums:</span>
+    <span class="c1"># column #1, reaction type</span>
+    <span class="c1"># column #2, falloff form</span>
+    <span class="c1"># column #3, third body form</span>
+    <span class="c1"># column #4, reversible type</span>
+
+    <span class="n">enum_order</span> <span class="o">=</span> <span class="p">(</span><span class="n">reaction_type</span><span class="p">,</span> <span class="n">falloff_form</span><span class="p">,</span> <span class="n">thd_body_type</span><span class="p">,</span> <span class="n">reversible_type</span><span class="p">)</span>
+    <span class="n">sort_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">reacs</span><span class="p">),</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reacs</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="n">enum</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">enum_order</span><span class="p">):</span>
+            <span class="n">e_val</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">get_type</span><span class="p">(</span><span class="n">enum</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">e_val</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+            <span class="n">sort_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">e_val</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+    <span class="n">ordering</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">reacs</span><span class="p">))</span>
+
+    <span class="c1"># now sort by column -- https://stackoverflow.com/a/38194077</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">enum_order</span><span class="p">))):</span>
+        <span class="n">inds</span> <span class="o">=</span> <span class="n">sort_matrix</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s1">&#39;mergesort&#39;</span><span class="p">)</span>
+        <span class="n">ordering</span> <span class="o">=</span> <span class="n">ordering</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
+        <span class="n">sort_matrix</span> <span class="o">=</span> <span class="n">sort_matrix</span><span class="p">[</span><span class="n">inds</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">return_order</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ordering</span>
+
+    <span class="c1"># sort reactions</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">reacs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ordering</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="read_mech"><a class="viewcode-back" href="../../../src/pyjac.core.mech_interpret.html#pyjac.core.read_mech">[docs]</a><span class="k">def</span> <span class="nf">read_mech</span><span class="p">(</span><span class="n">mech_filename</span><span class="p">,</span> <span class="n">therm_filename</span><span class="p">,</span> <span class="n">sort_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read and interpret mechanism file for elements, species, and reactions.</span>
 
 <span class="sd">    Parameters</span>
@@ -100,6 +142,9 @@
 <span class="sd">        Reaction mechanism filename (e.g. &#39;mech.dat&#39;)</span>
 <span class="sd">    therm_filename : str, optional</span>
 <span class="sd">        Thermodynamic database filename (e.g., &#39;therm.dat&#39;)</span>
+<span class="sd">    sort_type : :class:`enum_types.reaction_sorting`</span>
+<span class="sd">        If not None, sort the reactions in this mechanism according to the supplied</span>
+<span class="sd">        scheme</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -121,34 +166,31 @@
     <span class="n">elems</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">reacs</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">specs</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="n">units</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
     <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
-    <span class="c1"># By default, need to read thermo database if file given.</span>
-    <span class="k">if</span> <span class="n">therm_filename</span><span class="p">:</span>
-        <span class="n">therm_flag</span> <span class="o">=</span> <span class="bp">True</span>
-
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mech_filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">mech_filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
         <span class="c1"># start line reading loop</span>
-        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="c1"># remember last line position</span>
-            <span class="n">last_line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
-
-            <span class="n">line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
             <span class="c1"># end of file</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span> <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">line</span><span class="p">:</span>
+                <span class="k">break</span>
 
             <span class="c1"># skip blank or commented lines</span>
-            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;^\s*$&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span> <span class="ow">or</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;^\s*!&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span> <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\s*$&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span> <span class="ow">or</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\s*!&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                <span class="k">continue</span>
 
             <span class="c1"># don&#39;t convert to lowercase, since thermo</span>
             <span class="c1"># needs to match (for Chemkin)</span>
 
+            <span class="c1"># Remove trailing and leading whitespace, tabs, newline</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
             <span class="c1"># remove any comments from end of line</span>
             <span class="n">ind</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39;!&#39;</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">ind</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span> <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">ind</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">ind</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">ind</span><span class="p">]</span>
 
             <span class="c1"># now determine key</span>
             <span class="k">if</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">4</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;elem&#39;</span><span class="p">:</span>
@@ -187,14 +229,13 @@
                     <span class="k">elif</span> <span class="n">unit</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="n">act_energy_units</span><span class="p">:</span>
                         <span class="n">units_E</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Error: unsupported units on REACTION line.&#39;</span><span class="p">)</span>
-                        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;For pre-exponential factor, choose from: &#39;</span> <span class="o">+</span>
-                              <span class="n">pre_units</span>
-                              <span class="p">)</span>
-                        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;For activation energy, choose from: &#39;</span> <span class="o">+</span>
-                              <span class="n">act_energy_units</span>
-                              <span class="p">)</span>
-                        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Otherwise leave blank for moles and cal/mole.&#39;</span><span class="p">)</span>
+                        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Unsupported units on REACTION line. For &#39;</span>
+                                     <span class="s1">&#39;pre-exponential factor, choose from: &#39;</span> <span class="o">+</span>
+                                     <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pre_units</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">For activation energy&#39;</span>
+                                     <span class="s1">&#39;, choose from: &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">act_energy_units</span><span class="p">)</span>
+                                     <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Otherwise leave blank for moles and &#39;</span>
+                                     <span class="s1">&#39;cal/mole.&#39;</span><span class="p">)</span>
                         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
                 <span class="k">if</span> <span class="n">units_A</span> <span class="o">==</span> <span class="s1">&#39;molecules&#39;</span><span class="p">:</span>
@@ -210,8 +251,6 @@
                 <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
                 <span class="k">continue</span>
 
-            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-
             <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;elem&#39;</span><span class="p">:</span>
                 <span class="c1"># if any atomic weight declarations, replace / with spaces</span>
                 <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
@@ -220,7 +259,8 @@
                 <span class="n">e_last</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
                 <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">line_split</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span>
-                        <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;end&#39;</span><span class="p">:</span> <span class="k">continue</span>
+                        <span class="k">if</span> <span class="n">e</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;end&#39;</span><span class="p">:</span>
+                            <span class="k">continue</span>
                         <span class="k">if</span> <span class="n">e</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">elems</span><span class="p">:</span>
                             <span class="n">elems</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
                         <span class="n">e_last</span> <span class="o">=</span> <span class="n">e</span>
@@ -232,8 +272,9 @@
             <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;spec&#39;</span><span class="p">:</span>
                 <span class="n">line_split</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                 <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">line_split</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;end&#39;</span><span class="p">:</span> <span class="k">continue</span>
-                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">next</span><span class="p">((</span><span class="n">sp</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">specs</span> <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">s</span><span class="p">),</span> <span class="bp">None</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;end&#39;</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="nb">next</span><span class="p">((</span><span class="n">sp</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">specs</span> <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">s</span><span class="p">),</span> <span class="kc">None</span><span class="p">):</span>
                         <span class="n">specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">chem</span><span class="o">.</span><span class="n">SpecInfo</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
 
             <span class="k">elif</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;reac&#39;</span><span class="p">:</span>
@@ -242,7 +283,7 @@
                 <span class="k">if</span> <span class="s1">&#39;=&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
                     <span class="c1"># new reaction</span>
 
-                    <span class="n">cheb_flag</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="n">cheb_flag</span> <span class="o">=</span> <span class="kc">False</span>
 
                     <span class="c1"># get Arrhenius coefficients</span>
                     <span class="n">line_split</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
@@ -256,22 +297,22 @@
 
                     <span class="k">if</span> <span class="s1">&#39;&lt;=&gt;&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
                         <span class="n">ind</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;&lt;=&gt;&#39;</span><span class="p">)</span>
-                        <span class="n">reac_rev</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">reac_rev</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="n">reac_str</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                         <span class="n">prod_str</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">ind</span> <span class="o">+</span> <span class="mi">3</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                     <span class="k">elif</span> <span class="s1">&#39;=&gt;&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
                         <span class="n">ind</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;=&gt;&#39;</span><span class="p">)</span>
-                        <span class="n">reac_rev</span> <span class="o">=</span> <span class="bp">False</span>
+                        <span class="n">reac_rev</span> <span class="o">=</span> <span class="kc">False</span>
                         <span class="n">reac_str</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                         <span class="n">prod_str</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">ind</span> <span class="o">+</span> <span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="n">ind</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s1">&#39;=&#39;</span><span class="p">)</span>
-                        <span class="n">reac_rev</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">reac_rev</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="n">reac_str</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">ind</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                         <span class="n">prod_str</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="n">ind</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
-                    <span class="n">thd</span> <span class="o">=</span> <span class="bp">False</span>
-                    <span class="n">pdep</span> <span class="o">=</span> <span class="bp">False</span>
+                    <span class="n">thd</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="n">pdep</span> <span class="o">=</span> <span class="kc">False</span>
                     <span class="n">pdep_sp</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
                     <span class="n">reac_spec</span> <span class="o">=</span> <span class="p">[]</span>
@@ -296,14 +337,14 @@
                             <span class="c1"># &#39;+&#39; embedded within parentheses</span>
                             <span class="n">sub_str</span> <span class="o">=</span> <span class="n">sub_str</span><span class="p">[</span><span class="n">ind2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
                         <span class="k">elif</span> <span class="n">inParen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="s1">&#39;+&#39;</span><span class="p">:</span>
-                            <span class="n">pdep</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="n">pdep</span> <span class="o">=</span> <span class="kc">True</span>
 
                             <span class="c1"># either &#39;m&#39; or a specific species</span>
                             <span class="n">pdep_sp</span> <span class="o">=</span> <span class="n">sub_str</span><span class="p">[</span><span class="n">ind1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="n">ind2</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
                             <span class="n">pdep_sp</span> <span class="o">=</span> <span class="n">pdep_sp</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
                             <span class="k">if</span> <span class="n">pdep_sp</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span>
-                                <span class="n">thd</span> <span class="o">=</span> <span class="bp">True</span>
+                                <span class="n">thd</span> <span class="o">=</span> <span class="kc">True</span>
                                 <span class="n">pdep_sp</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
                             <span class="c1"># now remove from string</span>
@@ -348,7 +389,8 @@
 
                             <span class="c1"># search for first letter</span>
                             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sp</span><span class="p">)):</span>
-                                <span class="k">if</span> <span class="n">sp</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span> <span class="k">break</span>
+                                <span class="k">if</span> <span class="n">sp</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span>
+                                    <span class="k">break</span>
 
                             <span class="n">nu</span> <span class="o">=</span> <span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span>
                             <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">nu</span><span class="p">:</span>
@@ -365,7 +407,7 @@
 
                         <span class="c1"># check for third body</span>
                         <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span>
-                            <span class="n">thd</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="n">thd</span> <span class="o">=</span> <span class="kc">True</span>
                             <span class="k">continue</span>
 
                         <span class="c1"># check if species already in reaction</span>
@@ -394,14 +436,14 @@
                             <span class="c1"># &#39;+&#39; embedded within parentheses</span>
                             <span class="n">sub_str</span> <span class="o">=</span> <span class="n">sub_str</span><span class="p">[</span><span class="n">ind2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span>
                         <span class="k">elif</span> <span class="n">inParen</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">is</span> <span class="s1">&#39;+&#39;</span><span class="p">:</span>
-                            <span class="n">pdep</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="n">pdep</span> <span class="o">=</span> <span class="kc">True</span>
 
                             <span class="c1"># either &#39;m&#39; or a specific species</span>
                             <span class="n">pdep_sp</span> <span class="o">=</span> <span class="n">sub_str</span><span class="p">[</span><span class="n">ind1</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span> <span class="n">ind2</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
                             <span class="n">pdep_sp</span> <span class="o">=</span> <span class="n">pdep_sp</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
                             <span class="k">if</span> <span class="n">pdep_sp</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;m&#39;</span><span class="p">:</span>
-                                <span class="n">thd</span> <span class="o">=</span> <span class="bp">True</span>
+                                <span class="n">thd</span> <span class="o">=</span> <span class="kc">True</span>
                                 <span class="n">pdep_sp</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
 
                             <span class="c1"># now remove from string</span>
@@ -446,7 +488,8 @@
 
                             <span class="c1"># search for first letter</span>
                             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sp</span><span class="p">)):</span>
-                                <span class="k">if</span> <span class="n">sp</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span> <span class="k">break</span>
+                                <span class="k">if</span> <span class="n">sp</span><span class="p">[</span><span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isalpha</span><span class="p">():</span>
+                                    <span class="k">break</span>
 
                             <span class="n">nu</span> <span class="o">=</span> <span class="n">sp</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">i</span><span class="p">]</span>
                             <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">nu</span><span class="p">:</span>
@@ -463,7 +506,7 @@
 
                         <span class="c1"># check for third body</span>
                         <span class="k">if</span> <span class="n">sp</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">,</span> <span class="s1">&#39;M&#39;</span><span class="p">]:</span>
-                            <span class="n">thd</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="n">thd</span> <span class="o">=</span> <span class="kc">True</span>
                             <span class="k">continue</span>
 
                         <span class="c1"># check if species already in reaction</span>
@@ -479,7 +522,7 @@
                     <span class="c1"># Don&#39;t want to confuse third-body and pressure-dependent</span>
                     <span class="c1"># reactions... they are different!</span>
                     <span class="k">if</span> <span class="n">pdep</span><span class="p">:</span>
-                        <span class="n">thd</span> <span class="o">=</span> <span class="bp">False</span>
+                        <span class="n">thd</span> <span class="o">=</span> <span class="kc">False</span>
 
                     <span class="c1"># Convert given activation energy units to internal units</span>
                     <span class="n">reac_E</span> <span class="o">*=</span> <span class="n">act_energy_fact</span><span class="p">[</span><span class="n">units_E</span><span class="p">]</span>
@@ -491,7 +534,8 @@
                             <span class="n">reac_A</span> <span class="o">/=</span> <span class="mf">1000.</span> <span class="o">**</span> <span class="n">reac_ord</span>
                         <span class="k">elif</span> <span class="n">pdep</span><span class="p">:</span>
                             <span class="c1"># Low- (chemically activated bimolecular reaction) or</span>
-                            <span class="c1"># high-pressure (fall-off reaction) limit parameters</span>
+                            <span class="c1"># high-pressure (fall-off reaction) limit</span>
+                            <span class="c1"># parameters</span>
                             <span class="n">reac_A</span> <span class="o">/=</span> <span class="mf">1000.</span> <span class="o">**</span> <span class="p">(</span><span class="n">reac_ord</span> <span class="o">-</span> <span class="mf">1.</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="c1"># Elementary reaction</span>
@@ -504,7 +548,8 @@
                                          <span class="p">)</span>
                     <span class="n">reac</span><span class="o">.</span><span class="n">thd_body</span> <span class="o">=</span> <span class="n">thd</span>
                     <span class="n">reac</span><span class="o">.</span><span class="n">pdep</span> <span class="o">=</span> <span class="n">pdep</span>
-                    <span class="k">if</span> <span class="n">pdep</span><span class="p">:</span> <span class="n">reac</span><span class="o">.</span><span class="n">pdep_sp</span> <span class="o">=</span> <span class="n">pdep_sp</span>
+                    <span class="k">if</span> <span class="n">pdep</span><span class="p">:</span>
+                        <span class="n">reac</span><span class="o">.</span><span class="n">pdep_sp</span> <span class="o">=</span> <span class="n">pdep_sp</span>
 
                     <span class="n">reacs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reac</span><span class="p">)</span>
 
@@ -513,7 +558,7 @@
 
                     <span class="n">aux</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
                     <span class="k">if</span> <span class="n">aux</span> <span class="o">==</span> <span class="s1">&#39;dup&#39;</span><span class="p">:</span>
-                        <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dup</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">dup</span> <span class="o">=</span> <span class="kc">True</span>
 
                     <span class="k">elif</span> <span class="n">aux</span> <span class="o">==</span> <span class="s1">&#39;rev&#39;</span><span class="p">:</span>
                         <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
@@ -533,7 +578,8 @@
                                 <span class="n">par1</span> <span class="o">/=</span> <span class="mf">1000.</span> <span class="o">**</span> <span class="n">reac_ord</span>
                             <span class="k">elif</span> <span class="n">pdep</span><span class="p">:</span>
                                 <span class="c1"># Low- (chemically activated bimolecular reaction) or</span>
-                                <span class="c1"># high-pressure (fall-off reaction) limit parameters</span>
+                                <span class="c1"># high-pressure (fall-off reaction) limit</span>
+                                <span class="c1"># parameters</span>
                                 <span class="n">par1</span> <span class="o">/=</span> <span class="mf">1000.</span> <span class="o">**</span> <span class="p">(</span><span class="n">reac_ord</span> <span class="o">-</span> <span class="mf">1.</span><span class="p">)</span>
                             <span class="k">else</span><span class="p">:</span>
                                 <span class="c1"># Elementary reaction</span>
@@ -545,7 +591,7 @@
                             <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rev_par</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">par2</span><span class="p">)</span>
                             <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rev_par</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">par3</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rev</span> <span class="o">=</span> <span class="bp">False</span>
+                            <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rev</span> <span class="o">=</span> <span class="kc">False</span>
 
                     <span class="k">elif</span> <span class="n">aux</span> <span class="o">==</span> <span class="s1">&#39;low&#39;</span><span class="p">:</span>
                         <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
@@ -589,10 +635,24 @@
                         <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
                         <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
                         <span class="n">line_split</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-                        <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">troe</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">troe</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="n">par1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line_split</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                         <span class="n">par2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line_split</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
                         <span class="n">par3</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line_split</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+                        <span class="n">do_warn</span> <span class="o">=</span> <span class="kc">False</span>
+                        <span class="k">if</span> <span class="n">par2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">do_warn</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="n">par2</span> <span class="o">=</span> <span class="mf">1e-30</span>
+                        <span class="k">if</span> <span class="n">par3</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                            <span class="n">do_warn</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="n">par3</span> <span class="o">=</span> <span class="mf">1e-30</span>
+                        <span class="k">if</span> <span class="n">do_warn</span><span class="p">:</span>
+                            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                                <span class="s1">&#39;Troe parameters in reaction </span><span class="si">{}</span><span class="s1"> modified to avoid&#39;</span>
+                                <span class="s1">&#39; division by zero!.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">reacs</span><span class="p">)))</span>
+
                         <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">troe_par</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">par1</span><span class="p">)</span>
                         <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">troe_par</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">par2</span><span class="p">)</span>
                         <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">troe_par</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">par3</span><span class="p">)</span>
@@ -606,7 +666,7 @@
                         <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
                         <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
                         <span class="n">line_split</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
-                        <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sri</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sri</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="n">par1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line_split</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                         <span class="n">par2</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line_split</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
                         <span class="n">par3</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line_split</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
@@ -621,7 +681,7 @@
                             <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sri_par</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">par4</span><span class="p">)</span>
                             <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">sri_par</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">par5</span><span class="p">)</span>
                     <span class="k">elif</span> <span class="n">aux</span> <span class="o">==</span> <span class="s1">&#39;che&#39;</span><span class="p">:</span>
-                        <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cheb</span> <span class="o">=</span> <span class="bp">True</span>
+                        <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cheb</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
                         <span class="n">line_split</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                         <span class="k">if</span> <span class="n">cheb_flag</span><span class="p">:</span>
@@ -629,10 +689,10 @@
                                 <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cheb_par</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">par</span><span class="p">))</span>
                         <span class="k">else</span><span class="p">:</span>
                             <span class="c1"># first CHEB line</span>
-                            <span class="n">cheb_flag</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="n">cheb_flag</span> <span class="o">=</span> <span class="kc">True</span>
                             <span class="c1"># Don&#39;t want Cheb reactions lumped in with</span>
                             <span class="c1"># standard falloff.</span>
-                            <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pdep</span> <span class="o">=</span> <span class="bp">False</span>
+                            <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pdep</span> <span class="o">=</span> <span class="kc">False</span>
                             <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cheb_n_temp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line_split</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
                             <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cheb_n_pres</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line_split</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
                             <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cheb_par</span> <span class="o">=</span> <span class="p">[]</span>
@@ -660,23 +720,25 @@
                         <span class="c1"># Look for pressure limits on same line:</span>
                         <span class="k">if</span> <span class="n">line_split</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;pcheb&#39;</span><span class="p">:</span>
                             <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">cheb_plim</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">line_split</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span> <span class="o">*</span> <span class="n">chem</span><span class="o">.</span><span class="n">PA</span><span class="p">,</span>
-                                                   <span class="nb">float</span><span class="p">(</span><span class="n">line_split</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span> <span class="o">*</span> <span class="n">chem</span><span class="o">.</span><span class="n">PA</span>
+                                                   <span class="nb">float</span><span class="p">(</span>
+                                                       <span class="n">line_split</span><span class="p">[</span><span class="mi">5</span><span class="p">])</span> <span class="o">*</span> <span class="n">chem</span><span class="o">.</span><span class="n">PA</span>
                                                    <span class="p">]</span>
                     <span class="k">elif</span> <span class="n">aux</span> <span class="o">==</span> <span class="s1">&#39;plo&#39;</span><span class="p">:</span>
                         <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
                         <span class="n">line_split</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
                         <span class="k">if</span> <span class="ow">not</span> <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plog</span><span class="p">:</span>
-                            <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plog</span> <span class="o">=</span> <span class="bp">True</span>
+                            <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plog</span> <span class="o">=</span> <span class="kc">True</span>
                             <span class="c1"># Don&#39;t want Plog reactions lumped in with</span>
                             <span class="c1"># standard falloff.</span>
-                            <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pdep</span> <span class="o">=</span> <span class="bp">False</span>
+                            <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pdep</span> <span class="o">=</span> <span class="kc">False</span>
                             <span class="n">reacs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">plog_par</span> <span class="o">=</span> <span class="p">[]</span>
                         <span class="n">pars</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">n</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">line_split</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">5</span><span class="p">]]</span>
 
                         <span class="c1"># Convert pressure from atm to Pa</span>
                         <span class="n">pars</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*=</span> <span class="mf">101325.0</span>
 
-                        <span class="c1"># Convert given activation energy units to internal units</span>
+                        <span class="c1"># Convert given activation energy units to internal</span>
+                        <span class="c1"># units</span>
                         <span class="n">pars</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">*=</span> <span class="n">act_energy_fact</span><span class="p">[</span><span class="n">units_E</span><span class="p">]</span>
 
                         <span class="c1"># Convert given pre-exponential units to internal units</span>
@@ -701,9 +763,9 @@
             <span class="n">n</span> <span class="o">=</span> <span class="n">reac</span><span class="o">.</span><span class="n">cheb_n_temp</span>
             <span class="n">m</span> <span class="o">=</span> <span class="n">reac</span><span class="o">.</span><span class="n">cheb_n_pres</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">reac</span><span class="o">.</span><span class="n">cheb_par</span><span class="p">)</span> <span class="o">!=</span> <span class="n">n</span> <span class="o">*</span> <span class="n">m</span><span class="p">:</span>
-                <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Error: incorrect number of CHEB coefficients in &#39;</span>
-                      <span class="s1">&#39;reaction &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
-                      <span class="p">)</span>
+                <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Incorrect number of CHEB coefficients in reaction &#39;</span>
+                              <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="n">idx</span><span class="p">))</span>
                 <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Convert units of first Chebyshev parameter</span>
@@ -713,6 +775,17 @@
 
                 <span class="n">reacs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">cheb_par</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">reac</span><span class="o">.</span><span class="n">cheb_par</span><span class="p">,</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">m</span><span class="p">))</span>
 
+    <span class="c1"># check that all species in reactions correspond to a known species</span>
+    <span class="n">spec_names</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">reac</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reacs</span><span class="p">):</span>
+        <span class="n">in_rxn</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">reac</span><span class="o">.</span><span class="n">reac</span> <span class="o">+</span> <span class="n">reac</span><span class="o">.</span><span class="n">prod</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">in_rxn</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">spec</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spec_names</span><span class="p">:</span>
+                <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Reaction </span><span class="si">{}</span><span class="s1"> contains unknown species </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">idx</span><span class="p">,</span> <span class="n">spec</span><span class="p">))</span>
+                <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+
     <span class="c1"># Split reversible reactions with explicit reverse parameters into</span>
     <span class="c1"># two irreversible reactions to match Cantera&#39;s behavior</span>
     <span class="k">for</span> <span class="n">reac</span> <span class="ow">in</span> <span class="n">reacs</span><span class="p">[:]:</span>
@@ -720,13 +793,13 @@
             <span class="n">new_reac</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">reac</span><span class="p">)</span>
 
             <span class="n">idx</span> <span class="o">=</span> <span class="n">reacs</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">reac</span><span class="p">)</span>
-            <span class="n">reacs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">rev</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">reacs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">rev</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">reacs</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span><span class="o">.</span><span class="n">rev_par</span> <span class="o">=</span> <span class="p">[]</span>
 
             <span class="n">new_reac</span><span class="o">.</span><span class="n">A</span> <span class="o">=</span> <span class="n">new_reac</span><span class="o">.</span><span class="n">rev_par</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">new_reac</span><span class="o">.</span><span class="n">b</span> <span class="o">=</span> <span class="n">new_reac</span><span class="o">.</span><span class="n">rev_par</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="n">new_reac</span><span class="o">.</span><span class="n">E</span> <span class="o">=</span> <span class="n">new_reac</span><span class="o">.</span><span class="n">rev_par</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-            <span class="n">new_reac</span><span class="o">.</span><span class="n">rev</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">new_reac</span><span class="o">.</span><span class="n">rev</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">new_reac</span><span class="o">.</span><span class="n">rev_par</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="n">new_reac</span><span class="o">.</span><span class="n">prod</span> <span class="o">=</span> <span class="n">reac</span><span class="o">.</span><span class="n">reac</span><span class="p">[:]</span>
             <span class="n">new_reac</span><span class="o">.</span><span class="n">prod_nu</span> <span class="o">=</span> <span class="n">reac</span><span class="o">.</span><span class="n">reac_nu</span><span class="p">[:]</span>
@@ -736,26 +809,37 @@
             <span class="n">reacs</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">new_reac</span><span class="p">)</span>
 
     <span class="c1"># Read seperate thermo file if present and needed</span>
-    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="ow">not</span> <span class="n">sp</span><span class="o">.</span><span class="n">mw</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">]):</span>
+    <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="ow">not</span> <span class="n">spec</span><span class="o">.</span><span class="n">mw</span> <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">]):</span>
         <span class="k">if</span> <span class="n">therm_filename</span><span class="p">:</span>
             <span class="n">read_thermo</span><span class="p">(</span><span class="n">therm_filename</span><span class="p">,</span> <span class="n">elems</span><span class="p">,</span> <span class="n">specs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Error: no thermo file specified, but species missing </span><span class="se">\n</span><span class="s1">&#39;</span>
-                  <span class="s1">&#39;data. Either specify file, or ensure complete data in</span><span class="se">\n</span><span class="s1">&#39;</span>
-                  <span class="s1">&#39;mechanism file with THERMO option.&#39;</span>
-                  <span class="p">)</span>
+            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s1">&#39;No thermo file specified, but species missing </span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="s1">&#39;data. Either specify file, or ensure complete data in</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="s1">&#39;mechanism file with THERMO option.&#39;</span><span class="p">)</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># Check for missing thermo data again</span>
-    <span class="n">missing_mw</span> <span class="o">=</span> <span class="p">[</span><span class="n">sp</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">specs</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">sp</span><span class="o">.</span><span class="n">mw</span><span class="p">]</span>
+    <span class="n">missing_mw</span> <span class="o">=</span> <span class="p">[</span><span class="n">spec</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">specs</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">spec</span><span class="o">.</span><span class="n">mw</span><span class="p">]</span>
     <span class="k">if</span> <span class="n">missing_mw</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Error: missing thermo data for &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_mw</span><span class="p">))</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Missing thermo data for &#39;</span> <span class="o">+</span> <span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">missing_mw</span><span class="p">))</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># determine reaction type enums</span>
+    <span class="k">for</span> <span class="n">reac</span> <span class="ow">in</span> <span class="n">reacs</span><span class="p">:</span>
+        <span class="n">reac</span><span class="o">.</span><span class="n">finalize</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">specs</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">sort_type</span><span class="p">:</span>
+        <span class="n">reacs</span> <span class="o">=</span> <span class="n">sort_reactions</span><span class="p">(</span><span class="n">reacs</span><span class="p">,</span> <span class="n">sort_type</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">(</span><span class="n">elems</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">reacs</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="read_thermo"><a class="viewcode-back" href="../../../src/pyjac.core.mech_interpret.html#pyjac.core.mech_interpret.read_thermo">[docs]</a><span class="k">def</span> <span class="nf">read_thermo</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">elems</span><span class="p">,</span> <span class="n">specs</span><span class="p">):</span>
+<div class="viewcode-block" id="read_thermo"><a class="viewcode-back" href="../../../src/pyjac.core.mech_interpret.html#pyjac.core.read_thermo">[docs]</a><span class="k">def</span> <span class="nf">read_thermo</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">elems</span><span class="p">,</span> <span class="n">specs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read and interpret thermodynamic database for species data.</span>
 
 <span class="sd">    Reads the thermodynamic file and returns the species thermodynamic</span>
@@ -777,42 +861,49 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="nb">file</span><span class="p">:</span>
+    <span class="c1"># choose our element names to enable comparison between Chemkin &amp; Cantera</span>
+    <span class="n">elem_name_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">e</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span> <span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">elem_wt</span><span class="p">}</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
 
         <span class="c1"># loop through intro lines</span>
-        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
             <span class="c1"># skip blank or commented lines</span>
-            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;^\s*$&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span> <span class="ow">or</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;^\s*!&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span> <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\s*$&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span> <span class="ow">or</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\s*!&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                <span class="k">continue</span>
 
             <span class="c1"># skip &#39;thermo&#39; at beginning</span>
-            <span class="k">if</span> <span class="s1">&#39;thermo&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span> <span class="k">break</span>
+            <span class="k">if</span> <span class="s1">&#39;thermo&#39;</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="k">break</span>
 
         <span class="c1"># next line either has common temperature ranges or first species</span>
-        <span class="n">last_line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
-        <span class="n">line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">last_line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">tell</span><span class="p">()</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
         <span class="n">line_split</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">line_split</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
             <span class="n">T_ranges</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">read_str_num</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># no common temperature info</span>
-            <span class="nb">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">last_line</span><span class="p">)</span>
+            <span class="n">file</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">last_line</span><span class="p">)</span>
             <span class="c1"># default</span>
 
         <span class="c1"># now start reading species thermo info</span>
-        <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
             <span class="c1"># first line of species info</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
 
             <span class="c1"># don&#39;t convert to lowercase, needs to match thermo for Chemkin</span>
 
             <span class="c1"># break if end of file</span>
-            <span class="k">if</span> <span class="n">line</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;end&#39;</span><span class="p">:</span> <span class="k">break</span>
+            <span class="k">if</span> <span class="n">line</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;end&#39;</span><span class="p">:</span>
+                <span class="k">break</span>
 
             <span class="c1"># skip blank/commented line</span>
-            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;^\s*$&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span> <span class="ow">or</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;^\s*!&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span> <span class="k">continue</span>
+            <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\s*$&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span> <span class="ow">or</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^\s*!&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">):</span>
+                <span class="k">continue</span>
 
             <span class="c1"># species name, columns 0:18</span>
             <span class="n">spec</span> <span class="o">=</span> <span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">18</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
@@ -824,15 +915,15 @@
                 <span class="n">spec</span> <span class="o">=</span> <span class="n">spec</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span> <span class="n">spec</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)]</span>
 
             <span class="c1"># now need to determine if this species is in mechanism</span>
-            <span class="k">if</span> <span class="nb">next</span><span class="p">((</span><span class="n">sp</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">specs</span> <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">spec</span><span class="p">),</span> <span class="bp">None</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">next</span><span class="p">((</span><span class="n">sp</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">specs</span> <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">spec</span><span class="p">),</span> <span class="kc">None</span><span class="p">):</span>
                 <span class="n">sp_ind</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">specs</span><span class="p">))</span>
                               <span class="k">if</span> <span class="n">specs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">spec</span>
                               <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># not in mechanism, read next three lines and continue</span>
-                <span class="n">line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-                <span class="n">line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-                <span class="n">line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
                 <span class="k">continue</span>
 
             <span class="c1"># set species to the one matched</span>
@@ -841,9 +932,9 @@
             <span class="c1"># ensure not reading the same species more than once...</span>
             <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">mw</span><span class="p">:</span>
                 <span class="c1"># already done! skip next three lines</span>
-                <span class="n">line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-                <span class="n">line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-                <span class="n">line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
                 <span class="k">continue</span>
 
             <span class="c1"># now get element composition of species, columns 24:44</span>
@@ -853,18 +944,19 @@
             <span class="k">for</span> <span class="n">e_str</span> <span class="ow">in</span> <span class="n">elem_str</span><span class="p">:</span>
                 <span class="n">e</span> <span class="o">=</span> <span class="n">e_str</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
                 <span class="c1"># skip if blank</span>
-                <span class="k">if</span> <span class="n">e</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">e</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span> <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">e</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span> <span class="ow">or</span> <span class="n">e</span> <span class="o">==</span> <span class="s1">&#39;0&#39;</span><span class="p">:</span>
+                    <span class="k">continue</span>
                 <span class="c1"># may need to convert to float first, in case of e.g. &quot;1.&quot;</span>
                 <span class="n">e_num</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">e_str</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
                 <span class="n">e_num</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">e_num</span><span class="p">)</span>
 
-                <span class="n">spec</span><span class="o">.</span><span class="n">elem</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">e</span><span class="p">,</span> <span class="n">e_num</span><span class="p">])</span>
+                <span class="n">spec</span><span class="o">.</span><span class="n">elem</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">elem_name_map</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">lower</span><span class="p">()],</span> <span class="n">e_num</span><span class="p">])</span>
 
                 <span class="c1"># calculate molecular weight</span>
                 <span class="n">spec</span><span class="o">.</span><span class="n">mw</span> <span class="o">+=</span> <span class="n">e_num</span> <span class="o">*</span> <span class="n">elem_wt</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span>
 
             <span class="c1"># temperatures for species</span>
-            <span class="n">T_spec</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">read_str_num</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">45</span><span class="p">:</span><span class="mi">73</span><span class="p">])</span>
+            <span class="n">T_spec</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">read_str_num</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">45</span><span class="p">:</span><span class="mi">74</span><span class="p">])</span>
             <span class="n">T_low</span> <span class="o">=</span> <span class="n">T_spec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="n">T_high</span> <span class="o">=</span> <span class="n">T_spec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">T_spec</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
@@ -875,7 +967,7 @@
             <span class="n">spec</span><span class="o">.</span><span class="n">Trange</span> <span class="o">=</span> <span class="p">[</span><span class="n">T_low</span><span class="p">,</span> <span class="n">T_com</span><span class="p">,</span> <span class="n">T_high</span><span class="p">]</span>
 
             <span class="c1"># second species line</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="n">coeffs</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">split_str</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">75</span><span class="p">],</span> <span class="mi">15</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">hi</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">hi</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -884,7 +976,7 @@
             <span class="n">spec</span><span class="o">.</span><span class="n">hi</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
 
             <span class="c1"># third species line</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="n">coeffs</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">split_str</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">75</span><span class="p">],</span> <span class="mi">15</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">hi</span><span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">hi</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -893,7 +985,7 @@
             <span class="n">spec</span><span class="o">.</span><span class="n">lo</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="mi">4</span><span class="p">])</span>
 
             <span class="c1"># fourth species line</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="nb">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
             <span class="n">coeffs</span> <span class="o">=</span> <span class="n">utils</span><span class="o">.</span><span class="n">split_str</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">75</span><span class="p">],</span> <span class="mi">15</span><span class="p">)</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">lo</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">lo</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
@@ -901,12 +993,13 @@
             <span class="n">spec</span><span class="o">.</span><span class="n">lo</span><span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">coeffs</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
 
             <span class="c1"># stop reading if all species in mechanism accounted for</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">next</span><span class="p">((</span><span class="n">sp</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">specs</span> <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">mw</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">),</span> <span class="bp">None</span><span class="p">):</span> <span class="k">break</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">next</span><span class="p">((</span><span class="n">sp</span> <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">specs</span> <span class="k">if</span> <span class="n">sp</span><span class="o">.</span><span class="n">mw</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">),</span> <span class="kc">None</span><span class="p">):</span>
+                <span class="k">break</span>
 
-    <span class="k">return</span> <span class="bp">None</span></div>
+    <span class="k">return</span> <span class="kc">None</span></div>
 
 
-<div class="viewcode-block" id="read_mech_ct"><a class="viewcode-back" href="../../../src/pyjac.core.mech_interpret.html#pyjac.core.mech_interpret.read_mech_ct">[docs]</a><span class="k">def</span> <span class="nf">read_mech_ct</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">gas</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+<div class="viewcode-block" id="read_mech_ct"><a class="viewcode-back" href="../../../src/pyjac.core.mech_interpret.html#pyjac.core.read_mech_ct">[docs]</a><span class="k">def</span> <span class="nf">read_mech_ct</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">gas</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sort_type</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Read and interpret Cantera-format mechanism file.</span>
 
 <span class="sd">    Parameters</span>
@@ -915,6 +1008,9 @@
 <span class="sd">        Reaction mechanism filename (e.g. &#39;mech.cti&#39;). Optional.</span>
 <span class="sd">    gas : `cantera.Solution` object</span>
 <span class="sd">        Existing Cantera Solution object to be used. Optional.</span>
+<span class="sd">    sort_type : :class:`enum_types.reaction_sorting`</span>
+<span class="sd">        If not None, sort the reactions in this mechanism according to the supplied</span>
+<span class="sd">        scheme</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -930,14 +1026,16 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">CANTERA_FLAG</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Error: Cantera not installed. Cannot interpret &#39;</span>
-              <span class="s1">&#39;Cantera-format mechanism.&#39;</span><span class="p">)</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Cantera not installed. Cannot interpret Cantera-format&#39;</span>
+                     <span class="s1">&#39; mechanism.&#39;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
         <span class="n">gas</span> <span class="o">=</span> <span class="n">ct</span><span class="o">.</span><span class="n">Solution</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">gas</span><span class="p">:</span>
-        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Error: need either filename or Cantera Solution object.&#39;</span><span class="p">)</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Need either filename or Cantera Solution object.&#39;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
     <span class="c1"># Elements</span>
@@ -945,6 +1043,9 @@
     <span class="k">for</span> <span class="n">e</span><span class="p">,</span> <span class="n">wt</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">elems</span><span class="p">,</span> <span class="n">gas</span><span class="o">.</span><span class="n">atomic_weights</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">elem_wt</span><span class="p">:</span>
             <span class="n">elem_wt</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">lower</span><span class="p">()]</span> <span class="o">=</span> <span class="n">wt</span>
+
+    <span class="c1"># choose our element names to enable comparison between Chemkin &amp; Cantera</span>
+    <span class="n">elem_name_map</span> <span class="o">=</span> <span class="p">{</span><span class="n">e</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span> <span class="n">e</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">elem_wt</span><span class="p">}</span>
 
     <span class="c1"># Species</span>
     <span class="n">specs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -958,7 +1059,7 @@
 
         <span class="c1"># Species elemental composition</span>
         <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">species</span><span class="o">.</span><span class="n">composition</span><span class="p">:</span>
-            <span class="n">spec</span><span class="o">.</span><span class="n">elem</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">e</span><span class="p">,</span> <span class="n">species</span><span class="o">.</span><span class="n">composition</span><span class="p">[</span><span class="n">e</span><span class="p">]])</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">elem</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">elem_name_map</span><span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">lower</span><span class="p">()],</span> <span class="nb">int</span><span class="p">(</span><span class="n">species</span><span class="o">.</span><span class="n">composition</span><span class="p">[</span><span class="n">e</span><span class="p">])])</span>
 
         <span class="c1"># Species thermodynamic properties</span>
         <span class="n">coeffs</span> <span class="o">=</span> <span class="n">species</span><span class="o">.</span><span class="n">thermo</span><span class="o">.</span><span class="n">coeffs</span>
@@ -969,7 +1070,8 @@
             <span class="n">spec</span><span class="o">.</span><span class="n">hi</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">8</span><span class="p">]</span>
             <span class="n">spec</span><span class="o">.</span><span class="n">lo</span> <span class="o">=</span> <span class="n">coeffs</span><span class="p">[</span><span class="mi">8</span><span class="p">:</span><span class="mi">15</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Error: unsupported thermo form for species &#39;</span> <span class="o">+</span> <span class="n">sp</span><span class="p">)</span>
+            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Unsupported thermo form for species &#39;</span> <span class="o">+</span> <span class="n">sp</span><span class="p">)</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="n">specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
@@ -979,6 +1081,37 @@
 
     <span class="c1"># Cantera internally uses joules/kmol for activation energy</span>
     <span class="n">E_fac</span> <span class="o">=</span> <span class="n">act_energy_fact</span><span class="p">[</span><span class="s1">&#39;joules/kmole&#39;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">handle_effiencies</span><span class="p">(</span><span class="n">reac</span><span class="p">,</span> <span class="n">ct_rxn</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Convert Cantera `cantera.Reaction`&#39;s third body efficienicies</span>
+<span class="sd">           to pyJac&#39;s internal format, and return updated reaction</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reac : `ReacInfo`</span>
+<span class="sd">            The pyJac reaction to update</span>
+<span class="sd">        ct_rxn : `Reaction` object</span>
+<span class="sd">            Corresponding cantera reaction to pull the third bodies from</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        updated_reac: `ReacInfo`</span>
+<span class="sd">            The updated pyjac reaction with appropriate third body efficiencies</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="c1"># See if single species acts as third body</span>
+        <span class="k">if</span> <span class="n">rxn</span><span class="o">.</span><span class="n">default_efficiency</span> <span class="o">==</span> <span class="mf">0.0</span> \
+                <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">ct_rxn</span><span class="o">.</span><span class="n">efficiencies</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="mi">1</span>\
+                <span class="ow">and</span> <span class="nb">list</span><span class="p">(</span><span class="n">ct_rxn</span><span class="o">.</span><span class="n">efficiencies</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span>\
+                <span class="ow">and</span> <span class="n">reac</span><span class="o">.</span><span class="n">pdep</span><span class="p">:</span>
+            <span class="n">reac</span><span class="o">.</span><span class="n">pdep_sp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">efficiencies</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">gas</span><span class="o">.</span><span class="n">species_names</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">ct_rxn</span><span class="o">.</span><span class="n">efficiencies</span><span class="p">:</span>
+                    <span class="n">reac</span><span class="o">.</span><span class="n">thd_body_eff</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">sp</span><span class="p">,</span> <span class="n">ct_rxn</span><span class="o">.</span><span class="n">efficiencies</span><span class="p">[</span><span class="n">sp</span><span class="p">]])</span>
+                <span class="k">elif</span> <span class="n">ct_rxn</span><span class="o">.</span><span class="n">default_efficiency</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+                    <span class="n">reac</span><span class="o">.</span><span class="n">thd_body_eff</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">sp</span><span class="p">,</span> <span class="n">ct_rxn</span><span class="o">.</span><span class="n">default_efficiency</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">reac</span>
 
     <span class="k">for</span> <span class="n">rxn</span> <span class="ow">in</span> <span class="n">gas</span><span class="o">.</span><span class="n">reactions</span><span class="p">():</span>
 
@@ -993,14 +1126,11 @@
                                  <span class="n">rxn</span><span class="o">.</span><span class="n">rate</span><span class="o">.</span><span class="n">temperature_exponent</span><span class="p">,</span>
                                  <span class="n">rxn</span><span class="o">.</span><span class="n">rate</span><span class="o">.</span><span class="n">activation_energy</span> <span class="o">*</span> <span class="n">E_fac</span>
                                  <span class="p">)</span>
-            <span class="n">reac</span><span class="o">.</span><span class="n">thd_body</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="k">for</span> <span class="n">thd_body</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">efficiencies</span><span class="p">:</span>
-                <span class="n">reac</span><span class="o">.</span><span class="n">thd_body_eff</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">thd_body</span><span class="p">,</span>
-                                          <span class="n">rxn</span><span class="o">.</span><span class="n">efficiencies</span><span class="p">[</span><span class="n">thd_body</span><span class="p">]</span>
-                                          <span class="p">])</span>
+            <span class="n">reac</span><span class="o">.</span><span class="n">thd_body</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">reac</span> <span class="o">=</span> <span class="n">handle_effiencies</span><span class="p">(</span><span class="n">reac</span><span class="p">,</span> <span class="n">rxn</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">ct</span><span class="o">.</span><span class="n">FalloffReaction</span><span class="p">)</span> <span class="ow">and</span> \
-             <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">ct</span><span class="o">.</span><span class="n">ChemicallyActivatedReaction</span><span class="p">):</span>
+                <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">ct</span><span class="o">.</span><span class="n">ChemicallyActivatedReaction</span><span class="p">):</span>
             <span class="n">reac</span> <span class="o">=</span> <span class="n">chem</span><span class="o">.</span><span class="n">ReacInfo</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">reversible</span><span class="p">,</span>
                                  <span class="nb">list</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span><span class="o">.</span><span class="n">keys</span><span class="p">()),</span>
                                  <span class="nb">list</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">reactants</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
@@ -1010,13 +1140,8 @@
                                  <span class="n">rxn</span><span class="o">.</span><span class="n">high_rate</span><span class="o">.</span><span class="n">temperature_exponent</span><span class="p">,</span>
                                  <span class="n">rxn</span><span class="o">.</span><span class="n">high_rate</span><span class="o">.</span><span class="n">activation_energy</span> <span class="o">*</span> <span class="n">E_fac</span>
                                  <span class="p">)</span>
-            <span class="n">reac</span><span class="o">.</span><span class="n">pdep</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="c1"># See if single species acts as third body</span>
-            <span class="k">if</span> <span class="n">rxn</span><span class="o">.</span><span class="n">default_efficiency</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
-                <span class="n">reac</span><span class="o">.</span><span class="n">pdep_sp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">efficiencies</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">efficiencies</span><span class="p">:</span>
-                    <span class="n">reac</span><span class="o">.</span><span class="n">thd_body_eff</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">sp</span><span class="p">,</span> <span class="n">rxn</span><span class="o">.</span><span class="n">efficiencies</span><span class="p">[</span><span class="n">sp</span><span class="p">]])</span>
+            <span class="n">reac</span><span class="o">.</span><span class="n">pdep</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">reac</span> <span class="o">=</span> <span class="n">handle_effiencies</span><span class="p">(</span><span class="n">reac</span><span class="p">,</span> <span class="n">rxn</span><span class="p">)</span>
 
             <span class="n">reac</span><span class="o">.</span><span class="n">low</span> <span class="o">=</span> <span class="p">[</span><span class="n">rxn</span><span class="o">.</span><span class="n">low_rate</span><span class="o">.</span><span class="n">pre_exponential_factor</span><span class="p">,</span>
                         <span class="n">rxn</span><span class="o">.</span><span class="n">low_rate</span><span class="o">.</span><span class="n">temperature_exponent</span><span class="p">,</span>
@@ -1024,10 +1149,21 @@
                         <span class="p">]</span>
 
             <span class="k">if</span> <span class="n">rxn</span><span class="o">.</span><span class="n">falloff</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;Troe&#39;</span><span class="p">:</span>
-                <span class="n">reac</span><span class="o">.</span><span class="n">troe</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">reac</span><span class="o">.</span><span class="n">troe</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">reac</span><span class="o">.</span><span class="n">troe_par</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">falloff</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">do_warn</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="n">reac</span><span class="o">.</span><span class="n">troe_par</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">reac</span><span class="o">.</span><span class="n">troe_par</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-30</span>
+                    <span class="n">do_warn</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">reac</span><span class="o">.</span><span class="n">troe_par</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">reac</span><span class="o">.</span><span class="n">troe_par</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-30</span>
+                    <span class="n">do_warn</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">do_warn</span><span class="p">:</span>
+                    <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Troe parameters in reaction </span><span class="si">{}</span><span class="s1"> modified to avoid&#39;</span>
+                                <span class="s1">&#39; division by zero!.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">reacs</span><span class="p">)))</span>
             <span class="k">elif</span> <span class="n">rxn</span><span class="o">.</span><span class="n">falloff</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;SRI&#39;</span><span class="p">:</span>
-                <span class="n">reac</span><span class="o">.</span><span class="n">sri</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">reac</span><span class="o">.</span><span class="n">sri</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">reac</span><span class="o">.</span><span class="n">sri_par</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">falloff</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">ct</span><span class="o">.</span><span class="n">ChemicallyActivatedReaction</span><span class="p">):</span>
@@ -1040,13 +1176,8 @@
                                  <span class="n">rxn</span><span class="o">.</span><span class="n">low_rate</span><span class="o">.</span><span class="n">temperature_exponent</span><span class="p">,</span>
                                  <span class="n">rxn</span><span class="o">.</span><span class="n">low_rate</span><span class="o">.</span><span class="n">activation_energy</span> <span class="o">*</span> <span class="n">E_fac</span>
                                  <span class="p">)</span>
-            <span class="n">reac</span><span class="o">.</span><span class="n">pdep</span> <span class="o">=</span> <span class="bp">True</span>
-            <span class="c1"># See if single species acts as third body</span>
-            <span class="k">if</span> <span class="n">rxn</span><span class="o">.</span><span class="n">default_efficiency</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
-                <span class="n">reac</span><span class="o">.</span><span class="n">pdep_sp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">efficiencies</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">sp</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">efficiencies</span><span class="p">:</span>
-                    <span class="n">reac</span><span class="o">.</span><span class="n">thd_body_eff</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">sp</span><span class="p">,</span> <span class="n">rxn</span><span class="o">.</span><span class="n">efficiencies</span><span class="p">[</span><span class="n">sp</span><span class="p">]])</span>
+            <span class="n">reac</span><span class="o">.</span><span class="n">pdep</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="n">reac</span> <span class="o">=</span> <span class="n">handle_effiencies</span><span class="p">(</span><span class="n">reac</span><span class="p">,</span> <span class="n">rxn</span><span class="p">)</span>
 
             <span class="n">reac</span><span class="o">.</span><span class="n">high</span> <span class="o">=</span> <span class="p">[</span><span class="n">rxn</span><span class="o">.</span><span class="n">high_rate</span><span class="o">.</span><span class="n">pre_exponential_factor</span><span class="p">,</span>
                          <span class="n">rxn</span><span class="o">.</span><span class="n">high_rate</span><span class="o">.</span><span class="n">temperature_exponent</span><span class="p">,</span>
@@ -1054,10 +1185,20 @@
                          <span class="p">]</span>
 
             <span class="k">if</span> <span class="n">rxn</span><span class="o">.</span><span class="n">falloff</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;Troe&#39;</span><span class="p">:</span>
-                <span class="n">reac</span><span class="o">.</span><span class="n">troe</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">reac</span><span class="o">.</span><span class="n">troe</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">reac</span><span class="o">.</span><span class="n">troe_par</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">falloff</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="n">do_warn</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="k">if</span> <span class="n">reac</span><span class="o">.</span><span class="n">troe_par</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">reac</span><span class="o">.</span><span class="n">troe_par</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-30</span>
+                    <span class="n">do_warn</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">reac</span><span class="o">.</span><span class="n">troe_par</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">reac</span><span class="o">.</span><span class="n">troe_par</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1e-30</span>
+                    <span class="n">do_warn</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="k">if</span> <span class="n">do_warn</span><span class="p">:</span>
+                    <span class="n">logging</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Troe parameters in reaction </span><span class="si">{}</span><span class="s1"> modified to avoid&#39;</span>
+                                    <span class="s1">&#39; division by zero!.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">reacs</span><span class="p">)))</span>
             <span class="k">elif</span> <span class="n">rxn</span><span class="o">.</span><span class="n">falloff</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s1">&#39;SRI&#39;</span><span class="p">:</span>
-                <span class="n">reac</span><span class="o">.</span><span class="n">sri</span> <span class="o">=</span> <span class="bp">True</span>
+                <span class="n">reac</span><span class="o">.</span><span class="n">sri</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="n">reac</span><span class="o">.</span><span class="n">sri_par</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">falloff</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
 
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rxn</span><span class="p">,</span> <span class="n">ct</span><span class="o">.</span><span class="n">PlogReaction</span><span class="p">):</span>
@@ -1068,7 +1209,7 @@
                                  <span class="nb">list</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
                                  <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
                                  <span class="p">)</span>
-            <span class="n">reac</span><span class="o">.</span><span class="n">plog</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">reac</span><span class="o">.</span><span class="n">plog</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">reac</span><span class="o">.</span><span class="n">plog_par</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">rate</span> <span class="ow">in</span> <span class="n">rxn</span><span class="o">.</span><span class="n">rates</span><span class="p">:</span>
                 <span class="n">pars</span> <span class="o">=</span> <span class="p">[</span><span class="n">rate</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">rate</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">pre_exponential_factor</span><span class="p">,</span>
@@ -1085,7 +1226,7 @@
                                  <span class="nb">list</span><span class="p">(</span><span class="n">rxn</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">values</span><span class="p">()),</span>
                                  <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span>
                                  <span class="p">)</span>
-            <span class="n">reac</span><span class="o">.</span><span class="n">cheb</span> <span class="o">=</span> <span class="bp">True</span>
+            <span class="n">reac</span><span class="o">.</span><span class="n">cheb</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">reac</span><span class="o">.</span><span class="n">cheb_n_temp</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">nTemperature</span>
             <span class="n">reac</span><span class="o">.</span><span class="n">cheb_n_pres</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">nPressure</span>
             <span class="n">reac</span><span class="o">.</span><span class="n">cheb_plim</span> <span class="o">=</span> <span class="p">[</span><span class="n">rxn</span><span class="o">.</span><span class="n">Pmin</span><span class="p">,</span> <span class="n">rxn</span><span class="o">.</span><span class="n">Pmax</span><span class="p">]</span>
@@ -1110,7 +1251,8 @@
                                  <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">print</span><span class="p">(</span><span class="s1">&#39;Error: unsupported reaction.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Unsupported reaction.&#39;</span><span class="p">)</span>
             <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
 
         <span class="n">reac</span><span class="o">.</span><span class="n">dup</span> <span class="o">=</span> <span class="n">rxn</span><span class="o">.</span><span class="n">duplicate</span>
@@ -1118,6 +1260,15 @@
         <span class="c1"># No reverse reactions with explicit coefficients in Cantera.</span>
 
         <span class="n">reacs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reac</span><span class="p">)</span>
+
+    <span class="c1"># determine reaction type enums</span>
+    <span class="k">for</span> <span class="n">reac</span> <span class="ow">in</span> <span class="n">reacs</span><span class="p">:</span>
+        <span class="n">reac</span><span class="o">.</span><span class="n">finalize</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">specs</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">spec</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">:</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
+
+    <span class="k">if</span> <span class="n">sort_type</span><span class="p">:</span>
+        <span class="n">reacs</span> <span class="o">=</span> <span class="n">sort_reactions</span><span class="p">(</span><span class="n">reacs</span><span class="p">,</span> <span class="n">sort_type</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="p">(</span><span class="n">elems</span><span class="p">,</span> <span class="n">specs</span><span class="p">,</span> <span class="n">reacs</span><span class="p">)</span></div>
 </pre></div>
@@ -1148,6 +1299,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faqs.html">Frequently asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../installing.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../src/index.html">pyJac API</a></li>
@@ -1156,12 +1308,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -1169,11 +1323,11 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2016, Kyle Niemeyer, Nicholas Curtis.
+      &copy;2018, Nicholas Curtis, Kyle Niemeyer.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
     </div>
 

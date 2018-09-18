@@ -1,37 +1,28 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pyjac.core.rate_subs module &mdash; pyJac 1.0.0 documentation</title>
-    
+    <title>pyjac.core.rate_subs module &#8212; pyJac 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '1.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-    <link rel="top" title="pyJac 1.0.0 documentation" href="../index.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
+  
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
+  </head><body>
   
 
     <div class="document">
@@ -45,107 +36,106 @@
 <p>This is kept separate from Jacobian creation module in order
 to create only the rate subroutines if desired.</p>
 <dl class="function">
-<dt id="pyjac.core.rate_subs.rxn_rate_const">
-<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">rxn_rate_const</code><span class="sig-paren">(</span><em>A</em>, <em>b</em>, <em>E</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#rxn_rate_const"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.rxn_rate_const" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns line with reaction rate calculation (after = sign).</p>
+<dt id="pyjac.core.rate_subs.inputs_and_outputs">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">inputs_and_outputs</code><span class="sig-paren">(</span><em>conp</em>, <em>ktype=&lt;KernelType.species_rates: (2</em>, <em>)&gt;</em>, <em>output_full_rop=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#inputs_and_outputs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.inputs_and_outputs" title="Permalink to this definition">¶</a></dt>
+<dd><p>A convenience method such that kernel inputs / output argument names are
+available for inspection</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>A</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Arrhenius pre-exponential coefficient</li>
-<li><strong>b</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Arrhenius temperature exponent</li>
-<li><strong>E</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><em>float</em></a>) &#8211; Arrhenius activation energy</li>
+<li><strong>conp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, use constant-pressure formulation, else constant-volume</li>
+<li><strong>ktype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">KernelType</span></code>) – The kernel type to return the arguments for – if unspecified, defaults to
+species rates</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>line</strong> &#8211; String with expression for reaction rate.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>input_args</strong> (<em>list of str</em>) – The input arguments to kernels generated in this file</li>
+<li><strong>output_args</strong> (<em>list of str</em>) – The output arguments to kernels generated in this file</li>
+</ul>
+</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)">str</a></p>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.assign_rates">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">assign_rates</code><span class="sig-paren">(</span><em>reacs</em>, <em>specs</em>, <em>rate_spec</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#assign_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.assign_rates" title="Permalink to this definition">¶</a></dt>
+<dd><p>From a given set of reactions, determine the rate types for evaluation</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>reacs</strong> (list of <code class="xref any docutils literal notranslate"><span class="pre">ReacInfo</span></code>) – The reactions in the mechanism</li>
+<li><strong>specs</strong> (list of <code class="xref any docutils literal notranslate"><span class="pre">SpecInfo</span></code>) – The species in the mechanism</li>
+<li><strong>rate_spec</strong> (<code class="xref any docutils literal notranslate"><span class="pre">RateSpecialization</span></code> enum) – The specialization option specified</li>
+</ul>
 </td>
 </tr>
 </tbody>
 </table>
 <p class="rubric">Notes</p>
-<p>Form of the reaction rate constant (from, e.g., Lu and Law <a class="footnote-reference" href="#id2" id="id1">[1]</a>):</p>
-<div class="math">
-\[k_f = \begin{cases}
-A &amp; \text{if } \beta = 0 \text{ and } T_a = 0 \\
-\exp \left( \log A + \beta \log T \right) &amp;
-\text{if } \beta \neq 0 \text{ and } \text{if } T_a = 0 \\
-\exp \left( \log A + \beta \log T - T_a / T \right)     &amp;
-\text{if } \beta \neq 0 \text{ and } T_a \neq 0 \\
-\exp \left( \log A - T_a / T \right)
-&amp; \text{if } \beta = 0 \text{ and } T_a \neq 0 \\
-A \prod^b T     &amp; \text{if } T_a = 0 \text{ and }
-b \in \mathbb{Z} \text{ (integers) }
-\end{cases}\]</div><p class="rubric">References</p>
-<table class="docutils footnote" frame="void" id="id2" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label"><a class="fn-backref" href="#id1">[1]</a></td><td>TF Lu and CK Law, &#8220;Toward accommodating realistic fuel chemistry
-in large-scale computations,&#8221; Progress in Energy and Combustion
-Science, vol. 35, pp. 192-215, 2009. doi:10.1016/j.pecs.2008.10.002</td></tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyjac.core.rate_subs.get_cheb_rate">
-<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_cheb_rate</code><span class="sig-paren">(</span><em>lang</em>, <em>rxn</em>, <em>write_defns=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_cheb_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_cheb_rate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a reaction, and a temperature and pressure, this routine
-will generate code to evaluate the Chebyshev rate efficiently.</p>
-<div class="admonition note">
-<p class="first admonition-title">Note</p>
-<p class="last">Assumes existence of variables dot_prod* of sized at least rxn.cheb_n_temp
-Pred and Tred, T and pres, and kf, cheb_temp_0 and cheb_temp_1.</p>
-</div>
+<p>For simple Arrhenius evaluations, the rate type keys are:</p>
+<dl class="docutils">
+<dt>if rate_spec == RateSpecialization.full</dt>
+<dd>0 -&gt; kf = A
+1 -&gt; kf = A * T * T * T …
+2 -&gt; kf = exp(logA + b * logT)
+3 -&gt; kf = exp(logA - Ta / T)
+4 -&gt; kf = exp(logA + b * logT - Ta / T)</dd>
+<dt>if rate_spec = RateSpecialization.hybrid</dt>
+<dd>0 -&gt; kf = A
+1 -&gt; kf = A * T * T * T …
+2 -&gt; kf = exp(logA + b * logT - Ta / T)</dd>
+<dt>if rate_spec == RateSpecialization.fixed</dt>
+<dd>0 -&gt; kf = exp(logA + b * logT - Ta / T)</dd>
+<dt>Note that the reactions in ‘fall’, ‘chem’ and ‘thd’ are also in</dt>
+<dd><blockquote class="first">
+<div>‘simple’</div></blockquote>
+<p class="last">Further, there are duplicates between ‘thd’ and ‘fall’ / ‘chem’</p>
+</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lang</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Programming language</li>
-<li><strong>rxn</strong> (<a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.ReacInfo" title="pyjac.core.chem_utilities.ReacInfo"><code class="xref any py py-class docutils literal"><span class="pre">ReacInfo</span></code></a>) &#8211; Reaction with Chebyshev pressure dependence.</li>
-<li><strong>write_defns</strong> (<em>bool, optional</em>) &#8211; If <code class="docutils literal"><span class="pre">True</span></code> (default), write calculation of <code class="docutils literal"><span class="pre">Tred</span></code> and <code class="docutils literal"><span class="pre">Pred</span></code>.</li>
-</ul>
-</td>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>rate_info</strong> – Keys are ‘simple’, ‘plog’, ‘cheb’, ‘fall’, ‘chem’, ‘thd’
+Values are further dictionaries including addtional rate info, number,
+offset, maps, etc.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>line</strong> &#8211; Line with evaluation of Chebyshev reaction rate.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><code class="xref any docutils literal"><span class="pre">str</span></code></a></p>
-</td>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">dict of parameters</td>
 </tr>
 </tbody>
 </table>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyjac.core.rate_subs.write_rxn_rates">
-<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">write_rxn_rates</code><span class="sig-paren">(</span><em>path</em>, <em>lang</em>, <em>specs</em>, <em>reacs</em>, <em>fwd_rxn_mapping</em>, <em>smm=None</em>, <em>auto_diff=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#write_rxn_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.write_rxn_rates" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write reaction rate subroutine.</p>
-<p>Includes conditionals for reversible reactions.</p>
+<dt id="pyjac.core.rate_subs.reset_arrays">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">reset_arrays</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#reset_arrays"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.reset_arrays" title="Permalink to this definition">¶</a></dt>
+<dd><p>Resets the dphi and wdot arrays for use in the rate evaluations</p>
+<p>kernel</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Path to build directory for file.</li>
-<li><strong>lang</strong> (<em>{'c', 'cuda', 'fortran', 'matlab'}</em>) &#8211; Programming language.</li>
-<li><strong>specs</strong> (list of <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.SpecInfo" title="pyjac.core.chem_utilities.SpecInfo"><code class="xref any py py-class docutils literal"><span class="pre">SpecInfo</span></code></a>) &#8211; List of species in the mechanism.</li>
-<li><strong>reacs</strong> (list of <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.ReacInfo" title="pyjac.core.chem_utilities.ReacInfo"><code class="xref any py py-class docutils literal"><span class="pre">ReacInfo</span></code></a>) &#8211; List of reactions in the mechanism.</li>
-<li><strong>fwd_rxn_mapping</strong> (<em>List of integers</em>) &#8211; The index of the reaction in the original mechanism</li>
-<li><strong>smm</strong> (<a class="reference internal" href="pyjac.core.shared_memory.html#pyjac.core.shared_memory.shared_memory_manager" title="pyjac.core.shared_memory.shared_memory_manager"><code class="xref any py py-class docutils literal"><span class="pre">shared_memory_manager</span></code></a>, optional) &#8211; If not <code class="docutils literal"><span class="pre">None</span></code> (default), <a class="reference internal" href="pyjac.core.shared_memory.html#pyjac.core.shared_memory.shared_memory_manager" title="pyjac.core.shared_memory.shared_memory_manager"><code class="xref any py py-class docutils literal"><span class="pre">shared_memory_manager</span></code></a> for CUDA optimizations</li>
-<li><strong>auto_diff</strong> (<em>Optional[bool]</em>) &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, generate files for Adept autodifferention library.</li>
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator for both
+equation types</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.None" title="pyjac.core.chem_utilities.None">None</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -153,28 +143,30 @@ Pred and Tred, T and pres, and kf, cheb_temp_0 and cheb_temp_1.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyjac.core.rate_subs.write_rxn_pressure_mod">
-<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">write_rxn_pressure_mod</code><span class="sig-paren">(</span><em>path</em>, <em>lang</em>, <em>specs</em>, <em>reacs</em>, <em>fwd_rxn_mapping</em>, <em>smm=None</em>, <em>auto_diff=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#write_rxn_pressure_mod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.write_rxn_pressure_mod" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write subroutine to for reaction pressure dependence modifications.</p>
+<dt id="pyjac.core.rate_subs.get_concentrations">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_concentrations</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>conp=True</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_concentrations"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_concentrations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determines concentrations from moles and state variables depending
+on constant pressure vs constant volue assumption</p>
+<p>kernel</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Path to build directory for file.</li>
-<li><strong>lang</strong> (<em>{'c', 'cuda', 'fortran', 'matlab'}</em>) &#8211; Language type.</li>
-<li><strong>specs</strong> (list of <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.SpecInfo" title="pyjac.core.chem_utilities.SpecInfo"><code class="xref any py py-class docutils literal"><span class="pre">SpecInfo</span></code></a>) &#8211; List of species in mechanism.</li>
-<li><strong>reacs</strong> (list of <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.ReacInfo" title="pyjac.core.chem_utilities.ReacInfo"><code class="xref any py py-class docutils literal"><span class="pre">ReacInfo</span></code></a>) &#8211; List of reactions in mechanism.</li>
-<li><strong>fwd_rxn_mapping</strong> (<em>List of int</em>) &#8211; The order of the reaction in the original mechanism</li>
-<li><strong>smm</strong> (<a class="reference internal" href="pyjac.core.shared_memory.html#pyjac.core.shared_memory.shared_memory_manager" title="pyjac.core.shared_memory.shared_memory_manager"><code class="xref any py py-class docutils literal"><span class="pre">shared_memory_manager</span></code></a>, optional) &#8211; If not <code class="docutils literal"><span class="pre">`None`</span></code>, <a class="reference internal" href="pyjac.core.shared_memory.html#pyjac.core.shared_memory.shared_memory_manager" title="pyjac.core.shared_memory.shared_memory_manager"><code class="xref any py py-class docutils literal"><span class="pre">shared_memory_manager</span></code></a> to use for CUDA optimizations</li>
-<li><strong>auto_diff</strong> (<em>bool, optional</em>) &#8211; If <code class="docutils literal"><span class="pre">`True`</span></code>, generate files for Adept autodifferention library.</li>
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>conp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, generate equations using constant pressure assumption
+If false, use constant volume equations</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator for both
+equation types</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.None" title="pyjac.core.chem_utilities.None">None</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -182,29 +174,540 @@ Pred and Tred, T and pres, and kf, cheb_temp_0 and cheb_temp_1.</p>
 </dd></dl>
 
 <dl class="function">
-<dt id="pyjac.core.rate_subs.write_spec_rates">
-<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">write_spec_rates</code><span class="sig-paren">(</span><em>path</em>, <em>lang</em>, <em>specs</em>, <em>reacs</em>, <em>fwd_spec_mapping</em>, <em>fwd_rxn_mapping</em>, <em>smm=None</em>, <em>auto_diff=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#write_spec_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.write_spec_rates" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write subroutine to evaluate species rates of production.</p>
+<dt id="pyjac.core.rate_subs.get_molar_rates">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_molar_rates</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>conp=True</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_molar_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_molar_rates" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Generates instructions, kernel arguements, and data for the</dt>
+<dd>molar derivatives</dd>
+</dl>
+<p>kernel</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Path to build directory for file.</li>
-<li><strong>lang</strong> (<em>{'c', 'cuda', 'fortran', 'matlab'}</em>) &#8211; Programming language.</li>
-<li><strong>specs</strong> (list of <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.SpecInfo" title="pyjac.core.chem_utilities.SpecInfo"><code class="xref any py py-class docutils literal"><span class="pre">SpecInfo</span></code></a>) &#8211; List of species in mechanism.</li>
-<li><strong>reacs</strong> (list of <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.ReacInfo" title="pyjac.core.chem_utilities.ReacInfo"><code class="xref any py py-class docutils literal"><span class="pre">ReacInfo</span></code></a>) &#8211; List of reactions in mechanism.</li>
-<li><strong>fwd_spec_mapping</strong> (<em>list of int</em>) &#8211; the index of the species in the original mechanism</li>
-<li><strong>fwd_rxn_mapping</strong> (<em>list of int</em>) &#8211; the index of the reactions in the original mechanism</li>
-<li><strong>smm</strong> (<em>shared_memory_manager, optional</em>) &#8211; If not <code class="docutils literal"><span class="pre">`None`</span></code>, <a class="reference internal" href="pyjac.core.shared_memory.html#pyjac.core.shared_memory.shared_memory_manager" title="pyjac.core.shared_memory.shared_memory_manager"><code class="xref any py py-class docutils literal"><span class="pre">shared_memory_manager</span></code></a> to use for CUDA optimizations</li>
-<li><strong>auto_diff</strong> (<em>bool, optional</em>) &#8211; If <code class="docutils literal"><span class="pre">`True`</span></code>, generate files for Adept autodifferention library.</li>
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>conp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, generate equations using constant pressure assumption
+If false, use constant volume equations</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>seen</strong></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator for both
+equation types</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><code class="xref any docutils literal"><span class="pre">bool</span></code></a>, <code class="docutils literal"><span class="pre">True</span></code> if species rate i is not identically zero</p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_extra_var_rates">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_extra_var_rates</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>conp=True</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_extra_var_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_extra_var_rates" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Generates instructions, kernel arguements, and data for the</dt>
+<dd>derivative of the “extra” variable – P or V depending on conV/conP
+assumption respectively</dd>
+</dl>
+<p>kernel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>conp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, generate equations using constant pressure assumption
+If false, use constant volume equations</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator for both
+equation types</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_temperature_rate">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_temperature_rate</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>conp=True</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_temperature_rate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_temperature_rate" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Generates instructions, kernel arguements, and data for the</dt>
+<dd>temperature derivative</dd>
+</dl>
+<p>kernel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>conp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, generate equations using constant pressure assumption
+If false, use constant volume equations</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator for both
+equation types</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_spec_rates">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_spec_rates</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>conp=True</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_spec_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_spec_rates" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Generates instructions, kernel arguements, and data for the</dt>
+<dd>temperature derivative</dd>
+</dl>
+<p>kernel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>conp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, generate equations using constant pressure assumption
+If false, use constant volume equations</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator for both
+equation types</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_rop_net">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_rop_net</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_rop_net"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_rop_net" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates instructions, kernel arguements, and data for the net
+Rate of Progress kernels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_rop">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_rop</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>allint={'net': False}</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_rop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_rop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates instructions, kernel arguements, and data for the Rate of Progress
+kernels</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>allint</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – If allint[‘net’] is True, powers of concentrations
+will be evaluated using multiplications</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_rxn_pres_mod">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_rxn_pres_mod</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_rxn_pres_mod"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_rxn_pres_mod" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates instructions, kernel arguements, and data for pressure
+modification term of the forward reaction rates.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_rev_rates">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_rev_rates</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>allint</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_rev_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_rev_rates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates instructions, kernel arguements, and data for reverse reaction
+rates</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>allint</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Contains keys ‘fwd’, ‘rev’ and ‘net’, with booleans corresponding to
+whether all nu values for that direction are integers.
+If True, powers of concentrations will be evaluated using
+multiplications</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_thd_body_concs">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_thd_body_concs</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_thd_body_concs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_thd_body_concs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates instructions, kernel arguements, and data for third body
+concentrations</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_cheb_arrhenius_rates">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_cheb_arrhenius_rates</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>maxP</em>, <em>maxT</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_cheb_arrhenius_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_cheb_arrhenius_rates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates instructions, kernel arguements, and data for cheb rate constants</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>maxP</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The maximum degree of pressure polynomials for chebyshev reactions in
+this mechanism</li>
+<li><strong>maxT</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The maximum degree of temperature polynomials for chebyshev reactions
+in this mechanism</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_plog_arrhenius_rates">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_plog_arrhenius_rates</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>maxP</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_plog_arrhenius_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_plog_arrhenius_rates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates instructions, kernel arguements, and data for p-log rate constants</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>maxP</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The maximum number of pressure interpolations of any reaction in
+the mechanism.</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_reduced_pressure_kernel">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_reduced_pressure_kernel</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_reduced_pressure_kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_reduced_pressure_kernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates instructions, kernel arguements, and data for the reduced
+pressure evaluation kernel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_troe_kernel">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_troe_kernel</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_troe_kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_troe_kernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates instructions, kernel arguements, and data for the Troe
+falloff evaluation kernel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_sri_kernel">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_sri_kernel</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_sri_kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_sri_kernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates instructions, kernel arguements, and data for the SRI
+falloff evaluation kernel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_lind_kernel">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_lind_kernel</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_lind_kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_lind_kernel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates instructions, kernel arguements, and data for the Lindeman
+falloff evaluation kernel</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_simple_arrhenius_rates">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_simple_arrhenius_rates</code><span class="sig-paren">(</span><em>loopy_opts</em>, <em>namestore</em>, <em>test_size=None</em>, <em>falloff=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_simple_arrhenius_rates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_simple_arrhenius_rates" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generates instructions, kernel arguements, and data for specialized forms
+of simple (non-pressure dependent) rate constants</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not none, this kernel is being used for testing.
+Hence we need to size the arrays accordingly</li>
+<li><strong>falloff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, generate rate kernel for the falloff rates, i.e. either
+k0 or kinf depending on whether the reaction is falloff or chemically
+activated</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl_list</strong> – The generated infos for feeding into the kernel generator</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <code class="xref py py-class docutils literal notranslate"><span class="pre">knl_info</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.get_specrates_kernel">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">get_specrates_kernel</code><span class="sig-paren">(</span><em>reacs</em>, <em>specs</em>, <em>loopy_opts</em>, <em>conp=True</em>, <em>test_size=None</em>, <em>auto_diff=False</em>, <em>output_full_rop=False</em>, <em>mem_limits=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#get_specrates_kernel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.get_specrates_kernel" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Helper function that generates kernels for</dt>
+<dd>evaluation of reaction rates / rate constants / and species rates</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>reacs</strong> (list of <code class="xref py py-class docutils literal notranslate"><span class="pre">ReacInfo</span></code>) – List of species in the mechanism.</li>
+<li><strong>specs</strong> (list of <code class="xref py py-class docutils literal notranslate"><span class="pre">SpecInfo</span></code>) – List of species in the mechanism.</li>
+<li><strong>loopy_opts</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>conp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, generate equations using constant pressure assumption
+If false, use constant volume equations</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not None, this kernel is being used for testing.</li>
+<li><strong>auto_diff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, generate files for Adept autodifferention library.</li>
+<li><strong>output_full_rop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, output forward and reversse rates of progress
+Useful in testing, as there are serious floating point errors for
+net production rates near equilibrium, invalidating direct comparison to
+Cantera</li>
+<li><strong>mem_limits</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> [</em><em>''</em><em>]</em>) – Path to a .yaml file indicating desired memory limits that control the
+desired maximum amount of global / local / or constant memory that
+the generated pyjac code may allocate.  Useful for testing, or otherwise
+limiting memory usage during runtime. The keys of this file are the
+members of <code class="xref py py-class docutils literal notranslate"><span class="pre">pyjac.kernel_utils.memory_limits.mem_type</span></code></li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Arguements for the construction of the <code class="xref py py-class docutils literal notranslate"><span class="pre">kernel_generator</span></code></li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>kernel_gen</strong> – The generator responsible for creating the resulting code</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">kernel_generator</span></code></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.core.rate_subs.polyfit_kernel_gen">
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">polyfit_kernel_gen</code><span class="sig-paren">(</span><em>nicename</em>, <em>loopy_opts</em>, <em>namestore</em>, <em>test_size=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#polyfit_kernel_gen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.polyfit_kernel_gen" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Helper function that generates kernels for</dt>
+<dd>evaluation of various thermodynamic species properties</dd>
+</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>nicename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The variable name to use in generated code</li>
+<li><strong>loopy_opts</strong> (<code class="xref any docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>namestore</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">array_creator.NameStore</span></code>) – The namestore / creator for this method</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not None, this kernel is being used for testing.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>knl</strong> – The generated loopy kernel for code generation / testing</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">loopy.LoopKernel</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -213,80 +716,36 @@ Pred and Tred, T and pres, and kf, cheb_temp_0 and cheb_temp_1.</p>
 
 <dl class="function">
 <dt id="pyjac.core.rate_subs.write_chem_utils">
-<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">write_chem_utils</code><span class="sig-paren">(</span><em>path</em>, <em>lang</em>, <em>specs</em>, <em>auto_diff</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#write_chem_utils"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.write_chem_utils" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write subroutine to evaluate species thermodynamic properties.</p>
-<p class="rubric">Notes</p>
-<p>Thermodynamic properties include:  enthalpy, energy, specific heat
-(constant pressure and volume).</p>
+<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">write_chem_utils</code><span class="sig-paren">(</span><em>reacs</em>, <em>specs</em>, <em>loopy_opts</em>, <em>conp=True</em>, <em>test_size=None</em>, <em>auto_diff=False</em>, <em>mem_limits=''</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#write_chem_utils"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.write_chem_utils" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Helper function that generates kernels for</dt>
+<dd>evaluation of species thermodynamic quantities</dd>
+</dl>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Path to build directory for file.</li>
-<li><strong>lang</strong> (<em>{'c', 'cuda', 'fortran', 'matlab'}</em>) &#8211; Programming language.</li>
-<li><strong>specs</strong> (list of <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.SpecInfo" title="pyjac.core.chem_utilities.SpecInfo"><code class="xref any py py-class docutils literal"><span class="pre">SpecInfo</span></code></a>) &#8211; List of species in the mechanism.</li>
-<li><strong>auto_diff</strong> (<em>bool, optional</em>) &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, generate files for Adept autodifferention library.</li>
+<li><strong>reacs</strong> (list of <code class="xref py py-class docutils literal notranslate"><span class="pre">ReacInfo</span></code>) – List of species in the mechanism.</li>
+<li><strong>specs</strong> (list of <code class="xref py py-class docutils literal notranslate"><span class="pre">SpecInfo</span></code>) – List of species in the mechanism.</li>
+<li><strong>loopy_opts</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">loopy_options</span></code> object) – A object containing all the loopy options to execute</li>
+<li><strong>conp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If true, generate equations using constant pressure assumption
+If false, use constant volume equations</li>
+<li><strong>test_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – If not None, this kernel is being used for testing.</li>
+<li><strong>auto_diff</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code>, generate files for Adept autodifferention library.</li>
+<li><strong>mem_limits</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> [</em><em>''</em><em>]</em>) – Path to a .yaml file indicating desired memory limits that control the
+desired maximum amount of global / local / or constant memory that
+the generated pyjac code may allocate.  Useful for testing, or otherwise
+limiting memory usage during runtime. The keys of this file are the
+members of <code class="xref py py-class docutils literal notranslate"><span class="pre">pyjac.kernel_utils.memory_limits.mem_type</span></code></li>
+<li><strong>kwargs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Arguements for the construction of the <code class="xref py py-class docutils literal notranslate"><span class="pre">kernel_generator</span></code></li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>kernel_gen</strong> – The generator responsible for creating the resulting code</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.None" title="pyjac.core.chem_utilities.None">None</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyjac.core.rate_subs.write_derivs">
-<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">write_derivs</code><span class="sig-paren">(</span><em>path</em>, <em>lang</em>, <em>specs</em>, <em>reacs</em>, <em>specs_nonzero</em>, <em>auto_diff=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#write_derivs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.write_derivs" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes derivative function file and header.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Path to build directory for file.</li>
-<li><strong>lang</strong> (<em>{'c', 'cuda', 'fortran', 'matlab'}</em>) &#8211; Programming language.</li>
-<li><strong>specs</strong> (list of <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.SpecInfo" title="pyjac.core.chem_utilities.SpecInfo"><code class="xref any py py-class docutils literal"><span class="pre">SpecInfo</span></code></a>) &#8211; List of species in the mechanism.</li>
-<li><strong>reacs</strong> (list of <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.ReacInfo" title="pyjac.core.chem_utilities.ReacInfo"><code class="xref any py py-class docutils literal"><span class="pre">ReacInfo</span></code></a>) &#8211; List of reactions in the mechanism.</li>
-<li><strong>specs_nonzero</strong> (<em>list of bool</em>) &#8211; List of <a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><code class="xref any docutils literal"><span class="pre">bool</span></code></a> indicating species with zero net production</li>
-<li><strong>auto_diff</strong> (<em>bool, optional</em>) &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, generate files for Adept autodifferention library.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.None" title="pyjac.core.chem_utilities.None">None</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyjac.core.rate_subs.write_mass_mole">
-<code class="descclassname">pyjac.core.rate_subs.</code><code class="descname">write_mass_mole</code><span class="sig-paren">(</span><em>path</em>, <em>lang</em>, <em>specs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/rate_subs.html#write_mass_mole"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.core.rate_subs.write_mass_mole" title="Permalink to this definition">¶</a></dt>
-<dd><p>Write files for mass/molar concentration and density conversion utility.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>path</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Path to build directory for file.</li>
-<li><strong>lang</strong> (<em>{'c', 'cuda', 'fortran', 'matlab'}</em>) &#8211; Programming language.</li>
-<li><strong>specs</strong> (list of <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.SpecInfo" title="pyjac.core.chem_utilities.SpecInfo"><code class="xref any py py-class docutils literal"><span class="pre">SpecInfo</span></code></a>) &#8211; List of species in mechanism.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.None" title="pyjac.core.chem_utilities.None">None</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><code class="xref py py-class docutils literal notranslate"><span class="pre">kernel_generator</span></code></p>
 </td>
 </tr>
 </tbody>
@@ -322,6 +781,7 @@ Pred and Tred, T and pres, and kf, cheb_temp_0 and cheb_temp_1.</p>
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faqs.html">Frequently asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="index.html">pyJac API</a></li>
@@ -330,12 +790,14 @@ Pred and Tred, T and pres, and kf, cheb_temp_0 and cheb_temp_1.</p>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -343,14 +805,14 @@ Pred and Tred, T and pres, and kf, cheb_temp_0 and cheb_temp_1.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2016, Kyle Niemeyer, Nicholas Curtis.
+      &copy;2018, Nicholas Curtis, Kyle Niemeyer.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="../_sources/src/pyjac.core.rate_subs.txt"
+      <a href="../_sources/src/pyjac.core.rate_subs.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

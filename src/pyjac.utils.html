@@ -1,37 +1,28 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pyjac.utils module &mdash; pyJac 1.0.0 documentation</title>
-    
+    <title>pyjac.utils module &#8212; pyJac 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '1.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-    <link rel="top" title="pyJac 1.0.0 documentation" href="../index.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
+  
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
+  </head><body>
   
 
     <div class="document">
@@ -43,51 +34,124 @@
 <span id="pyjac-utils-module"></span><h1>pyjac.utils module<a class="headerlink" href="#module-pyjac.utils" title="Permalink to this headline">¶</a></h1>
 <p>Module containing utility functions.</p>
 <dl class="data">
-<dt id="pyjac.utils.comment">
-<code class="descclassname">pyjac.utils.</code><code class="descname">comment</code><em class="property"> = {'fortran': '!', 'c': '//', 'matlab': '%', 'cuda': '//'}</em><a class="headerlink" href="#pyjac.utils.comment" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; comment characters for each language</p>
+<dt id="pyjac.utils.langs">
+<code class="descclassname">pyjac.utils.</code><code class="descname">langs</code><em class="property"> = ['c', 'opencl']</em><a class="headerlink" href="#pyjac.utils.langs" title="Permalink to this definition">¶</a></dt>
+<dd><p>list(<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">str</span></code></a>) – list of supported languages</p>
 </dd></dl>
 
-<dl class="data">
-<dt id="pyjac.utils.langs">
-<code class="descclassname">pyjac.utils.</code><code class="descname">langs</code><em class="property"> = ['c', 'cuda', 'fortran', 'matlab']</em><a class="headerlink" href="#pyjac.utils.langs" title="Permalink to this definition">¶</a></dt>
-<dd><p>list(<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><code class="xref any docutils literal"><span class="pre">str</span></code></a>) &#8211; list of supported languages</p>
+<dl class="function">
+<dt id="pyjac.utils.platform_is_gpu">
+<code class="descclassname">pyjac.utils.</code><code class="descname">platform_is_gpu</code><span class="sig-paren">(</span><em>platform</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/utils.html#platform_is_gpu"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.utils.platform_is_gpu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Attempts to determine if the given platform name corresponds to a GPU</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>platform_name</strong> (str or <code class="xref py py-class docutils literal notranslate"><span class="pre">pyopencl.platform</span></code>) – The name of the platform to check</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>is_gpu</strong> – True if platform found and the device type is GPU
+False if platform found and the device type is not GPU
+None otherwise</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a> or None</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.utils.stringify_args">
+<code class="descclassname">pyjac.utils.</code><code class="descname">stringify_args</code><span class="sig-paren">(</span><em>arglist</em>, <em>kwd=False</em>, <em>joiner='</em>, <em>'</em>, <em>use_quotes=False</em>, <em>remove_empty=True</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/utils.html#stringify_args"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.utils.stringify_args" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="pyjac.utils.partition">
+<code class="descclassname">pyjac.utils.</code><code class="descname">partition</code><span class="sig-paren">(</span><em>tosplit</em>, <em>predicate</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/utils.html#partition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.utils.partition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Splits the list <a href="#id1"><span class="problematic" id="id2">:param:`tosplit`</span></a> based on the <a href="#id3"><span class="problematic" id="id4">:param:`predicate`</span></a> applied to each
+list element and returns the two resulting lists</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>tosplit</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – The list to split</li>
+<li><strong>predicate</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">six.Callable</span></code>) – A callable predicate that takes as an argument a list element to test.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>true_list</strong> (<em>list</em>) – The list of elements in <a href="#id5"><span class="problematic" id="id6">:param:`tosplit`</span></a> for which <a href="#id7"><span class="problematic" id="id8">:param:`predicate`</span></a> were
+True</li>
+<li><strong>false_list</strong> (<em>list</em>) – The list of elements in <a href="#id9"><span class="problematic" id="id10">:param:`tosplit`</span></a> for which <a href="#id11"><span class="problematic" id="id12">:param:`predicate`</span></a> were
+False</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="data">
 <dt id="pyjac.utils.file_ext">
-<code class="descclassname">pyjac.utils.</code><code class="descname">file_ext</code><em class="property"> = {'fortran': '.f90', 'c': '.c', 'matlab': '.m', 'cuda': '.cu'}</em><a class="headerlink" href="#pyjac.utils.file_ext" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; source code file extensions based on language</p>
-</dd></dl>
-
-<dl class="data">
-<dt id="pyjac.utils.restrict">
-<code class="descclassname">pyjac.utils.</code><code class="descname">restrict</code><em class="property"> = {'c': '__restrict__', 'cuda': '__restrict__'}</em><a class="headerlink" href="#pyjac.utils.restrict" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; language-dependent keyword for restrict</p>
+<code class="descclassname">pyjac.utils.</code><code class="descname">file_ext</code><em class="property"> = {'c': '.c', 'cuda': '.cu', 'opencl': '.ocl'}</em><a class="headerlink" href="#pyjac.utils.file_ext" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – source code file extensions based on language</p>
 </dd></dl>
 
 <dl class="data">
 <dt id="pyjac.utils.header_ext">
-<code class="descclassname">pyjac.utils.</code><code class="descname">header_ext</code><em class="property"> = {'c': '.h', 'cuda': '.cuh'}</em><a class="headerlink" href="#pyjac.utils.header_ext" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; header extensions based on language</p>
+<code class="descclassname">pyjac.utils.</code><code class="descname">header_ext</code><em class="property"> = {'c': '.h', 'cuda': '.cuh', 'opencl': '.oclh'}</em><a class="headerlink" href="#pyjac.utils.header_ext" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – header extensions based on language</p>
 </dd></dl>
 
 <dl class="data">
 <dt id="pyjac.utils.line_end">
-<code class="descclassname">pyjac.utils.</code><code class="descname">line_end</code><em class="property"> = {'fortran': '\n', 'c': ';\n', 'matlab': ';\n', 'cuda': ';\n'}</em><a class="headerlink" href="#pyjac.utils.line_end" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; line endings dependent on language</p>
+<code class="descclassname">pyjac.utils.</code><code class="descname">line_end</code><em class="property"> = {'c': ';', 'cuda': ';', 'opencl': ';'}</em><a class="headerlink" href="#pyjac.utils.line_end" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – line endings dependent on language</p>
 </dd></dl>
 
 <dl class="data">
 <dt id="pyjac.utils.exp_10_fun">
-<code class="descclassname">pyjac.utils.</code><code class="descname">exp_10_fun</code><em class="property"> = {'fortran': 'exp(log(10) * ', 'c': 'pow(10.0, ', 'matlab': 'exp(log(10.0) * ', 'cuda': 'exp10('}</em><a class="headerlink" href="#pyjac.utils.exp_10_fun" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; exp10 functions for various languages</p>
+<code class="descclassname">pyjac.utils.</code><code class="descname">exp_10_fun</code><em class="property"> = {'c': 'exp(log(10) * {val})', 'cuda': 'exp10({val})', 'fortran': 'exp(log(10) * {val})', 'opencl': 'exp10({val})'}</em><a class="headerlink" href="#pyjac.utils.exp_10_fun" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>dict</em> – exp10 functions for various languages</p>
 </dd></dl>
 
-<dl class="data">
-<dt id="pyjac.utils.array_chars">
-<code class="descclassname">pyjac.utils.</code><code class="descname">array_chars</code><em class="property"> = {'fortran': '({})', 'c': '[{}]', 'matlab': '({})', 'cuda': '[INDEX({})]'}</em><a class="headerlink" href="#pyjac.utils.array_chars" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>dict</em> &#8211; the characters to format an index into an array per language</p>
+<dl class="function">
+<dt id="pyjac.utils.enum_to_string">
+<code class="descclassname">pyjac.utils.</code><code class="descname">enum_to_string</code><span class="sig-paren">(</span><em>enum</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/utils.html#enum_to_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.utils.enum_to_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience method that converts an IntEnum/Enum to string</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>enum</strong> (<em>Enum</em>) – The enum to convert</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>name</strong> – The stringified enum</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.utils.listify">
+<code class="descclassname">pyjac.utils.</code><code class="descname">listify</code><span class="sig-paren">(</span><em>value</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/utils.html#listify"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.utils.listify" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convert value to list</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>value</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.7)"><em>object</em></a>) – The value to convert</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>listified</strong> – If string, return [string]
+If tuple or other iterable, convert to lsit
+If not iterable, return [value]</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)">list</a></td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
@@ -99,14 +163,14 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>num_specs</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Number of species.</li>
-<li><strong>last_species</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Index of species being moved to end of system.</li>
+<li><strong>num_specs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Number of species.</li>
+<li><strong>last_species</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Index of species being moved to end of system.</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
-<li><strong>fwd_species_map</strong> (list of <a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><code class="xref any docutils literal"><span class="pre">int</span></code></a>) &#8211; List of original indices in new order</li>
-<li><strong>back_species_map</strong> (list of <a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><code class="xref any docutils literal"><span class="pre">int</span></code></a>) &#8211; List of new indicies in original order</li>
+<li><strong>fwd_species_map</strong> (list of <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">int</span></code></a>) – List of original indices in new order</li>
+<li><strong>back_species_map</strong> (list of <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">int</span></code></a>) – List of new indicies in original order</li>
 </ul>
 </p>
 </td>
@@ -124,15 +188,15 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>isp</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Species index</li>
-<li><strong>rxn</strong> (<a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.ReacInfo" title="pyjac.core.chem_utilities.ReacInfo"><code class="xref any py py-class docutils literal"><span class="pre">ReacInfo</span></code></a>) &#8211; Reaction</li>
+<li><strong>isp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Species index</li>
+<li><strong>rxn</strong> (<code class="xref any docutils literal notranslate"><span class="pre">ReacInfo</span></code>) – Reaction</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nu</strong> &#8211; Overall stoichiometric coefficient of species <code class="docutils literal"><span class="pre">isp</span></code> in reaction <code class="docutils literal"><span class="pre">rxn</span></code></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>nu</strong> – Overall stoichiometric coefficient of species <code class="docutils literal notranslate"><span class="pre">isp</span></code> in reaction <code class="docutils literal notranslate"><span class="pre">rxn</span></code></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)">int</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
 </td>
 </tr>
 </tbody>
@@ -149,15 +213,15 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>string</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; String to be parsed.</li>
-<li><strong>sep</strong> (<em>str, optional</em>) &#8211; Delimiter (default is None, which means consecutive whitespace).</li>
+<li><strong>string</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – String to be parsed.</li>
+<li><strong>sep</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>, </em><em>optional</em>) – Delimiter (default is None, which means consecutive whitespace).</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Floats separated by <code class="docutils literal"><span class="pre">sep</span></code> in <code class="docutils literal"><span class="pre">string</span></code>.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Floats separated by <code class="docutils literal notranslate"><span class="pre">sep</span></code> in <code class="docutils literal notranslate"><span class="pre">string</span></code>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><code class="xref any docutils literal"><span class="pre">float</span></code></a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">float</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -173,15 +237,15 @@
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>seq</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; String containing sequence of smaller strings of constant length.</li>
-<li><strong>length</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Length of individual sequences.</li>
+<li><strong>seq</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – String containing sequence of smaller strings of constant length.</li>
+<li><strong>length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – Length of individual sequences.</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of strings of length <code class="docutils literal"><span class="pre">length</span></code> from <code class="docutils literal"><span class="pre">seq</span></code>.</p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">List of strings of length <code class="docutils literal notranslate"><span class="pre">length</span></code> from <code class="docutils literal notranslate"><span class="pre">seq</span></code>.</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><code class="xref any docutils literal"><span class="pre">str</span></code></a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">str</span></code></a></p>
 </td>
 </tr>
 </tbody>
@@ -197,64 +261,11 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Path of directory to be created</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Path of directory to be created</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.None" title="pyjac.core.chem_utilities.None">None</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyjac.utils.get_array">
-<code class="descclassname">pyjac.utils.</code><code class="descname">get_array</code><span class="sig-paren">(</span><em>lang</em>, <em>name</em>, <em>index</em>, <em>twod=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/utils.html#get_array"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.utils.get_array" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a language and an index, returns the proper string index formatted
-into the appropriate array characters (e.g., [] or ()).</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lang</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; One of the accepted languages</li>
-<li><strong>name</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; The name of the array</li>
-<li><strong>index</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; The index to format</li>
-<li><strong>twod</strong> (<em>int, optional</em>) &#8211; If not <code class="docutils literal"><span class="pre">None</span></code> and the lang is &#8216;fortan&#8217; or &#8216;matlab&#8217; this will be formatted
-as a second index in the array.</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>name</strong> &#8211; String with indexed array.</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)">str</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyjac.utils.get_index">
-<code class="descclassname">pyjac.utils.</code><code class="descname">get_index</code><span class="sig-paren">(</span><em>lang</em>, <em>index</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/utils.html#get_index"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.utils.get_index" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given an integer index this function will return the proper string
-version of the index based on the language and other considerations</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lang</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; One of the supported languages, {&#8216;c&#8217;, &#8216;cuda&#8217;, &#8216;fortran&#8217;, &#8216;matlab&#8217;}</li>
-<li><strong>index</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; </li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">The string corresponding to the correct index to be formatted into the code</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)">str</a></p>
-</td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">None</td>
 </tr>
 </tbody>
 </table>
@@ -263,23 +274,23 @@ version of the index based on the language and other considerations</p>
 <dl class="function">
 <dt id="pyjac.utils.reassign_species_lists">
 <code class="descclassname">pyjac.utils.</code><code class="descname">reassign_species_lists</code><span class="sig-paren">(</span><em>reacs</em>, <em>specs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/utils.html#reassign_species_lists"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.utils.reassign_species_lists" title="Permalink to this definition">¶</a></dt>
-<dd><p>Given a list of <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.ReacInfo" title="pyjac.core.chem_utilities.ReacInfo"><code class="xref any py py-class docutils literal"><span class="pre">ReacInfo</span></code></a>, and <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.SpecInfo" title="pyjac.core.chem_utilities.SpecInfo"><code class="xref any py py-class docutils literal"><span class="pre">SpecInfo</span></code></a>, this method will update the
-<a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.ReacInfo" title="pyjac.core.chem_utilities.ReacInfo"><code class="xref any py py-class docutils literal"><span class="pre">ReacInfo</span></code></a> reactants / products / third body list to integers
-representing the species&#8217; index in the list.</p>
+<dd><p>Given a list of <code class="xref any docutils literal notranslate"><span class="pre">ReacInfo</span></code>, and <code class="xref any docutils literal notranslate"><span class="pre">SpecInfo</span></code>, this method will update the
+<code class="xref any docutils literal notranslate"><span class="pre">ReacInfo</span></code> reactants / products / third body list to integers
+representing the species’ index in the list.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>reacs</strong> (list of <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.ReacInfo" title="pyjac.core.chem_utilities.ReacInfo"><code class="xref any py py-class docutils literal"><span class="pre">ReacInfo</span></code></a>) &#8211; List of reactions to be updated.</li>
-<li><strong>specs</strong> (list of <a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.SpecInfo" title="pyjac.core.chem_utilities.SpecInfo"><code class="xref any py py-class docutils literal"><span class="pre">SpecInfo</span></code></a>) &#8211; List of species</li>
+<li><strong>reacs</strong> (list of <code class="xref any docutils literal notranslate"><span class="pre">ReacInfo</span></code>) – List of reactions to be updated.</li>
+<li><strong>specs</strong> (list of <code class="xref any docutils literal notranslate"><span class="pre">SpecInfo</span></code>) – List of species</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.None" title="pyjac.core.chem_utilities.None">None</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
 </td>
 </tr>
 </tbody>
@@ -289,16 +300,16 @@ representing the species&#8217; index in the list.</p>
 <dl class="function">
 <dt id="pyjac.utils.is_integer">
 <code class="descclassname">pyjac.utils.</code><code class="descname">is_integer</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/utils.html#is_integer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.utils.is_integer" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns <a class="reference external" href="https://docs.python.org/library/constants.html#True" title="(in Python v2.7)"><code class="xref any docutils literal"><span class="pre">True</span></code></a> if argument is an integer or whole number.</p>
+<dd><p>Returns <a class="reference external" href="https://docs.python.org/3/library/constants.html#True" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">True</span></code></a> if argument is an integer or whole number.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>val</strong> (<em>int, float</em>) &#8211; Value to be checked.</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>val</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Value to be checked.</td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal"><span class="pre">True</span></code> if <code class="docutils literal"><span class="pre">val</span></code> is <a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><code class="xref any docutils literal"><span class="pre">int</span></code></a> or whole number (if <a class="reference external" href="https://docs.python.org/library/functions.html#float" title="(in Python v2.7)"><code class="xref any docutils literal"><span class="pre">float</span></code></a>).</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><code class="docutils literal notranslate"><span class="pre">True</span></code> if <code class="docutils literal notranslate"><span class="pre">val</span></code> is <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">int</span></code></a> or whole number (if <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">float</span></code></a>).</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)">bool</a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></td>
 </tr>
 </tbody>
 </table>
@@ -311,11 +322,11 @@ representing the species&#8217; index in the list.</p>
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> &#8211; </td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>None</strong> – </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>args</strong> &#8211; Command line arguments for running pyJac.</td>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>args</strong> – Command line arguments for running pyJac.</td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/argparse.html#argparse.Namespace" title="(in Python v2.7)"><code class="xref any docutils literal"><span class="pre">argparse.Namespace</span></code></a></td>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/argparse.html#argparse.Namespace" title="(in Python v3.7)"><code class="xref any docutils literal notranslate"><span class="pre">argparse.Namespace</span></code></a></td>
 </tr>
 </tbody>
 </table>
@@ -350,6 +361,7 @@ representing the species&#8217; index in the list.</p>
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faqs.html">Frequently asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="index.html">pyJac API</a></li>
@@ -358,12 +370,14 @@ representing the species&#8217; index in the list.</p>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -371,14 +385,14 @@ representing the species&#8217; index in the list.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2016, Kyle Niemeyer, Nicholas Curtis.
+      &copy;2018, Nicholas Curtis, Kyle Niemeyer.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="../_sources/src/pyjac.utils.txt"
+      <a href="../_sources/src/pyjac.utils.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

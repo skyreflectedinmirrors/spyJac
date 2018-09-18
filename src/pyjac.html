@@ -1,37 +1,28 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pyjac package &mdash; pyJac 1.0.0 documentation</title>
-    
+    <title>pyjac package &#8212; pyJac 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '1.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-    <link rel="top" title="pyJac 1.0.0 documentation" href="../index.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
+  
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
+  </head><body>
   
 
     <div class="document">
@@ -47,15 +38,11 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="pyjac.core.html">pyjac.core package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="pyjac.core.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pyjac.core.CParams.html">pyjac.core.CParams module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyjac.core.CUDAParams.html">pyjac.core.CUDAParams module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyjac.core.cache_optimizer.html">pyjac.core.cache_optimizer module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyjac.core.chem_utilities.html">pyjac.core.chem_utilities module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyjac.core.create_jacobian.html">pyjac.core.create_jacobian module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyjac.core.mech_auxiliary.html">pyjac.core.mech_auxiliary module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyjac.core.mech_interpret.html">pyjac.core.mech_interpret module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyjac.core.rate_subs.html">pyjac.core.rate_subs module</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pyjac.core.shared_memory.html">pyjac.core.shared_memory module</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="pyjac.core.html#module-pyjac.core">Module contents</a></li>
@@ -88,7 +75,6 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pyjac.pywrap.html">pyjac.pywrap package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="pyjac.pywrap.html#submodules">Submodules</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pyjac.pywrap.parallel_compiler.html">pyjac.pywrap.parallel_compiler module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pyjac.pywrap.pywrap_gen.html">pyjac.pywrap.pywrap_gen module</a></li>
 </ul>
 </li>
@@ -108,6 +94,139 @@
 </div>
 <div class="section" id="module-pyjac">
 <span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-pyjac" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="pyjac.create_jacobian">
+<code class="descclassname">pyjac.</code><code class="descname">create_jacobian</code><span class="sig-paren">(</span><em>lang</em>, <em>mech_name=None</em>, <em>therm_name=None</em>, <em>gas=None</em>, <em>width=None</em>, <em>depth=None</em>, <em>ilp=None</em>, <em>unr=None</em>, <em>build_path='./out/'</em>, <em>last_spec=None</em>, <em>kernel_type=&lt;KernelType.jacobian: 3&gt;</em>, <em>platform=''</em>, <em>data_order='C'</em>, <em>rate_specialization=&lt;RateSpecialization.full: 2&gt;</em>, <em>split_rate_kernels=True</em>, <em>split_rop_net_kernels=False</em>, <em>conp=True</em>, <em>data_filename='data.bin'</em>, <em>output_full_rop=False</em>, <em>use_atomic_doubles=True</em>, <em>use_atomic_ints=True</em>, <em>jac_type=&lt;JacobianType.exact: 0&gt;</em>, <em>jac_format=&lt;JacobianFormat.full: 0&gt;</em>, <em>for_validation=False</em>, <em>fd_order=1</em>, <em>fd_mode=&lt;FiniteDifferenceMode.forward: 0&gt;</em>, <em>mem_limits=''</em>, <em>work_size=None</em>, <em>explicit_simd=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/core/create_jacobian.html#create_jacobian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.create_jacobian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create Jacobian subroutine from mechanism.</p>
+<blockquote>
+<div><dl class="docutils">
+<dt>lang <span class="classifier-delimiter">:</span> <span class="classifier">{‘c’, ‘opencl’}</span></dt>
+<dd>Language type.</dd>
+<dt>mech_name <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd>Reaction mechanism filename (e.g. ‘mech.dat’).
+This or gas must be specified</dd>
+<dt>therm_name <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd>Thermodynamic database filename (e.g. ‘therm.dat’)
+or nothing if info in mechanism file.</dd>
+<dt>gas <span class="classifier-delimiter">:</span> <span class="classifier">cantera.Solution, optional</span></dt>
+<dd>The mechanism to generate the Jacobian for.  This or <code class="docutils literal notranslate"><span class="pre">mech_name</span></code> must be
+specified</dd>
+<dt>width <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>If supplied, use a ‘wide’ vectorization strategy.
+The SIMD vector-width to use.  If the targeted platform is a GPU,
+this is the GPU block size. Cannot be specified along with <a href="#id1"><span class="problematic" id="id2">:param:`depth`</span></a>.</dd>
+<dt>depth <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>If supplied, use a ‘deep’ vectorization strategy.
+The SIMD vector-width to use.  If the targeted platform is a GPU,
+this is the GPU block size. Cannot be specified along with <a href="#id3"><span class="problematic" id="id4">:param:`width`</span></a>.</dd>
+<dt>unr <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd>If supplied, unroll inner loops (i.e. those that would be affected by a
+deep vectorization). Can be used in conjunction with deep or wide parallelism</dd>
+<dt>build_path <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd>The output directory for the jacobian files</dd>
+<dt>last_spec <span class="classifier-delimiter">:</span> <span class="classifier">str, optional</span></dt>
+<dd>If specified, the species to assign to the last index.
+Typically should be N2, Ar, He or another inert bath gas</dd>
+<dt>kernel_type <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">KernelType</span></code></span></dt>
+<dd>The type of kernel to generate, defaults to Jacobian</dd>
+<dt>platform <span class="classifier-delimiter">:</span> <span class="classifier">{‘CPU’, ‘GPU’, or other vendor specific name}</span></dt>
+<dd><p class="first">The OpenCL platform to run on.
+*   If ‘CPU’ or ‘GPU’, the first available matching platform will be used
+*   If a vendor specific string, it will be passed to pyopencl to get the</p>
+<blockquote class="last">
+<div>platform</div></blockquote>
+</dd>
+<dt>data_order <span class="classifier-delimiter">:</span> <span class="classifier">{‘C’, ‘F’}</span></dt>
+<dd>The data ordering, ‘C’ (row-major) recommended for deep vectorizations,
+while ‘F’ (column-major) recommended for wide vectorizations</dd>
+<dt>rate_specialization <span class="classifier-delimiter">:</span> <span class="classifier">{‘fixed’, ‘hybrid’, ‘full’}</span></dt>
+<dd>The level of specialization in evaluating reaction rates.
+‘Full’ is the full form suggested by Lu et al. (citation)
+‘Hybrid’ turns off specializations in the exponential term (Ta = 0, b = 0)
+‘Fixed’ is a fixed expression exp(logA + b logT + Ta / T)</dd>
+<dt>split_rate_kernels <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd>If True, and the :param”<code class="xref any docutils literal notranslate"><span class="pre">rate_specialization</span></code> is not ‘Fixed’, split different
+valuation types into different kernels</dd>
+<dt>split_rop_net_kernels <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd>If True, break different ROP values (fwd / back / pdep) into different
+kernels</dd>
+<dt>conp <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd>If True, use the constant pressure assumption.  If False, use the constant
+volume assumption.</dd>
+<dt>data_filename <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd>If specified, the path to the data.bin file that will be used for kernel
+testing</dd>
+<dt>output_full_rop <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd>If <code class="docutils literal notranslate"><span class="pre">True</span></code>, output forward and reversse rates of progress
+Useful in testing, as there are serious floating point errors for
+net production rates near equilibrium, invalidating direct comparison to
+Cantera</dd>
+<dt>use_atomic_doubles: bool [False]</dt>
+<dd>If True, the target language / platform can utilized atomic instructions
+for double precision floating point types.  This affects how deep-vectorized
+code is generated in pyJac – if False, any potential data-races will
+be run in serial form, resulting in a poor vectorization.</dd>
+<dt>use_atomic_ints: bool [False]</dt>
+<dd>If True, the target language / platform can utilized atomic instructions
+for integer types.  This affects the driver kernel generated by pyJac.
+If True, the driver will be generated in “queue” form, and various threads
+may run without (weak) synchronziation. If False, the threads should run in
+“lock-step” form (e.g., the global size in OpenCL should be equal to the
+number of initial conditions).  <a href="#id5"><span class="problematic" id="id6">:see:`Kernel Driver Types`</span></a> for more
+information.</dd>
+<dt>jac_type: [‘exact’, ‘approximate’, ‘finite_difference’]</dt>
+<dd><p class="first">The type of Jacobian kernel to generate.</p>
+<p class="last">An ‘approximate’ Jacobian ignores derivatives of the last species with
+respect to other species in the mechanism –
+i.e. :math:<a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+</dd>
+</dl>
+</div></blockquote>
+<dl class="docutils">
+<dt>rac{partial n_{N_s}}{partial n_{j}}` – in the reaction rate</dt>
+<dd><blockquote class="first">
+<div><p>derivatives.</p>
+<p>This can significantly increase sparsity for mechanisms containing reactions
+that include the last species directly, or as a third-body species with a
+non-unity efficiency, but gives results in an approxmiate Jacobian, and thus
+is more suitable to use with implicit integration techniques.</p>
+<p>Finally a ‘finite_difference’ jacobian is computed using finite differences
+of the species rates kernel.  This is used internally for performance testing
+comparison, but is also available to the user if desired.</p>
+</div></blockquote>
+<dl class="docutils">
+<dt>jac_format: [‘full’, ‘sparse’]</dt>
+<dd>If ‘sparse’, the Jacobian will be encoded using a compressed row or column
+storage format (for a data order of ‘C’ and ‘F’ respectively).</dd>
+<dt>for_validation: bool [False]</dt>
+<dd>If True, this kernel is being generated to validate pyJac, hence we need
+to save output data to a file</dd>
+<dt>fd_order: int [1]</dt>
+<dd>The order of the finite difference jacobian – used if <a href="#id9"><span class="problematic" id="id10">:param:`jac_type`</span></a> ==
+‘finite_difference’</dd>
+<dt>fd_mode: [‘forward’, ‘backward’, ‘central’]</dt>
+<dd>The mode of the finite difference Jacobian, forward, backwards or central
+used if <a href="#id11"><span class="problematic" id="id12">:param:`jac_type`</span></a> == ‘finite_difference’</dd>
+<dt>mem_limits: str [‘’]</dt>
+<dd>Path to a .yaml file indicating desired memory limits that control the
+desired maximum amount of global / local / or constant memory that
+the generated pyjac code may allocate.  Useful for testing, or otherwise
+limiting memory usage during runtime. The keys of this file are the
+members of <code class="xref py py-class docutils literal notranslate"><span class="pre">pyjac.kernel_utils.memory_limits.mem_type</span></code></dd>
+<dt>work_size: int [None]</dt>
+<dd>If specified, this is the number of thermo-chemical states that pyJac
+should evaluate concurrently in the generated source code. This option is
+most useful for coupling to an external library that that has already been
+parallelized, e.g., via OpenMP.</dd>
+<dt>explicit_simd: bool [False]</dt>
+<dd>If true, use explicit-SIMD instructions in OpenCL if possible.  Currently
+available for wide-vectorizations only.</dd>
+</dl>
+<p class="last">None</p>
+</dd>
+</dl>
+</dd></dl>
+
 </div>
 </div>
 
@@ -138,6 +257,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faqs.html">Frequently asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="index.html">pyJac API</a></li>
@@ -146,12 +266,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -159,14 +281,14 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2016, Kyle Niemeyer, Nicholas Curtis.
+      &copy;2018, Nicholas Curtis, Kyle Niemeyer.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="../_sources/src/pyjac.txt"
+      <a href="../_sources/src/pyjac.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

@@ -1,37 +1,28 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pyjac.performance_tester.performance_tester module &mdash; pyJac 1.0.0 documentation</title>
-    
+    <title>pyjac.performance_tester.performance_tester module &#8212; pyJac 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '1.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-    <link rel="top" title="pyJac 1.0.0 documentation" href="../index.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
+  
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
+  </head><body>
   
 
     <div class="document">
@@ -42,130 +33,196 @@
   <div class="section" id="module-pyjac.performance_tester.performance_tester">
 <span id="pyjac-performance-tester-performance-tester-module"></span><h1>pyjac.performance_tester.performance_tester module<a class="headerlink" href="#module-pyjac.performance_tester.performance_tester" title="Permalink to this headline">¶</a></h1>
 <p>Module for performance testing of pyJac and related tools.</p>
-<dl class="data">
-<dt id="pyjac.performance_tester.performance_tester.STATIC">
-<code class="descclassname">pyjac.performance_tester.performance_tester.</code><code class="descname">STATIC</code><em class="property"> = True</em><a class="headerlink" href="#pyjac.performance_tester.performance_tester.STATIC" title="Permalink to this definition">¶</a></dt>
-<dd><p><em>bool</em> &#8211; CUDA only works for static libraries</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyjac.performance_tester.performance_tester.is_pdep">
-<code class="descclassname">pyjac.performance_tester.performance_tester.</code><code class="descname">is_pdep</code><span class="sig-paren">(</span><em>rxn</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#is_pdep"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.is_pdep" title="Permalink to this definition">¶</a></dt>
-<dd><p>Check if reaction is pressure depedent.</p>
-<p class="rubric">Notes</p>
-<p>Includes traditional pressure dependence: third-body, falloff, and
-chemically activated bimolecular reactions. Does not include pressure-log
-or Chebyshev reactions.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>rxn</strong> (<a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.ReacInfo" title="pyjac.core.chem_utilities.ReacInfo"><code class="xref any py py-class docutils literal"><span class="pre">ReacInfo</span></code></a>) &#8211; Reaction object being queried for pressure depedence</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><code class="docutils literal"><span class="pre">True</span></code> if <code class="xref any docutils literal"><span class="pre">rxn</span></code> is pressure dependent</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyjac.performance_tester.performance_tester.check_step_file">
-<code class="descclassname">pyjac.performance_tester.performance_tester.</code><code class="descname">check_step_file</code><span class="sig-paren">(</span><em>filename</em>, <em>steplist</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#check_step_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.check_step_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks file for existing data, returns number of runs left</p>
+<dl class="class">
+<dt id="pyjac.performance_tester.performance_tester.performance_runner">
+<em class="property">class </em><code class="descclassname">pyjac.performance_tester.performance_tester.</code><code class="descname">performance_runner</code><span class="sig-paren">(</span><em>rtype=&lt;KernelType.jacobian: 3&gt;</em>, <em>repeats=10</em>, <em>steplist=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#performance_runner"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.performance_runner" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pyjac.tests.test_utils.runner</span></code></p>
+<p>Initialize the performance runner class</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of file with data</li>
-<li><strong>steplist</strong> (<em>list of int</em>) &#8211; List of different numbers of steps</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>runs</strong> &#8211; Dictionary with number of runs left for each step</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/library/stdtypes.html#dict" title="(in Python v2.7)">dict</a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyjac.performance_tester.performance_tester.check_file">
-<code class="descclassname">pyjac.performance_tester.performance_tester.</code><code class="descname">check_file</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#check_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.check_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Checks file for existing data, returns number of completed runs</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Name of file with data</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>num_completed</strong> &#8211; Number of completed runs</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)">int</a></td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyjac.performance_tester.performance_tester.getf">
-<code class="descclassname">pyjac.performance_tester.performance_tester.</code><code class="descname">getf</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#getf"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.getf" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="pyjac.performance_tester.performance_tester.cmd_link">
-<code class="descclassname">pyjac.performance_tester.performance_tester.</code><code class="descname">cmd_link</code><span class="sig-paren">(</span><em>lang</em>, <em>shared</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#cmd_link"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.cmd_link" title="Permalink to this definition">¶</a></dt>
-<dd><p>Return linker command.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lang</strong> (<em>{'icc', 'c', 'cuda'}</em>) &#8211; Programming language</li>
-<li><strong>shared</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; <code class="docutils literal"><span class="pre">True</span></code> if shared</li>
-</ul>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>cmd</strong> &#8211; List with linker command</p>
-</td>
-</tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">list of <a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><code class="xref any docutils literal"><span class="pre">str</span></code></a></p>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="function">
-<dt id="pyjac.performance_tester.performance_tester.linker">
-<code class="descclassname">pyjac.performance_tester.performance_tester.</code><code class="descname">linker</code><span class="sig-paren">(</span><em>lang</em>, <em>temp_lang</em>, <em>test_dir</em>, <em>filelist</em>, <em>lib=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#linker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.linker" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="function">
-<dt id="pyjac.performance_tester.performance_tester.performance_tester">
-<code class="descclassname">pyjac.performance_tester.performance_tester.</code><code class="descname">performance_tester</code><span class="sig-paren">(</span><em>home</em>, <em>work_dir</em>, <em>use_old_opt</em>, <em>num_threads</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#performance_tester"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.performance_tester" title="Permalink to this definition">¶</a></dt>
-<dd><p>Runs performance testing for pyJac, TChem, and finite differences.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>home</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Directory of source code files</li>
-<li><strong>work_dir</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Working directory with mechanisms and for data</li>
-<li><strong>use_old_opt</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#bool" title="(in Python v2.7)"><em>bool</em></a>) &#8211; If <code class="docutils literal"><span class="pre">True</span></code>, use old optimization files found</li>
-<li><strong>num_threads</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#int" title="(in Python v2.7)"><em>int</em></a>) &#8211; Number of OpenMP threads to parallelize performance testing</li>
+<li><strong>rtype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">KernelType</span></code>) – The type of run to test (jacobian or species_rates)</li>
+<li><strong>repeats</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a><em> [</em><em>10</em><em>]</em>) – The number of runs per state</li>
 </ul>
 </td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.None" title="pyjac.core.chem_utilities.None">None</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="pyjac.performance_tester.performance_tester.performance_runner.pre">
+<code class="descname">pre</code><span class="sig-paren">(</span><em>gas</em>, <em>data</em>, <em>num_conditions</em>, <em>max_vec_size</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#performance_runner.pre"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.performance_runner.pre" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initializes the performance runner for mechanism</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>gas</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">cantera.Solution</span></code>) – unused</li>
+<li><strong>data</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – unused</li>
+<li><strong>num_conditions</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The number of conditions to test</li>
+<li><strong>max_vec_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – unused</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyjac.performance_tester.performance_tester.performance_runner.check_file">
+<code class="descname">check_file</code><span class="sig-paren">(</span><em>filename</em>, <em>state</em>, <em>limits={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#performance_runner.check_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.performance_runner.check_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks file for existing data and determines the number of runs left
+for this file / state</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of file with data</li>
+<li><strong>state</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – The current state of the <code class="xref py py-class docutils literal notranslate"><span class="pre">OptionLoop</span></code>, used in this context
+to provide the OpenCL platform (and determine which filetype to use)</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>valid</strong> – If true, the test case is complete and can be skipped</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyjac.performance_tester.performance_tester.performance_runner.check_step_file">
+<code class="descname">check_step_file</code><span class="sig-paren">(</span><em>filename</em>, <em>_</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#performance_runner.check_step_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.performance_runner.check_step_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>checks file for existing data and returns number of runs left to do
+for each step in <code class="xref py py-attr docutils literal notranslate"><span class="pre">steplist</span></code>
+:param filename: Name of file with data
+:type filename: str
+:param steplist: List of different numbers of steps
+:type steplist: list of int</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><strong>runs</strong> – Dictionary with number of runs left for each step</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyjac.performance_tester.performance_tester.performance_runner.check_full_file">
+<code class="descname">check_full_file</code><span class="sig-paren">(</span><em>filename</em>, <em>num_conditions</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#performance_runner.check_full_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.performance_runner.check_full_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks a file for existing data, returns number of completed runs</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name of file with data</li>
+<li><strong>num_conditions</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – The number of conditions (possibly limited) to check for.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>num_completed</strong> – Number of completed runs</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
+<dt id="pyjac.performance_tester.performance_tester.performance_runner.run">
+<code class="descname">run</code><span class="sig-paren">(</span><em>state</em>, <em>dirs</em>, <em>phi_path</em>, <em>data_output</em>, <em>limits={}</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#performance_runner.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.performance_runner.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the validation test for the given state</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>state</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary containing the state of the current optimization / language
+/ vectorization patterns, etc.</li>
+<li><strong>dirs</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary of directories to use for building / testing, etc.
+Has the keys “build”, “test”, “obj” and “run”</li>
+<li><strong>phi_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Not used</li>
+<li><strong>data_output</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The file to output the results to</li>
+<li><strong>limits</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – If supplied, a limit on the number of conditions that may be tested
+at once. Important for larger mechanisms that may cause memory overflows</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.performance_tester.performance_tester.species_performance_tester">
+<code class="descclassname">pyjac.performance_tester.performance_tester.</code><code class="descname">species_performance_tester</code><span class="sig-paren">(</span><em>work_dir='performance'</em>, <em>test_matrix=None</em>, <em>prefix=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#species_performance_tester"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.species_performance_tester" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs performance testing of the species rates kernel for pyJac</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>work_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Working directory with mechanisms and for data</li>
+<li><strong>test_matrix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The testing matrix file, specifing the configurations to test</li>
+<li><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – a prefix within the work directory to store the output of this run</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.performance_tester.performance_tester.jacobian_performance_tester">
+<code class="descclassname">pyjac.performance_tester.performance_tester.</code><code class="descname">jacobian_performance_tester</code><span class="sig-paren">(</span><em>work_dir='performance'</em>, <em>test_matrix=None</em>, <em>prefix=''</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/performance_tester/performance_tester.html#jacobian_performance_tester"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.performance_tester.performance_tester.jacobian_performance_tester" title="Permalink to this definition">¶</a></dt>
+<dd><p>Runs performance testing of the jacobian kernel for pyJac</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>work_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Working directory with mechanisms and for data</li>
+<li><strong>test_matrix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The testing matrix file, specifing the configurations to test</li>
+<li><strong>prefix</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – a prefix within the work directory to store the output of this run</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
 </td>
 </tr>
 </tbody>
@@ -201,6 +258,7 @@ or Chebyshev reactions.</p>
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faqs.html">Frequently asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="index.html">pyJac API</a></li>
@@ -209,12 +267,14 @@ or Chebyshev reactions.</p>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -222,14 +282,14 @@ or Chebyshev reactions.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2016, Kyle Niemeyer, Nicholas Curtis.
+      &copy;2018, Nicholas Curtis, Kyle Niemeyer.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="../_sources/src/pyjac.performance_tester.performance_tester.txt"
+      <a href="../_sources/src/pyjac.performance_tester.performance_tester.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

@@ -1,39 +1,30 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Overview &mdash; pyJac 1.0.0 documentation</title>
-    
+    <title>Overview &#8212; pyJac 2.0.0 documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    './',
-        VERSION:     '1.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-    <link rel="top" title="pyJac 1.0.0 documentation" href="index.html" />
-    <link rel="next" title="Examples" href="examples.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Frequently asked Questions" href="faqs.html" />
     <link rel="prev" title="pyJac" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
+  
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
+  </head><body>
   
 
     <div class="document">
@@ -43,40 +34,58 @@
             
   <div class="section" id="overview">
 <h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
-<p>pyJac creates the C or CUDA source code files necessary to evaluate the
-analytical Jacobian matrix for a constant-pressure reacting system. Briefly, a
-thermochemical state is described using a composition vector:</p>
-<div class="math">
-\[\Phi = \left \lbrace T, Y_1, Y_2, \dotsc,
-Y_{N_{\text{sp}} - 1} \right \rbrace^{\text{T}}\]</div>
-<p>where <em>T</em> is the temperature, <span class="math">\(Y_i\)</span> are the mass fractions, and
-<span class="math">\(N_{\text{sp}}\)</span> is the number of species in the model. The mass fraction
-of the final species is determined through conservation of mass:</p>
-<div class="math">
-\[Y_{N_{\text{sp}}} = 1 - \sum_{k=1}^{N_{\text{sp}} - 1} Y_k\]</div>
+<p>pyJac creates the C or OpenCL source code files necessary to evaluate the
+analytical Jacobian matrix for a constant-pressure (CONP) or constant-volume (CONV) reacting system.</p>
+<div class="section" id="state-vector">
+<span id="state-vec"></span><h2>State Vector<a class="headerlink" href="#state-vector" title="Permalink to this headline">¶</a></h2>
+<p>Briefly, a CONP thermochemical state is described using a state vector:</p>
+<div class="math notranslate nohighlight">
+\[\Phi = \left \lbrace T, V, n_1, n_2, \dotsc,
+n_{N_{\text{sp}} - 1} \right \rbrace^{\text{T}}\]</div>
+<p>where <em>T</em> is the temperature, <em>V</em> the volume, <span class="math notranslate nohighlight">\(n_i\)</span> the moles of each species,
+and <span class="math notranslate nohighlight">\(N_{\text{sp}}\)</span> is the number of species in the model.
+The moles of the final species is determined through the ideal gas law:</p>
+<div class="math notranslate nohighlight">
+\[n_{N_{\text{sp}}} = \frac{P V}{\mathcal{R} T} - \sum_{k=1}^{N_{\text{sp}} - 1} n_k\]</div>
+<p>where the <em>P</em> is the pressure of the system, and <span class="math notranslate nohighlight">\(\mathcal{R}\)</span> the ideal gas constant.
+In a constant-volume system (CONV), the pressure takes the place of the volume in
+the state vector.</p>
+</div>
+<div class="section" id="jacobian-formulation">
+<span id="id1"></span><h2>Jacobian Formulation<a class="headerlink" href="#jacobian-formulation" title="Permalink to this headline">¶</a></h2>
 <p>The governing equations of chemical kinetics include ordinary differential
-equations for the rate of change of temperature and the species&#8217; mass fractions:</p>
-<div class="math">
-\[\begin{split}f &amp;= \frac{\partial \Phi}{\partial t} \\
-  &amp;= \left \lbrace \frac{\partial T}{\partial t},
-  \frac{\partial Y_1}{\partial t}, \frac{\partial Y_2}{\partial t},
-  \dotsc, \frac{\partial Y_{N_{\text{sp}} - 1}}{\partial t}
+equations for the (CONP) rate of change of temperature, pressure and species moles’:</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}f &amp;= \frac{\text{d} \Phi}{\text{d} t} \\
+  &amp;= \left \lbrace \frac{\text{d} T}{\text{d} t},
+  \frac{\text{d} V}{\text{d} t}
+  \frac{\text{d} n_1}{\text{d} t}, \frac{\text{d} n_2}{\text{d} t},
+  \dotsc, \frac{\text{d} n_{N_{\text{sp}} - 1}}{\text{d} t}
   \right \rbrace^{\text{T}}\end{split}\]</div>
 <p>where</p>
-<div class="math">
-\[\begin{split}\frac{\partial T}{\partial t} &amp;= \frac{-1}{\rho c_p}
-\sum_{k=1}^{N_{\text{sp}}} h_k W_k \dot{\omega}_k \\
-\frac{\partial Y_k}{\partial t} &amp;= \frac{1}{\rho} W_k
-\dot{\omega}_k \quad k = 1, \dotsc, N_{\text{sp}} - 1\end{split}\]</div>
-<p>where <span class="math">\(c_p\)</span> is the mass-averaged constant-pressure specific heat,
-<span class="math">\(h_k\)</span> is the specific enthalpy of species <em>k</em>, and <span class="math">\(\dot{\omega}_k\)</span>
-is the overall production rate of species <em>k</em>.</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}\frac{\text{d} T}{\text{d} t} &amp;= -
+\frac{\sum_{k=1}^{N_{\text{sp}}} H_k \dot{\omega}_k}{\sum_{k=1}^{N_{\text{sp}}} [C]_k C_{p,k}} \\
+\frac{\text{d}V}{\text{d}t} &amp;= V\left(\frac{T\mathcal{R}}{P} \sum_{k=1}^{N_{\text{sp} -1}} \left( 1 - \frac{W_k}{W_{N_{\text{sp}}}}\right) \dot{\omega}_k + \frac{1}{T} \frac{\text{d} T}{\text{d} t} \right) \\
+\frac{\text{d} n_k}{\text{d} t} &amp;= V \dot{\omega}_k \quad k = 1, \dotsc, N_{\text{sp}} - 1\end{split}\]</div>
+<p>where <span class="math notranslate nohighlight">\(C_{p, k}\)</span> is the molar constant-pressure specific heat of species <em>k</em>,
+<span class="math notranslate nohighlight">\(H_k\)</span> is the molar enthalpy of species <em>k</em>, <span class="math notranslate nohighlight">\(\dot{\omega}_k\)</span>
+is the overall production rate of species <em>k</em>, <span class="math notranslate nohighlight">\(W_k\)</span> the molecular weight of
+species <em>k</em> and <span class="math notranslate nohighlight">\([C]_k\)</span> the concentration of species <em>k</em>.</p>
 <p>The Jacobian matrix is then filled by the partial derivaties
-<span class="math">\(\partial f / \partial \Phi\)</span>, such that</p>
-<div class="math">
+<span class="math notranslate nohighlight">\(\partial f / \partial \Phi\)</span>, such that</p>
+<div class="math notranslate nohighlight">
 \[\mathcal{J}_{i,j} = \frac{\partial f_i}{\partial \Phi_j}\]</div>
-<p>More details can be found in the paper fully describing version 1.0 of pyJac:
-<a class="reference external" href="http://kyleniemeyer.github.io/pyJac-paper/">http://kyleniemeyer.github.io/pyJac-paper/</a></p>
+<p>The full set of equations solved by pyJac are available in the supplimental <a class="reference external" href="https://arxiv.org/src/1809.01029v1/anc/derivations.pdf">derivations</a>, while more details on version 2 of pyJac can be found in our upcoming <a class="reference external" href="https://arxiv.org/abs/1809.01029">paper</a></p>
+</div>
+<div class="section" id="units">
+<span id="id2"></span><h2>Units<a class="headerlink" href="#units" title="Permalink to this headline">¶</a></h2>
+<p>pyJac utilizes SI units, namely Pascals for pressure, <span class="math notranslate nohighlight">\(m^3\)</span> for Volume, Joules for energy, Kelvin for temperature, and kmoles for species moles.</p>
+<p>Since the user is free to specify two extensive properties, i.e., Volume and moles for CONP systems, the choice of moles is somewhat arbitrary, as long as the supplied state satistifies the ideal gas relation:</p>
+<div class="math notranslate nohighlight">
+\[P V = n \mathcal{R} T\]</div>
+<p>One typical choice is to simply pick <span class="math notranslate nohighlight">\(V=1 \left[m^3\right]\)</span>, <span class="math notranslate nohighlight">\(n_k\)</span> = <span class="math notranslate nohighlight">\(X_k\)</span> (the mole fraction of species <em>k</em>) and let the total number of moles in the system (<em>n</em>) adjust accordingly.</p>
+</div>
 </div>
 
 
@@ -106,6 +115,7 @@ is the overall production rate of species <em>k</em>.</p>
 <h3>Navigation</h3>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">Frequently asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="src/index.html">pyJac API</a></li>
@@ -114,12 +124,14 @@ is the overall production rate of species <em>k</em>.</p>
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -127,14 +139,14 @@ is the overall production rate of species <em>k</em>.</p>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2016, Kyle Niemeyer, Nicholas Curtis.
+      &copy;2018, Nicholas Curtis, Kyle Niemeyer.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="_sources/overview.txt"
+      <a href="_sources/overview.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

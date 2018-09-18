@@ -1,0 +1,237 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Driver Functions &#8212; pyJac 2.0.0 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="driver-functions">
+<h1>Driver Functions<a class="headerlink" href="#driver-functions" title="Permalink to this headline">¶</a></h1>
+<p>There are two major types of driver functions for pyJac, queue-based methods and
+lock-step methods. The correct choice of driver function depends on the target language
+and device, and further affects things such as memory usage, and data ordering.</p>
+<p>This section will discuss the various driver function types and their rammifications.</p>
+<div class="section" id="why-implement-a-driver">
+<span id="driver-function"></span><h2>Why implement a driver?<a class="headerlink" href="#why-implement-a-driver" title="Permalink to this headline">¶</a></h2>
+<p>When using pyJac on it’s own, we potentially want to evaluate the chemical kinetic
+source rates or Jacobian for many different initial conditions concurrently. To
+achieve this, we need to loop over the initial conditions e.g., as in the following
+psuedo-code:</p>
+<dl class="docutils">
+<dt><a href="#id1"><span class="problematic" id="id2">``</span></a><a href="#id3"><span class="problematic" id="id4">`</span></a></dt>
+<dd><dl class="first docutils">
+<dt>for i in initial_conditions:</dt>
+<dd>jacobian[i] = eval_jacobian(phi[i])</dd>
+</dl>
+<p class="last">end</p>
+</dd>
+</dl>
+<p><a href="#id5"><span class="problematic" id="id6">``</span></a><a href="#id7"><span class="problematic" id="id8">`</span></a></p>
+<p>where <code class="xref any docutils literal notranslate"><span class="pre">jacobian</span></code> and <code class="xref any docutils literal notranslate"><span class="pre">phi</span></code> represent the chemical kinetic Jacobian and
+thermochemical state vector (a.k.a., $Phi$).</p>
+<p>However, when coupling pyJac to an external code (e.g., to an ODE integration library)
+these arrays may already be created, for instance in CFD codes, one often sees something
+like:</p>
+<dl class="docutils">
+<dt><a href="#id9"><span class="problematic" id="id10">``</span></a><a href="#id11"><span class="problematic" id="id12">`</span></a></dt>
+<dd><dl class="first docutils">
+<dt>for icell in cells:</dt>
+<dd><p class="first">double phi_local[n_spec + 1] = {0};
+// set temperature
+phi_local[0] = phi[icell, 0]
+for ispecies in species:</p>
+<blockquote>
+<div>// set species
+phi_local[ispecies + 1] = phi[icell, ispecies + 1]</div></blockquote>
+<p>end</p>
+<p class="last">solve_ode(phi_local, pressure[icell])</p>
+</dd>
+</dl>
+<p class="last">end</p>
+</dd>
+</dl>
+<p><a href="#id13"><span class="problematic" id="id14">``</span></a><a href="#id15"><span class="problematic" id="id16">`</span></a></p>
+<p>Here the calling code has implicitly assumed that the ODE integrator operates on local
+copies of the global state arrays <code class="xref any docutils literal notranslate"><span class="pre">phi</span></code> and <code class="xref any docutils literal notranslate"><span class="pre">pressure</span></code>.  Hence, pyJac must support
+this sort of memory format.</p>
+<p>In addition, reacting-flow codes may use different state-variables, e.g., mass-fractions,
+mole-fractions, concentrations, etc.!  The driver function provides a natural place to
+enable conversion to/from the calling code’s state variables to pyJac’s state-vector
+(see <span class="xref std std-ref">state-vector</span>).</p>
+</div>
+<div class="section" id="specifying-the-work-size">
+<span id="work-size"></span><h2>Specifying the Work-Size<a class="headerlink" href="#specifying-the-work-size" title="Permalink to this headline">¶</a></h2>
+<p>In pyJac, the work-size is defined as the total number of separate (potentially
+vectorized) evaluations of the chemical kinetic properties / source rates / Jacobian
+happening concurrently.  This is determined automatically per-language via:</p>
+<p><a href="#id31"><span class="problematic" id="id32">|Language |OpenMP           |OpenCL          |
+|:-------:|</span></a>—————–<a href="#id33"><span class="problematic" id="id34">|----------------|</span></a>
+<a href="#id35"><span class="problematic" id="id36">|Work-Size|omp_num_threads()|get_num_groups()|</span></a></p>
+<p>Alternatively, a more intuitive meaning for various devices is a follows:</p>
+<p><a href="#id37"><span class="problematic" id="id38">|Device   |CPU                 |GPU        |
+|:-------:|</span></a>——————–<a href="#id39"><span class="problematic" id="id40">|-----------|</span></a>
+<a href="#id41"><span class="problematic" id="id42">|Work-Size|# of cores / threads|# of blocks|</span></a></p>
+<p>Where a ‘thread block’ for a GPU is defined in the CUDA sense.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">While the work-size may be specified at run-time, if it is specified during the
+generation process via the <span class="xref std std-ref">work_size_flag</span>, more optimized code will be
+generated.</p>
+</div>
+<p>For vectorized codes, the work-size is not exactly equal to the number of
+thermochemical states that are being evaluated concurrently.  For example, if
+a single CPU core is being utilized, but a <span class="xref std std-ref">vector-width</span> of 4 is specified, the
+work-size will still be equal to one.</p>
+</div>
+<div class="section" id="memory-requirements">
+<span id="working-buffer"></span><h2>Memory Requirements<a class="headerlink" href="#memory-requirements" title="Permalink to this headline">¶</a></h2>
+<p>The memory allocated by pyJac is based on a few factors:</p>
+<ol class="arabic simple">
+<li>The <a class="reference internal" href="#work-size"><span class="std std-ref">Specifying the Work-Size</span></a> specified during generation or at run-time.</li>
+</ol>
+<p>For CPU and Accelerator devices, this tends to be in the 10s of threads.
+On a GPU however, typically 100s to 1000s of threads are required to saturate the
+throughput of the device.</p>
+<p>In pyJac, a non-input/output array of size (per initial-condition) of <code class="xref any docutils literal notranslate"><span class="pre">N_s</span></code>
+(e.g., the concentrations) is typically shaped:
+<a href="#id17"><span class="problematic" id="id18">``</span></a><a href="#id19"><span class="problematic" id="id20">`</span></a></p>
+<blockquote>
+<div>concentrations.shape = (work-size, N_s)</div></blockquote>
+<p><a href="#id21"><span class="problematic" id="id22">``</span></a>`
+such that all threads have their own working copy of the <code class="xref any docutils literal notranslate"><span class="pre">concentrations</span></code> array to
+work with.</p>
+<p>On a GPU, the <a class="reference internal" href="#work-size"><span class="std std-ref">Specifying the Work-Size</span></a> is calculated (in CUDA terminology) as the number of blocks
+launched multipled by the size of each block (i.e., <code class="xref any docutils literal notranslate"><span class="pre">gridDim</span> <span class="pre">*</span> <span class="pre">blockDim</span></code>).  Or in OpenCL
+terminology, the output of <code class="xref any docutils literal notranslate"><span class="pre">get_global_size()</span></code>.
+On the CPU and MIC however, the <code class="xref any docutils literal notranslate"><span class="pre">global_size</span></code> can typically be set the number of CPU
+cores (or threads) the user wishes to use, and the allocated memory size can be
+significantly reduced.</p>
+<p>For vectorized execution, the shape of the arrays changes slightly to
+(note: assuming a wide-vectorized “C”-ordering <a href="#id23"><span class="problematic" id="id24">:see:`vector_split`</span></a>):
+<a href="#id25"><span class="problematic" id="id26">``</span></a><a href="#id27"><span class="problematic" id="id28">`</span></a></p>
+<blockquote>
+<div>concentrations.shape = (work-size, N_s, vector_width)</div></blockquote>
+<p><a href="#id29"><span class="problematic" id="id30">``</span></a>`
+where the <code class="xref any docutils literal notranslate"><span class="pre">vector_width</span></code> is typically 2–8 for CPUs and MICs, and 64–1024 for GPUs
+(note: this corresponds to the block-size in CUDA).</p>
+</div>
+<div class="section" id="lockstep-based-driver">
+<h2>Lockstep-based driver<a class="headerlink" href="#lockstep-based-driver" title="Permalink to this headline">¶</a></h2>
+<p>This type of driver is very similar to static-based scheduling in OpenMP (
+see <a href="#id43"><span class="problematic" id="id44">`_mp_scheduling`_</span></a>). Essentially all threads recieve their assigned initial
+conditons at startup, and evaluate the Jacobian or source terms for them.</p>
+<p>This doesn’t have any scheduling overhead, but if different threads take different
+amounts of time to complete (e.g., as in ODE integration of different initial
+conditions), the work may become unbalanced, and some threads may wait for the others
+to complete.</p>
+</div>
+<div class="section" id="queue-based-driver">
+<h2>Queue-based driver<a class="headerlink" href="#queue-based-driver" title="Permalink to this headline">¶</a></h2>
+<p>This type of driver is based on dynamic scheduling in OpenMP (see <a href="#id45"><span class="problematic" id="id46">`_mp_scheduling`_</span></a>).
+Unlike in the lockstep-driver, threads in the queue-based driver recieve their
+assigned initial conditions at runtime.
+Specifically, each thread will perform an atomic integer addition on a global counter
+to determine the next initial condition to evaluate.
+This reduces the effects of varying runtimes between different initial conditions, but
+incurs some-overhead due to the atomic counter update.</p>
+<p>Queue-based drivers are not-available for target languages / platforms that do not
+implement atomic operations for integer types.</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">pyJac</a></h1>
+
+
+
+<p class="blurb">Python-based generator of analytical Jacobians for chemical kinetics</p>
+
+
+
+
+<p>
+<iframe src="https://ghbtns.com/github-btn.html?user=kyleniemeyer&repo=pyjac&type=watch&count=true&size=large&v=2"
+  allowtransparency="true" frameborder="0" scrolling="0" width="200px" height="35px"></iframe>
+</p>
+
+
+
+
+
+<h3>Navigation</h3>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faqs.html">Frequently asked Questions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="installing.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="src/index.html">pyJac API</a></li>
+</ul>
+
+
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Nicholas Curtis, Kyle Niemeyer.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/driver_functions.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+    <a href="https://github.com/kyleniemeyer/pyjac" class="github">
+        <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png" alt="Fork me on GitHub"  class="github"/>
+    </a>
+    
+
+    
+  </body>
+</html>

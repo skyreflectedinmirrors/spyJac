@@ -1,37 +1,28 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>pyjac.pywrap.pywrap_gen module &mdash; pyJac 1.0.0 documentation</title>
-    
+    <title>pyjac.pywrap.pywrap_gen module &#8212; pyJac 2.0.0 documentation</title>
     <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '1.0.0',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
-      };
-    </script>
+    <script type="text/javascript" src="../_static/documentation_options.js"></script>
     <script type="text/javascript" src="../_static/jquery.js"></script>
     <script type="text/javascript" src="../_static/underscore.js"></script>
     <script type="text/javascript" src="../_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
-    <link rel="top" title="pyJac 1.0.0 documentation" href="../index.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
    
   <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
   
+  
   <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body role="document">
+  </head><body>
   
 
     <div class="document">
@@ -42,27 +33,147 @@
   <div class="section" id="module-pyjac.pywrap.pywrap_gen">
 <span id="pyjac-pywrap-pywrap-gen-module"></span><h1>pyjac.pywrap.pywrap_gen module<a class="headerlink" href="#module-pyjac.pywrap.pywrap_gen" title="Permalink to this headline">¶</a></h1>
 <p>Module for generating Python wrapper around pyJac code.</p>
+<dl class="class">
+<dt id="pyjac.pywrap.pywrap_gen.WrapperGen">
+<em class="property">class </em><code class="descclassname">pyjac.pywrap.pywrap_gen.</code><code class="descname">WrapperGen</code><span class="sig-paren">(</span><em>name=''</em>, <em>kernel_args=[]</em>, <em>lang='c'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/pywrap/pywrap_gen.html#WrapperGen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.WrapperGen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytools.ImmutableRecord</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">pyjac.kernel_utils.kernel_gen.DocumentingRecord</span></code></p>
+<p>A serializable class for python wrapper generation</p>
+<dl class="attribute">
+<dt id="pyjac.pywrap.pywrap_gen.WrapperGen.name">
+<code class="descname">name</code><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.WrapperGen.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – The name of the generated kernel</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyjac.pywrap.pywrap_gen.WrapperGen.kernel_args">
+<code class="descname">kernel_args</code><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.WrapperGen.kernel_args" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>list of str</em> – The input / output arguments of the kernel</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyjac.pywrap.pywrap_gen.WrapperGen.lang">
+<code class="descname">lang</code><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.WrapperGen.lang" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – The language this wrapper is being generated for</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="pyjac.pywrap.pywrap_gen.SetupGen">
+<em class="property">class </em><code class="descclassname">pyjac.pywrap.pywrap_gen.</code><code class="descname">SetupGen</code><span class="sig-paren">(</span><em>name=''</em>, <em>libname=''</em>, <em>include_dirs=[]</em>, <em>package_lang='c'</em>, <em>wrapper=''</em>, <em>lang=''</em>, <em>build_dir=''</em>, <em>libraries=[]</em>, <em>libdirs=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/pywrap/pywrap_gen.html#SetupGen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.SetupGen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">pytools.ImmutableRecord</span></code></p>
+<p>A serializable class for python setup.py generation</p>
+<dl class="attribute">
+<dt id="pyjac.pywrap.pywrap_gen.SetupGen.lang">
+<code class="descname">lang</code><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.SetupGen.lang" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – The generated language</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyjac.pywrap.pywrap_gen.SetupGen.package_lang">
+<code class="descname">package_lang</code><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.SetupGen.package_lang" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – The short-name of the language/wrapper being generated</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyjac.pywrap.pywrap_gen.SetupGen.wrapper">
+<code class="descname">wrapper</code><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.SetupGen.wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Filename / path to the generated pyx file</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyjac.pywrap.pywrap_gen.SetupGen.build_dir">
+<code class="descname">build_dir</code><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.SetupGen.build_dir" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – Build directory path</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyjac.pywrap.pywrap_gen.SetupGen.name">
+<code class="descname">name</code><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.SetupGen.name" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – The base-name the generated python wrapper should take</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyjac.pywrap.pywrap_gen.SetupGen.libname">
+<code class="descname">libname</code><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.SetupGen.libname" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>str</em> – The path to the generated library</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyjac.pywrap.pywrap_gen.SetupGen.include_dirs">
+<code class="descname">include_dirs</code><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.SetupGen.include_dirs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Optional[list of str]</em> – Optional; if supplied, extra include directions for the python wrapper</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyjac.pywrap.pywrap_gen.SetupGen.libraries">
+<code class="descname">libraries</code><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.SetupGen.libraries" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Optional[list of str]</em> – Optional; if supplied extra libraries to use</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="pyjac.pywrap.pywrap_gen.SetupGen.libdirs">
+<code class="descname">libdirs</code><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.SetupGen.libdirs" title="Permalink to this definition">¶</a></dt>
+<dd><p><em>Optional[list of str]</em> – Optional; if supplied, library directories</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="function">
 <dt id="pyjac.pywrap.pywrap_gen.generate_setup">
-<code class="descclassname">pyjac.pywrap.pywrap_gen.</code><code class="descname">generate_setup</code><span class="sig-paren">(</span><em>setupfile</em>, <em>home_dir</em>, <em>build_dir</em>, <em>out_dir</em>, <em>libname</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/pywrap/pywrap_gen.html#generate_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.generate_setup" title="Permalink to this definition">¶</a></dt>
+<code class="descclassname">pyjac.pywrap.pywrap_gen.</code><code class="descname">generate_setup</code><span class="sig-paren">(</span><em>lang</em>, <em>setupfile</em>, <em>pyxfile</em>, <em>home_dir</em>, <em>build_dir</em>, <em>out_dir</em>, <em>libname</em>, <em>extra_include_dirs=[]</em>, <em>libraries=[]</em>, <em>libdirs=[]</em>, <em>ktype=&lt;KernelType.jacobian: 3&gt;</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/pywrap/pywrap_gen.html#generate_setup"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.generate_setup" title="Permalink to this definition">¶</a></dt>
 <dd><p>Helper method to fill in the template .in files</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>setupfile</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Filename of existing setup file</li>
-<li><strong>home_dir</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Home directory path</li>
-<li><strong>build_dir</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Build directory path</li>
-<li><strong>out_dir</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Output directory path</li>
-<li><strong>libname</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Library name</li>
+<li><strong>lang</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The language of the wrapper being generated</li>
+<li><strong>setupfile</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Filename of the setup file template</li>
+<li><strong>pyxfile</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Filename of the pyx file template</li>
+<li><strong>home_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Home directory path</li>
+<li><strong>build_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Build directory path</li>
+<li><strong>out_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Output directory path</li>
+<li><strong>libname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Library name</li>
+<li><strong>extra_include_dirs</strong> (<em>Optional</em><em>[</em><em>list of str</em><em>]</em>) – Optional; if supplied, extra include directions for the python wrapper</li>
+<li><strong>libraries</strong> (<em>Optional</em><em>[</em><em>list of str</em><em>]</em>) – Optional; if supplied extra libraries to use</li>
+<li><strong>libdirs</strong> (<em>Optional</em><em>[</em><em>list of str</em><em>]</em>) – Optional; if supplied, library directories</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>setup</strong> – The path to the generated setup.py file</p>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.None" title="pyjac.core.chem_utilities.None">None</a></p>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyjac.pywrap.pywrap_gen.generate_wrapper">
+<code class="descclassname">pyjac.pywrap.pywrap_gen.</code><code class="descname">generate_wrapper</code><span class="sig-paren">(</span><em>lang</em>, <em>pyxfile</em>, <em>build_dir</em>, <em>ktype=&lt;KernelType.jacobian: 3&gt;</em>, <em>additional_inputs=[]</em>, <em>additional_outputs=[]</em>, <em>nice_name=None</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/pywrap/pywrap_gen.html#generate_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.generate_wrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate the Cython wrapper file</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>lang</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The language of the wrapper being generated</li>
+<li><strong>pyxfile</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Filename of the pyx file template</li>
+<li><strong>build_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The path to place the generated cython wrapper in</li>
+<li><strong>ktype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">KernelType</span></code> [KernelType.jacobian]) – The type of wrapper to generate</li>
+<li><strong>additional_inputs</strong> (<em>list of str</em>) – If supplied, treat these arguments as additional input variables</li>
+<li><strong>additional_outputs</strong> (<em>list of str</em>) – If supplied, treat these arguments as additional output variables</li>
+<li><strong>nice_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> [</em><em>None</em><em>]</em>) – If supplied, use this instead of <a href="#id1"><span class="problematic" id="id2">:param:`ktype`</span></a> to derive the kernel name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>wrapper</strong> – The path to the generated python wrapper</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
 </td>
 </tr>
 </tbody>
@@ -77,7 +188,7 @@
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dname</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Base directory name</td>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>dname</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Base directory name</td>
 </tr>
 <tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"></td>
 </tr>
@@ -88,25 +199,42 @@
 </dd></dl>
 
 <dl class="function">
-<dt id="pyjac.pywrap.pywrap_gen.generate_wrapper">
-<code class="descclassname">pyjac.pywrap.pywrap_gen.</code><code class="descname">generate_wrapper</code><span class="sig-paren">(</span><em>lang</em>, <em>source_dir</em>, <em>out_dir=None</em>, <em>auto_diff=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/pywrap/pywrap_gen.html#generate_wrapper"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.generate_wrapper" title="Permalink to this definition">¶</a></dt>
+<dt id="pyjac.pywrap.pywrap_gen.pywrap">
+<code class="descclassname">pyjac.pywrap.pywrap_gen.</code><code class="descname">pywrap</code><span class="sig-paren">(</span><em>lang</em>, <em>source_dir</em>, <em>build_dir=None</em>, <em>out_dir=None</em>, <em>obj_dir=None</em>, <em>platform=''</em>, <em>additional_outputs=[]</em>, <em>ktype=&lt;KernelType.jacobian: 3&gt;</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/pyjac/pywrap/pywrap_gen.html#pywrap"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#pyjac.pywrap.pywrap_gen.pywrap" title="Permalink to this definition">¶</a></dt>
 <dd><p>Generates a Python wrapper for the given language and source files</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
-<li><strong>lang</strong> (<em>{'cuda', 'c', 'tchem'}</em>) &#8211; Programming language of pyJac (cuda, c) or TChem</li>
-<li><strong>source_dir</strong> (<a class="reference external" href="https://docs.python.org/library/functions.html#str" title="(in Python v2.7)"><em>str</em></a>) &#8211; Directory path of source files.</li>
-<li><strong>out_dir</strong> (<em>Optional[str]</em>) &#8211; Directory path for output files</li>
-<li><strong>auto_diff</strong> (<em>Optional[bool]</em>) &#8211; Optional; if <code class="docutils literal"><span class="pre">True</span></code>, build autodifferentiation library</li>
+<li><strong>lang</strong> (<em>{'cuda'</em><em>, </em><em>'c'</em><em>, </em><em>'tchem'}</em>) – Programming language of pyJac (cuda, c) or TChem</li>
+<li><strong>source_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Directory path of source files.</li>
+<li><strong>build_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Directory path of the generated c/cuda/opencl library</li>
+<li><strong>out_dir</strong> (<em>Optional</em><em> [</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em>) – Directory path for the output python library</li>
+<li><strong>obj_dir</strong> (<em>Optional</em><em> [</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em>) – Directory path to place the compiled objects</li>
+<li><strong>platform</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em>) – Optional; if specified, the platform for OpenCL execution</li>
+<li><strong>additional_outputs</strong> (<em>list of str</em>) – If specified, these additional arguments should be considered outputs of the
+generated kernel call. Useful in testing, to allow output of the forward,
+reverse, pressure depenedent and net rates of progress for a more thorough
+comparison to Cantera (specifically, to quantify floating point errors for
+net production rates near equilibrium)</li>
+<li><strong>ktype</strong> (<code class="xref py py-class docutils literal notranslate"><span class="pre">KernelType</span></code> [KernelType.jacobian]) – The type of wrapper to generate</li>
 </ul>
 </td>
 </tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+<tr class="field-even field"><th class="field-name" colspan="2">Keyword Arguments:</th></tr>
+<tr class="field-even field"><td>&#160;</td><td class="field-body"><ul class="first simple">
+<li><strong>file_base</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Used for creation of libraries for :param:<a href="#id3"><span class="problematic" id="id4">`</span></a>ktype`==KernelType.dummy – the
+base filename (generator name) for this library</li>
+<li><strong>additional_inputs</strong> (<em>list of str</em><em> [</em><em>[</em><em>]</em><em>]</em>) – Use to supply additional input argument names to the generator process;
+currently this is only used for :param:<a href="#id5"><span class="problematic" id="id6">`</span></a>ktype`==KernelType.dummy</li>
+</ul>
 </td>
 </tr>
-<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last"><a class="reference internal" href="pyjac.core.chem_utilities.html#pyjac.core.chem_utilities.None" title="pyjac.core.chem_utilities.None">None</a></p>
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"></p>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">None</p>
 </td>
 </tr>
 </tbody>
@@ -142,6 +270,7 @@
 <h3>Navigation</h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faqs.html">Frequently asked Questions</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../installing.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="index.html">pyJac API</a></li>
@@ -150,12 +279,14 @@
 
 <div id="searchbox" style="display: none" role="search">
   <h3>Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../search.html" method="get">
       <input type="text" name="q" />
       <input type="submit" value="Go" />
       <input type="hidden" name="check_keywords" value="yes" />
       <input type="hidden" name="area" value="default" />
     </form>
+    </div>
 </div>
 <script type="text/javascript">$('#searchbox').show(0);</script>
         </div>
@@ -163,14 +294,14 @@
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2016, Kyle Niemeyer, Nicholas Curtis.
+      &copy;2018, Nicholas Curtis, Kyle Niemeyer.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.8</a>
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.4</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
       
       |
-      <a href="../_sources/src/pyjac.pywrap.pywrap_gen.txt"
+      <a href="../_sources/src/pyjac.pywrap.pywrap_gen.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 
