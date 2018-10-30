@@ -632,6 +632,8 @@ class SubTest(TestClass):
         phi = self.store.phi_cp.copy()
         ref_thd = self.store.ref_thd.copy()
         ref_ans = self.store.ref_Pr.copy()
+        if not ref_ans.size:
+            raise SkipTest('No falloff / third-body reactions')
         args = {'phi': lambda x: np.array(phi, order=x, copy=True),
                 'thd_conc': lambda x: np.array(ref_thd, order=x, copy=True),
                 'Pr': lambda x: np.zeros_like(ref_ans, order=x)
