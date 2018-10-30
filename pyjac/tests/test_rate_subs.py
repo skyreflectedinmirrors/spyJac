@@ -755,19 +755,23 @@ class SubTest(TestClass):
         fall_only_inds = np.where(np.in1d(self.store.thd_inds,
                                           self.store.fall_inds))[0]
 
+        if not thd_only_inds.size:
+            raise SkipTest('No pressure-modified reactions')
+
         # create the kernel call
         kc = [kernel_call('ci_thd', [ref_pres_mod],
                           out_mask=[0],
                           compare_mask=[get_comparable((thd_only_inds,),
                                                        ref_pres_mod)],
                           input_mask=['Fi', 'Pr'],
-                          strict_name_match=True, **args),
-              kernel_call('ci_fall', [ref_pres_mod],
-                          out_mask=[0],
-                          compare_mask=[get_comparable(
-                            (fall_only_inds,), ref_pres_mod)],
-                          input_mask=['thd_conc'],
                           strict_name_match=True, **args)]
+        if fall_only_inds.size:
+            kc += [kernel_call('ci_fall', [ref_pres_mod],
+                               out_mask=[0],
+                               compare_mask=[get_comparable(
+                                (fall_only_inds,), ref_pres_mod)],
+                               input_mask=['thd_conc'],
+                               strict_name_match=True, **args)]
         self.__generic_rate_tester(get_rxn_pres_mod, kc)
 
     @attr('long')
