@@ -276,16 +276,19 @@ class SubTest(TestClass):
             # test the simple reaction rates
             simple_reacs = [gas.reaction(i) for i in simple_inds]
             rate_checker([(result['simple']['A'][i], result['simple']['b'][i],
-                           result['simple']['Ta'][i]) for i in range(result['simple']['num'])],
+                           result['simple']['Ta'][i]) for i in range(
+                           result['simple']['num'])],
                          [__get_rate(reac, False) for reac in simple_reacs],
                          result['simple']['type'])
 
             # test the falloff (alternate) rates
             fall_reacs = [gas.reaction(i) for i in result['fall']['map']]
-            rate_checker([(result['fall']['A'][i], result['fall']['b'][i],
-                           result['fall']['Ta'][i]) for i in range(result['fall']['num'])],
-                         [__get_rate(reac, True) for reac in fall_reacs],
-                         result['fall']['type'])
+            if fall_reacs:
+                rate_checker([(result['fall']['A'][i], result['fall']['b'][i],
+                               result['fall']['Ta'][i]) for i in range(
+                               result['fall']['num'])],
+                             [__get_rate(reac, True) for reac in fall_reacs],
+                             result['fall']['type'])
 
         __tester(result, RateSpecialization.fixed)
 
