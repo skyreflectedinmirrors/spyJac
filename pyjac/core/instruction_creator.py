@@ -353,7 +353,7 @@ def guarded_add_transform(mapstore, variable, domain, **kwargs):
     return None
 
 
-def get_update_instruction(mapstore, mask_arr, base_update_insn, deps=[]):
+def get_update_instruction(mapstore, mask_arr, base_update_insn):
     """
     Handles updating a value by a possibly specified (masked value),
     for example this can be used to generate an instruction (or set thereof)
@@ -394,10 +394,12 @@ def get_update_instruction(mapstore, mask_arr, base_update_insn, deps=[]):
     if not mask_arr:
         # get id for noop anchor
         idx = re.search(r'id=([^,}]+)', base_update_insn)
-        deps = utils.listify(deps)
-        deps = utils.stringify_args(deps, joiner=':')
+        deps = re.search(r'dep=([^,}]+)', base_update_insn)
         if deps:
-            deps = ' deps={deps}'.format(deps=deps)
+            deps = deps.group(1)
+            deps = ', dep={deps}'.format(deps=deps)
+        else:
+            deps = ''
         return '... nop {{id={id}{deps}}}'.format(
             id=idx.group(1),
             deps=deps)
