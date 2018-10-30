@@ -1174,9 +1174,10 @@ def get_rop_net(loopy_opts, namestore, test_size=None):
         kernel_data['rev'] = []
         maps['rev'] = arc.MapStore(loopy_opts, namestore.num_rev_reacs, test_size)
         transforms['rev'] = namestore.rev_map
-        kernel_data['pres_mod'] = []
-        maps['pres_mod'] = arc.MapStore(loopy_opts, namestore.num_thd, test_size)
-        transforms['pres_mod'] = namestore.thd_map
+        if namestore.pres_mod:
+            kernel_data['pres_mod'] = []
+            maps['pres_mod'] = arc.MapStore(loopy_opts, namestore.num_thd, test_size)
+            transforms['pres_mod'] = namestore.thd_map
     else:
         transforms['rev'] = namestore.rev_mask
         transforms['pres_mod'] = namestore.thd_mask
