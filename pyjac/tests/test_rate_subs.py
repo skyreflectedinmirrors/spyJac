@@ -829,10 +829,11 @@ class SubTest(TestClass):
         rev_removed[np.where(np.isnan(rev_removed))] = 0
         args = {'rop_fwd': lambda x: np.array(fwd_removed, order=x, copy=True),
                 'rop_rev': lambda x: np.array(rev_removed, order=x, copy=True),
-                'pres_mod': lambda x: np.array(self.store.ref_pres_mod,
-                                               order=x, copy=True),
                 'rop_net': lambda x: np.zeros_like(self.store.rxn_rates, order=x)
                 }
+        if self.store.thd_inds.size:
+            args['pres_mod'] = lambda x: np.array(self.store.ref_pres_mod,
+                                                  order=x, copy=True)
 
         # first test w/o the splitting
         kc = kernel_call('rop_net', [self.store.rxn_rates], **args)
@@ -855,9 +856,11 @@ class SubTest(TestClass):
               kernel_call('rop_net_rev', [self.store.rxn_rates],
                           input_mask=__input_mask, strict_name_match=True,
                           check=False, chain=__chainer, **args),
-              kernel_call('rop_net_pres_mod', [self.store.rxn_rates],
-                          input_mask=__input_mask, strict_name_match=True,
-                          chain=__chainer, **args)]
+              ]
+        if self.store.thd_inds.size:
+            kc += [kernel_call('rop_net_pres_mod', [self.store.rxn_rates],
+                               input_mask=__input_mask, strict_name_match=True,
+                               chain=__chainer, **args)]
         self.__generic_rate_tester(get_rop_net, kc, do_ropsplit=True)
 
     @attr('long')
