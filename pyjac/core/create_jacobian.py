@@ -954,12 +954,11 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
     mapstore.check_and_add_transform(rxn_range, num_range)
 
     # rev mask depends on actual reaction index
-    mapstore.check_and_add_transform(namestore.rev_mask, rxn_range)
+    ic.guarded_add_transform(mapstore, namestore.rev_mask, rxn_range)
     # thd_mask depends on actual reaction index
-    mapstore.check_and_add_transform(namestore.thd_mask, rxn_range)
+    ic.guarded_add_transform(mapstore, namestore.thd_mask, rxn_range)
     # pres mod is on thd_mask
-    mapstore.check_and_add_transform(
-        namestore.pres_mod, namestore.thd_mask)
+    ic.guarded_add_transform(mapstore, namestore.pres_mod, namestore.thd_mask)
     # nu's are on the actual rxn index
     mapstore.check_and_add_transform(
         namestore.rxn_to_spec_offsets, rxn_range)
@@ -969,12 +968,12 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
         # fwd ROP is on actual rxn index
         mapstore.check_and_add_transform(namestore.rop_fwd, rxn_range)
         # rev ROP is on rev mask
-        mapstore.check_and_add_transform(namestore.rop_rev, namestore.rev_mask)
+        ic.guarded_add_transform(mapstore, namestore.rop_rev, namestore.rev_mask)
     else:
         # kf is on real index
         mapstore.check_and_add_transform(namestore.kf, rxn_range)
         # kr is on rev rxn index
-        mapstore.check_and_add_transform(namestore.kr, namestore.rev_mask)
+        ic.guarded_add_transform(mapstore, namestore.kr, namestore.rev_mask)
 
     # extra inames
     net_ind = 'net_ind'
@@ -2644,12 +2643,11 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
     mapstore.check_and_add_transform(rxn_range, num_range)
 
     # rev mask depends on actual reaction index
-    mapstore.check_and_add_transform(namestore.rev_mask, rxn_range)
+    ic.guarded_add_transform(mapstore, namestore.rev_mask, rxn_range)
     # thd_mask depends on actual reaction index
-    mapstore.check_and_add_transform(namestore.thd_mask, rxn_range)
+    ic.guarded_add_transform(mapstore, namestore.thd_mask, rxn_range)
     # pres mod is on thd_mask
-    mapstore.check_and_add_transform(
-        namestore.pres_mod, namestore.thd_mask)
+    ic.guarded_add_transform(mapstore, namestore.pres_mod, namestore.thd_mask)
     # nu's are on the actual rxn index
     mapstore.check_and_add_transform(
         namestore.rxn_to_spec_offsets, rxn_range)
@@ -2659,13 +2657,12 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
         # fwd ROP is on actual rxn index
         mapstore.check_and_add_transform(namestore.rop_fwd, rxn_range)
         # rev ROP is on rev mask
-        mapstore.check_and_add_transform(
-            namestore.rop_rev, namestore.rev_mask)
+        ic.guarded_add_transform(mapstore, namestore.rop_rev, namestore.rev_mask)
     else:
         # kf is on real index
         mapstore.check_and_add_transform(namestore.kf, rxn_range)
         # kr is on rev rxn index
-        mapstore.check_and_add_transform(namestore.kr, namestore.rev_mask)
+        ic.guarded_add_transform(mapstore, namestore.kr, namestore.rev_mask)
 
     # extra inames
     net_ind = 'net_ind'
@@ -2950,12 +2947,9 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
                 '<> dkf = (${beta_str} + ${Ta_str} * Tinv) * Tinv {id=dkf}'
             ).safe_substitute(**locals())
 
-        # and put together instructions
-        instructions = Template("""
-        ${dkf_instructions}
-        <> dRopidT = ${rop_fwd_str} * dkf {id=init, dep=dkf*}
-        <> ci = 1 {id=ci_init}
-        if ${rev_mask_str} >= 0
+        rev_update = ic.get_update_instruction(
+            mapstore, namestore.rop_rev,
+            Template("""
             <> dBk_sum = 0 {id=dBk_init}
             for ${net_ind}
                 dBk_sum = dBk_sum + \
@@ -2964,10 +2958,19 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
             end
             dRopidT = dRopidT - ${rop_rev_str} * \
                 (dkf - dBk_sum) {id=rev, dep=init:up}
-        end
-        if ${thd_mask_str} >= 0
-            ci = ${pres_mod_str} {id=ci, dep=ci_init}
-        end
+            """).safe_substitute(**locals()))
+        pmod_update = ic.get_update_instruction(
+            mapstore, namestore.pres_mod,
+            Template('ci = ${pres_mod_str} {id=ci, dep=ci_init}').safe_substitute(
+                **locals()))
+
+        # and put together instructions
+        instructions = Template("""
+        ${dkf_instructions}
+        <> dRopidT = ${rop_fwd_str} * dkf {id=init, dep=dkf*}
+        <> ci = 1 {id=ci_init}
+        ${rev_update}
+        ${pmod_update}
         dRopidT = dRopidT * ci * ${V_str} {id=Ropi_final, dep=rev:ci*}
         """).safe_substitute(**locals())
     else:
@@ -4214,19 +4217,15 @@ def __dropidnj(loopy_opts, namestore, allint, test_size=None,
         mapstore.check_and_add_transform(namestore.kf, rxn_range)
 
         # and reverse
-        mapstore.check_and_add_transform(
-            namestore.rev_mask, rxn_range)
+        ic.guarded_add_transform(mapstore, namestore.rev_mask, rxn_range)
 
         # check and add transforms for pressure mod
-        mapstore.check_and_add_transform(
-            namestore.thd_mask, rxn_range)
+        ic.guarded_add_transform(mapstore, namestore.thd_mask, rxn_range)
 
     else:
         # add default transforms
-        mapstore.check_and_add_transform(
-            namestore.kr, namestore.rev_mask)
-        mapstore.check_and_add_transform(
-            namestore.pres_mod, namestore.thd_mask)
+        ic.guarded_add_transform(mapstore, namestore.kr, namestore.rev_mask)
+        ic.guarded_add_transform(mapstore, namestore.pres_mod, namestore.thd_mask)
 
     rxn_to_spec_offsets_lp, rxn_to_spec_offsets_str = mapstore.apply_maps(
         namestore.rxn_to_spec_offsets, var_name)
@@ -4245,8 +4244,6 @@ def __dropidnj(loopy_opts, namestore, allint, test_size=None,
         namestore.rxn_to_spec_reac_nu, net_ind_k, affine=net_ind_k)
 
     # Check for forward / rev / third body maps with/without NS
-    rev_mask_lp, rev_mask_str = mapstore.apply_maps(
-        namestore.rev_mask, var_name)
     kr_lp = None
     pres_mod_lp = None
     if do_ns:
@@ -4400,18 +4397,23 @@ def __dropidnj(loopy_opts, namestore, allint, test_size=None,
             end
         """)
 
+    kr_update = ic.get_update_instruction(
+        mapstore, namestore.kr,
+        Template('kr_i = ${kr_str} {id=kr2, dep=kr}').safe_substitute(
+            **locals()))
+    pmod_update = ic.get_update_instruction(
+        mapstore, namestore.pres_mod,
+        Template('ci = ${pres_mod_str} {id=ci_up, dep=ci_set}').safe_substitute(
+            **locals()))
+
     kernel_data.append(jac_lp)
     instructions = Template("""
         # loop over all species in reaction
         <> ci = 1.0d {id=ci_set}
-        if ${pmod_mask_str} >= 0
-            ci = ${pres_mod_str} {id=ci_up, dep=ci_set}
-        end
+        ${pmod_update}
         <> kf_i = ${kf_str} {id=kf}
         <> kr_i = 0.0d {id=kr}
-        if ${rev_mask_str} >= 0
-            kr_i = ${kr_str} {id=kr2, dep=kr}
-        end
+        ${kr_update}
 
         <> net_offset = ${rxn_to_spec_offsets_str}
         <> net_offset_next = ${rxn_to_spec_offsets_next_str}
