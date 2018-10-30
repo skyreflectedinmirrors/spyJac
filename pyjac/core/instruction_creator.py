@@ -19,6 +19,7 @@ import numpy as np
 import six
 
 from pyjac.core.array_creator import var_name, jac_creator
+from pyjac import utils
 
 
 def use_atomics(loopy_opts):
@@ -352,7 +353,7 @@ def guarded_add_transform(mapstore, variable, domain, **kwargs):
     return None
 
 
-def get_update_instruction(mapstore, mask_arr, base_update_insn):
+def get_update_instruction(mapstore, mask_arr, base_update_insn, deps=[]):
     """
     Handles updating a value by a possibly specified (masked value),
     for example this can be used to generate an instruction (or set thereof)
@@ -370,6 +371,8 @@ def get_update_instruction(mapstore, mask_arr, base_update_insn):
         The update instruction to use as a base.  This may be surrounded by
         and if statement or possibly discarded altogether depending on the
         :param:`mask_arr` and :param:`mapstore`
+    deps: list of str
+        The instruction dependencies for the generated update insn
 
     Returns
     -------
@@ -391,7 +394,13 @@ def get_update_instruction(mapstore, mask_arr, base_update_insn):
     if not mask_arr:
         # get id for noop anchor
         idx = re.search(r'id=([^,}]+)', base_update_insn)
-        return '... nop {{id={id}}}'.format(id=idx.group(1))
+        deps = utils.listify(deps)
+        deps = utils.stringify_args(deps, joiner=':')
+        if deps:
+            deps = ' deps={deps}'.format(deps=deps)
+        return '... nop {{id={id}{deps}}}'.format(
+            id=idx.group(1),
+            deps=deps)
 
     # ensure mask array in domains
     assert mask_arr in mapstore.domain_to_nodes, (
