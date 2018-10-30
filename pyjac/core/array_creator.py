@@ -1231,7 +1231,7 @@ class MapStore(object):
             assert node.domain.initializer is not None, (
                 "Can't use non-initialized creator {} as a transform domain".
                 format(node.domain.name))
-        except:
+        except KeyError:
             # add the domain to the base of the tree
             node = self.tree.add_child(domain)
 
@@ -1326,6 +1326,9 @@ class MapStore(object):
 
         if not self.is_finalized:
             self.finalize()
+
+        if not variable:
+            return None, ''
 
         affine = kwargs.pop('affine', None)
 
@@ -2133,6 +2136,7 @@ class NameStore(object):
 
         # net species rates data
 
+        nu_dtype = kint_type if rate_info['net']['allint'] else np.float64
         # per reaction
         self.rxn_to_spec = creator('rxn_to_spec',
                                    dtype=kint_type,
@@ -2148,13 +2152,14 @@ class NameStore(object):
                                            initializer=off,
                                            order=self.order)
         self.rxn_to_spec_reac_nu = creator('reac_to_spec_nu',
-                                           dtype=kint_type, shape=rate_info[
-                                               'net']['nu'].shape,
+                                           dtype=nu_dtype,
+                                           shape=rate_info['net']['nu'].shape,
                                            initializer=rate_info['net']['nu'],
                                            order=self.order,
                                            affine=1)
         self.rxn_to_spec_prod_nu = creator('reac_to_spec_nu',
-                                           dtype=kint_type, shape=rate_info[
+                                           dtype=nu_dtype,
+                                           shape=rate_info[
                                                'net']['nu'].shape,
                                            initializer=rate_info['net']['nu'],
                                            order=self.order)
@@ -2200,7 +2205,7 @@ class NameStore(object):
                                            initializer=off,
                                            order=self.order)
         self.spec_to_rxn_nu = creator('spec_to_rxn_nu',
-                                      dtype=kint_type, shape=rate_info[
+                                      dtype=nu_dtype, shape=rate_info[
                                           'net_per_spec']['nu'].shape,
                                       initializer=rate_info[
                                           'net_per_spec']['nu'],
