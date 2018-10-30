@@ -337,6 +337,21 @@ class PrecomputedInstructions(object):
         return self.namer(self.basename)
 
 
+def guarded_add_transform(mapstore, variable, domain, **kwargs):
+    """
+    A simple guard around :func:`mapstore.check_and_add_transform`
+
+    Returns
+    -------
+    transform: :class:`domain_trainsform`
+        None if the variable or domain are invalid, or else the regular transform
+    """
+
+    if variable is not None and domain is not None:
+        return mapstore.check_and_add_transform(variable, domain, **kwargs)
+    return None
+
+
 def get_update_instruction(mapstore, mask_arr, base_update_insn):
     """
     Handles updating a value by a possibly specified (masked value),
