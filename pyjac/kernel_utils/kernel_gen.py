@@ -3801,7 +3801,7 @@ class knl_info(object):
         self.var_name = var_name
         if isinstance(kernel_data, set):
             kernel_data = list(kernel_data)
-        self.kernel_data = kernel_data[:]
+        self.kernel_data = [x for x in kernel_data[:] if x]
         self.extra_inames = extra_inames[:]
         self.assumptions = assumptions[:]
         self.parameters = parameters.copy()
