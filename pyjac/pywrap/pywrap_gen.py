@@ -3,7 +3,6 @@
 import sys
 import os
 import logging
-import multiprocessing
 
 from six.moves import cPickle as pickle
 from pytools import ImmutableRecord
@@ -208,7 +207,7 @@ def generate_wrapper(lang, pyxfile, build_dir, ktype=KernelType.jacobian,
             pickle.dump(wrapper, file)
 
         infile = pyxfile
-        outfile = os.path.basename(pyxfile[:pyxfile.rindex('.in')])
+        outfile = 'pyjac_{}.pyx'.format(utils.package_lang[lang])
         outfile = os.path.join(build_dir, outfile)
         # and cogify
         try:
@@ -336,7 +335,7 @@ def pywrap(lang, source_dir, build_dir=None, out_dir=None,
 
     # and build / run
     call = [setup, 'build_ext', '--build-lib', out_dir,
-            '--build-temp', obj_dir, '-j', str(multiprocessing.cpu_count())]
+            '--build-temp', obj_dir]
     if rpath:
         call += ['--rpath', rpath]
 
