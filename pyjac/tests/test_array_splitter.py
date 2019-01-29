@@ -190,7 +190,8 @@ def _split_doc(func, num, params):
 
 
 @parameterized(opts_loop,
-               doc_func=_split_doc)
+               doc_func=_split_doc,
+               skip_on_empty=True)
 def test_npy_array_splitter(opts):
     # create array split
     asplit = array_splitter(opts)
@@ -211,7 +212,8 @@ def test_npy_array_splitter(opts):
 
 
 @parameterized(lambda: opts_loop(width=[None]),
-               doc_func=_split_doc)
+               doc_func=_split_doc,
+               skip_on_empty=True)
 def test_lpy_deep_array_splitter(opts):
     from pymbolic.primitives import Subscript, Variable
     # create array split
@@ -264,7 +266,8 @@ def test_lpy_deep_array_splitter(opts):
 
 # currently only have SIMD for wide-vectorizations
 @parameterized(lambda: opts_loop(depth=[None]),
-               doc_func=_split_doc)
+               doc_func=_split_doc,
+               skip_on_empty=True)
 def test_lpy_wide_array_splitter(opts):
     from pymbolic.primitives import Subscript, Variable
     # create array split
@@ -318,7 +321,8 @@ def test_lpy_wide_array_splitter(opts):
 
 
 @parameterized(lambda: opts_loop(depth=[None]),
-               doc_func=_split_doc)
+               doc_func=_split_doc,
+               skip_on_empty=True)
 def test_lpy_iname_presplit(opts):
     """
     Tests that inames access to pre-split inames in non-split loopy arrays are
@@ -401,7 +405,8 @@ def test_atomic_deep_vec_with_small_split():
 
 
 @parameterized(opts_loop,
-               doc_func=_split_doc)
+               doc_func=_split_doc,
+               skip_on_empty=True)
 def test_get_split_shape(opts):
     # create array split
     asplit = array_splitter(opts)
@@ -479,7 +484,8 @@ def test_indexer(opts):
 
 
 @parameterized(lambda: opts_loop(skip_non_vec=False),
-               doc_func=_split_doc)
+               doc_func=_split_doc,
+               skip_on_empty=True)
 def test_get_split_elements(opts):
     # create opts
     asplit = array_splitter(opts)
