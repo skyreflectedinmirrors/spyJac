@@ -526,7 +526,7 @@ def __dcidE(loopy_opts, namestore, test_size=None,
     # compute guarded exponentials / logs
     expg = ic.GuardedExp(loopy_opts)
     logg = ic.GuardedLog(loopy_opts)
-    guard = ic.Guard(loopy_opts, minv=utils.small)
+    nonzero_guard = ic.NonzeroGuard(loopy_opts)
     if rxn_type != reaction_type.thd:
         # update factors
         factor = 'dci_fall_dE'
@@ -560,7 +560,7 @@ def __dcidE(loopy_opts, namestore, test_size=None,
                 namestore.Fcent, *default_inds)
             kernel_data.extend([Atroe_lp, Btroe_lp, Fcent_lp])
 
-            Pr_g = guard(Pr_str)
+            Pr_g = nonzero_guard(Pr_str)
             log_fcent = logg(Fcent_str)
             dFi_instructions = Template("""
                 <> absqsq = ${Atroe_str} * ${Atroe_str} + \
@@ -594,7 +594,7 @@ def __dcidE(loopy_opts, namestore, test_size=None,
 
             sri_fac = Template(inner).safe_substitute(**locals())
             log_pr = logg(Pr_str)
-            Pr_g = guard(Pr_str)
+            Pr_g = nonzero_guard(Pr_str)
 
             # create insns
             dFi_instructions = Template("""
@@ -648,7 +648,7 @@ def __dcidE(loopy_opts, namestore, test_size=None,
         """).safe_substitute(**locals())
 
     # and update manglers
-    manglers.extend([precompute, expg, logg, guard])
+    manglers.extend([precompute, expg, logg, nonzero_guard])
     rop_net_rev_update = ic.get_update_instruction(
         mapstore, namestore.rop_rev,
         Template(
