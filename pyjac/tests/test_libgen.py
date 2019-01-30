@@ -4,7 +4,7 @@ from __future__ import division
 
 import sys
 
-from pyjac.libgen import libgen  # noaq
+from pyjac.libgen import libgen  # noqa
 
 
 class TestLibgen(object):

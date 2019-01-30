@@ -3,9 +3,9 @@
 
 import multiprocessing
 from multiprocessing import Pool
-import distutils.ccompiler
 
 N = multiprocessing.cpu_count()
+
 
 # monkey-patch for parallel compilation
 def parallel_compile(self, sources, output_dir=None, macros=None,
@@ -41,8 +41,7 @@ def parallel_compile(self, sources, output_dir=None, macros=None,
     """
     # those lines are copied from distutils.ccompiler.CCompiler directly
     macros, objects, extra_postargs, pp_opts, build = self._setup_compile(
-        output_dir, macros, include_dirs, sources, depends, extra_postargs
-        )
+        output_dir, macros, include_dirs, sources, depends, extra_postargs)
     cc_args = self._get_cc_args(pp_opts, debug, extra_preargs)
 
     # number of parallel compilations

@@ -129,8 +129,8 @@ def generate_setup(lang, setupfile, pyxfile, home_dir, build_dir, out_dir, libna
         # and cogify
         try:
             Cog().callableMain([
-                        'cogapp', '-e', '-d', '-Dsetupgen={}'.format(setupgen),
-                        '-o', outfile, infile])
+                'cogapp', '-e', '-d', '-Dsetupgen={}'.format(setupgen),
+                '-o', outfile, infile])
         except Exception:
             logger = logging.getLogger(__name__)
             logger.error('Error generating python setup file: {}'.format(outfile))
@@ -212,8 +212,8 @@ def generate_wrapper(lang, pyxfile, build_dir, ktype=KernelType.jacobian,
         # and cogify
         try:
             Cog().callableMain([
-                        'cogapp', '-e', '-d', '-Dwrappergen={}'.format(wrappergen),
-                        '-o', outfile, infile])
+                'cogapp', '-e', '-d', '-Dwrappergen={}'.format(wrappergen),
+                '-o', outfile, infile])
         except Exception:
             logger = logging.getLogger(__name__)
             logger.error('Error generating python wrapper file: {}'.format(outfile))

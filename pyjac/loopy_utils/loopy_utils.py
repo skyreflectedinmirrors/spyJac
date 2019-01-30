@@ -652,7 +652,7 @@ def set_adept_editor(knl,
             size=size))
     setters = '\n'.join(setters)
 
-    jac_size = dep_size * indep_size
+    # jac_size = dep_size * indep_size
     # find the output name
     jac_base_offset = '&' + output.name + \
         '[ad_j * {dep_size} * {indep_size}]'.format(

@@ -148,11 +148,11 @@ class SubTest(TestClass):
                     silenced_warnings=['write_race(0)'])
                 # create generators
                 kgen = make_kernel_generator(
-                     opts, KernelType.dummy, [info],
-                     namestore,
-                     input_arrays=[param.name, spec.name],
-                     output_arrays=[spec.name],
-                     name='ric_tester')
+                    opts, KernelType.dummy, [info],
+                    namestore,
+                    input_arrays=[param.name, spec.name],
+                    output_arrays=[spec.name],
+                    name='ric_tester')
                 # make kernels
                 kgen._make_kernels()
                 # and generate RIC
@@ -189,8 +189,8 @@ class SubTest(TestClass):
                 # cogify
                 try:
                     Cog().callableMain([
-                                'cogapp', '-e', '-d', '-Dconp={}'.format(conp),
-                                '-o', outfile, infile])
+                        'cogapp', '-e', '-d', '-Dconp={}'.format(conp),
+                        '-o', outfile, infile])
                 except Exception:
                     import logging
                     logger = logging.getLogger(__name__)

@@ -152,7 +152,8 @@ class write_race_silencer(object):
     """
 
     def __init__(self, write_races=[]):
-        self.write_races = ['write_race({name})'.format(name=x) for x in write_races]
+        self.write_races = ['write_race({name})'.format(
+            name=x) for x in write_races]
 
     def __call__(self, knl):
         return knl.copy(silenced_warnings=knl.silenced_warnings + self.write_races)
@@ -166,6 +167,7 @@ class within_inames_specializer(write_race_silencer):
 
     This should _not_ be used for anything but deep-vectorizations
     """
+
     def __init__(self, var_name=var_name, **kwargs):
         self.var_name = var_name
         super(within_inames_specializer, self).__init__(**kwargs)
@@ -376,7 +378,8 @@ class TemperatureGuard(Guard):
     """
 
     def __init__(self, loopy_opts, T_min=100., T_max=10000.):
-        super(TemperatureGuard, self).__init__(loopy_opts, minv=T_min, maxv=T_max)
+        super(TemperatureGuard, self).__init__(
+            loopy_opts, minv=T_min, maxv=T_max)
 
 
 class VolumeGuard(Guard):
@@ -524,7 +527,8 @@ class PowerFunction(PreambleMangler):
             manglers.append(mangler_type())
             # 2) float and long integer
             if self.name == 'pown':
-                manglers.append(mangler_type(arg_dtypes=(np.float64, np.int64)))
+                manglers.append(mangler_type(
+                    arg_dtypes=(np.float64, np.int64)))
             if self.is_simd:
                 from loopy.target.opencl import vec
                 vfloat = vec.types[np.dtype(np.float64),
@@ -688,7 +692,7 @@ def get_update_instruction(mapstore, mask_arr, base_update_insn):
         _, _, line_number, function_name, _, _ = inspect.stack()[1]
         logger.warn('Call to get_update_instruction() from {0}:{1} '
                     'used non-finalized mapstore, finalizing now...'.format(
-                         function_name, line_number))
+                        function_name, line_number))
 
         mapstore.finalize()
 
@@ -891,7 +895,8 @@ def with_conditional_jacobian(func):
                 jac, *jac_inds, plain_index=True, **kwargs)
             if index_insn:
                 # get the index
-                existing = sorted(_conditional_jacobian.id_namer.existing_names)
+                existing = sorted(
+                    _conditional_jacobian.id_namer.existing_names)
                 if existing or deps:
                     dep_str = 'dep={}'.format(':'.join(deps + existing))
                 else:
@@ -901,11 +906,11 @@ def with_conditional_jacobian(func):
                 name = _conditional_jacobian.id_namer(name)
                 index_insn = Template(
                     '${creation}jac_index = ${index_str} {id=${name}, ${dep_str}}'
-                    ).safe_substitute(
-                        creation='<> ' if not created_index else '',
-                        index_str=computed_ind,
-                        name=name,
-                        dep_str=dep_str)
+                ).safe_substitute(
+                    creation='<> ' if not created_index else '',
+                    index_str=computed_ind,
+                    name=name,
+                    dep_str=dep_str)
                 # add dependency to all before me (and just added)
                 # so that we don't get out of order
                 deps += [name]

@@ -922,8 +922,7 @@ class SubTest(TestClass):
         1: lambda self: self.__get_dci_check(
             lambda rxn: isinstance(rxn, ct.FalloffReaction) and
             rxn.falloff.type == 'Simple'),
-        2: lambda self: 2 + np.arange(self.store.gas.n_species - 1)
-        })
+        2: lambda self: 2 + np.arange(self.store.gas.n_species - 1)})
     def test_dci_lind_dnj(self):
         # test conp
         namestore, rate_info = self._make_namestore(True)
@@ -1030,8 +1029,7 @@ class SubTest(TestClass):
         1: lambda self: self.__get_dci_check(
             lambda rxn: isinstance(rxn, ct.FalloffReaction) and
             rxn.falloff.type == 'SRI'),
-        2: lambda self: 2 + np.arange(self.store.gas.n_species - 1)
-        })
+        2: lambda self: 2 + np.arange(self.store.gas.n_species - 1)})
     def test_dci_sri_dnj(self):
         # test conp
         namestore, rate_info = self._make_namestore(True)
@@ -1150,8 +1148,7 @@ class SubTest(TestClass):
         1: lambda self: self.__get_dci_check(
             lambda rxn: isinstance(rxn, ct.FalloffReaction) and
             rxn.falloff.type == 'Troe'),
-        2: lambda self: 2 + np.arange(self.store.gas.n_species - 1)
-        })
+        2: lambda self: 2 + np.arange(self.store.gas.n_species - 1)})
     def test_dci_troe_dnj(self):
         # test conp
         namestore, rate_info = self._make_namestore(True)
@@ -1302,8 +1299,7 @@ class SubTest(TestClass):
     @attr('long')
     @with_check_inds(check_inds={
         1: np.array([0]),
-        2: lambda self: np.arange(2, self.store.jac_dim)
-        })
+        2: lambda self: np.arange(2, self.store.jac_dim)})
     def test_dTdot_dnj(self):
         # conp
 
@@ -1383,8 +1379,7 @@ class SubTest(TestClass):
     @attr('long')
     @with_check_inds(check_inds={
         1: np.array([1]),
-        2: lambda self: np.arange(2, self.store.jac_dim)
-        })
+        2: lambda self: np.arange(2, self.store.jac_dim)})
     def test_dEdot_dnj(self):
         # conp
 
@@ -1698,8 +1693,7 @@ class SubTest(TestClass):
         1: lambda self: self.__get_check(
             lambda rxn: not (isinstance(rxn, ct.PlogReaction)
                              or isinstance(rxn, ct.ChebyshevReaction))),
-        2: np.array([0])
-        })
+        2: np.array([0])})
     def test_dRopidT(self):
         self.__run_ropi_test()
 
@@ -1707,8 +1701,7 @@ class SubTest(TestClass):
     @with_check_inds(check_inds={
         1: lambda self: self.__get_check(
             lambda rxn: isinstance(rxn, ct.PlogReaction)),
-        2: np.array([0])
-        })
+        2: np.array([0])})
     def test_dRopi_plog_dT(self):
         self.__run_ropi_test(reaction_type.plog)
 
@@ -1716,8 +1709,7 @@ class SubTest(TestClass):
     @with_check_inds(check_inds={
         1: lambda self: self.__get_check(
             lambda rxn: isinstance(rxn, ct.ChebyshevReaction)),
-        2: np.array([0])
-        })
+        2: np.array([0])})
     def test_dRopi_cheb_dT(self):
         self.__run_ropi_test(reaction_type.cheb)
 
@@ -1729,8 +1721,7 @@ class SubTest(TestClass):
         1: lambda self: self.__get_check(
             lambda rxn: not (isinstance(rxn, ct.PlogReaction)
                              or isinstance(rxn, ct.ChebyshevReaction))),
-        2: np.array([1])
-        })
+        2: np.array([1])})
     def test_dRopi_dE(self):
         self.__run_ropi_test(test_variable=True, conp=True)
         self.__run_ropi_test(test_variable=True, conp=False)
@@ -1742,8 +1733,7 @@ class SubTest(TestClass):
         0: lambda self: np.where(self.store.concs[:, -1] != 0)[0],
         1: lambda self: self.__get_check(
             lambda rxn: isinstance(rxn, ct.PlogReaction)),
-        2: np.array([1])
-        })
+        2: np.array([1])})
     def test_dRopi_plog_dE(self):
         self.__run_ropi_test(reaction_type.plog, True, conp=True)
         self.__run_ropi_test(reaction_type.plog, True, conp=False)
@@ -1755,8 +1745,7 @@ class SubTest(TestClass):
         0: lambda self: np.where(self.store.concs[:, -1] != 0)[0],
         1: lambda self: self.__get_check(
             lambda rxn: isinstance(rxn, ct.ChebyshevReaction)),
-        2: np.array([1])
-        })
+        2: np.array([1])})
     def test_dRopi_cheb_dE(self):
         self.__run_ropi_test(reaction_type.cheb, True, conp=True)
         self.__run_ropi_test(reaction_type.cheb, True, conp=False)
@@ -1773,14 +1762,11 @@ class SubTest(TestClass):
 
     @with_check_inds(check_inds={
         1: np.array([0]),
-        2: np.array([0]),
-        }, custom_checks={
+        2: np.array([0])}, custom_checks={
         #  find NaN's
         0: lambda self, conp: np.setdiff1d(
             np.arange(self.store.test_size), np.unique(np.where(np.isnan(
-                self.__get_full_jac(conp)))[0]), assume_unique=True)
-        }
-    )
+                self.__get_full_jac(conp)))[0]), assume_unique=True)})
     def __run_dtdot_dt(self, conp):
         # get the full jacobian
         fd_jac = self.__get_full_jac(conp)
@@ -1803,7 +1789,7 @@ class SubTest(TestClass):
         dc_name = 'dcp' if conp else 'dcv'
         dc = kernel_runner(_get_poly_wrapper(dc_name, conp),
                            self.store.test_size, args)(
-                           opts, namestore, self.store.test_size)[dc_name]
+            opts, namestore, self.store.test_size)[dc_name]
 
         args = {'conc': lambda x: np.array(
             self.store.concs, order=x, copy=True),
@@ -1890,13 +1876,11 @@ class SubTest(TestClass):
                 'Atroe': lambda x: np.zeros((
                     self.store.test_size, self.store.troe_inds.size), order=x),
                 'Btroe': lambda x: np.zeros((
-                    self.store.test_size, self.store.troe_inds.size), order=x),
-                })
+                    self.store.test_size, self.store.troe_inds.size), order=x)})
         elif rxn_type == falloff_form.sri:
             args.update({
                 'X': lambda x: np.zeros((
-                    self.store.test_size, self.store.sri_inds.size), order=x)
-                })
+                    self.store.test_size, self.store.sri_inds.size), order=x)})
 
         if conp:
             args.update({
@@ -1964,8 +1948,7 @@ class SubTest(TestClass):
         if test_variable:
             args.update({
                 'pres_mod': lambda x: np.array(
-                    self.store.ref_pres_mod, order=x, copy=True)
-                })
+                    self.store.ref_pres_mod, order=x, copy=True)})
 
         tester = dci_thd_dT if not test_variable else dci_thd_dE
         if rxn_type != reaction_type.thd:
@@ -2076,8 +2059,7 @@ class SubTest(TestClass):
     @attr('long')
     @with_check_inds(check_inds={
         0: lambda self: np.where(np.all(
-                    self.store.ref_Pr[:, self.store.lind_to_pr_map] != 0.0,
-                    axis=1))[0],
+            self.store.ref_Pr[:, self.store.lind_to_pr_map] != 0.0, axis=1))[0],
         # need to look at all 3body/fall, and exclude wrong type
         1: lambda self: self.__get_check(
             lambda rxn: (isinstance(rxn, ct.FalloffReaction) and
@@ -2091,8 +2073,7 @@ class SubTest(TestClass):
     @attr('long')
     @with_check_inds(check_inds={
         0: lambda self: np.where(np.all(
-                    self.store.ref_Pr[:, self.store.troe_to_pr_map] != 0.0,
-                    axis=1))[0],
+            self.store.ref_Pr[:, self.store.troe_to_pr_map] != 0.0, axis=1))[0],
         # need to look at all 3body/fall, and exclude wrong type
         1: lambda self: self.__get_check(
             lambda rxn: (isinstance(rxn, ct.FalloffReaction) and
@@ -2106,8 +2087,7 @@ class SubTest(TestClass):
     @attr('long')
     @with_check_inds(check_inds={
         0: lambda self: np.where(np.all(
-                    self.store.ref_Pr[:, self.store.sri_to_pr_map] != 0.0,
-                    axis=1))[0],
+            self.store.ref_Pr[:, self.store.sri_to_pr_map] != 0.0, axis=1))[0],
         # need to look at all 3body/fall, and exclude wrong type
         1: lambda self: self.__get_check(
             lambda rxn: (isinstance(rxn, ct.FalloffReaction) and
@@ -2132,8 +2112,7 @@ class SubTest(TestClass):
     @attr('long')
     @with_check_inds(check_inds={
         0: lambda self: np.where(np.all(
-                    self.store.ref_Pr[:, self.store.lind_to_pr_map] != 0.0,
-                    axis=1))[0],
+            self.store.ref_Pr[:, self.store.lind_to_pr_map] != 0.0, axis=1))[0],
         # need to look at all 3body/fall, and exclude wrong type
         1: lambda self: self.__get_check(
             lambda rxn: (isinstance(rxn, ct.FalloffReaction) and
@@ -2148,8 +2127,7 @@ class SubTest(TestClass):
     @attr('long')
     @with_check_inds(check_inds={
         0: lambda self: np.where(np.all(
-                    self.store.ref_Pr[:, self.store.troe_to_pr_map] != 0.0,
-                    axis=1))[0],
+            self.store.ref_Pr[:, self.store.troe_to_pr_map] != 0.0, axis=1))[0],
         # need to look at all 3body/fall, and exclude wrong type
         1: lambda self: self.__get_check(
             lambda rxn: (isinstance(rxn, ct.FalloffReaction) and
@@ -2164,8 +2142,7 @@ class SubTest(TestClass):
     @attr('long')
     @with_check_inds(check_inds={
         0: lambda self: np.where(np.all(
-                    self.store.ref_Pr[:, self.store.sri_to_pr_map] != 0.0,
-                    axis=1))[0],
+            self.store.ref_Pr[:, self.store.sri_to_pr_map] != 0.0, axis=1))[0],
         # need to look at all 3body/fall, and exclude wrong type
         1: lambda self: self.__get_check(
             lambda rxn: (isinstance(rxn, ct.FalloffReaction) and
@@ -2178,15 +2155,13 @@ class SubTest(TestClass):
         self.__run_dci_thd_dvar(falloff_form.sri, test_variable=True, conp=False)
 
     @with_check_inds(check_inds={
-            1: np.array([1]),
-            2: np.array([0])},
-        custom_checks={
-            # exclude purposefully included nan's
-            0: lambda self, conp: np.setdiff1d(
-                np.arange(self.store.test_size),
-                np.unique(np.where(np.isnan(self.__get_full_jac(conp)))[0]),
-                assume_unique=True)
-        })
+        1: np.array([1]),
+        2: np.array([0])}, custom_checks={
+        # exclude purposefully included nan's
+        0: lambda self, conp: np.setdiff1d(
+            np.arange(self.store.test_size),
+            np.unique(np.where(np.isnan(self.__get_full_jac(conp)))[0]),
+            assume_unique=True)})
     def __run_test_dedot_dt(self, conp):
         # conp
         fd_jac = self.__get_full_jac(conp)
@@ -2230,16 +2205,13 @@ class SubTest(TestClass):
         self.__run_test_dedot_dt(False)
 
     @with_check_inds(check_inds={
-            1: np.array([0]),
-            2: np.array([1])
-        },
-        custom_checks={
+        1: np.array([0]),
+        2: np.array([1])}, custom_checks={
             # exclude purposefully included nan's
             0: lambda self, conp: np.setdiff1d(
                 np.arange(self.store.test_size), np.unique(
                     np.where(np.isnan(self.__get_full_jac(conp)))[0]),
-                assume_unique=True)
-        })
+                assume_unique=True)})
     def __run_test_dtdot_de(self, conp):
         # get the full jacobian
         fd_jac = self.__get_full_jac(conp)
@@ -2273,8 +2245,7 @@ class SubTest(TestClass):
                 'h': lambda x: np.array(
                     spec_energy, order=x, copy=True),
                 'conc': lambda x: np.array(
-                    self.store.concs, order=x, copy=True)},
-                )
+                    self.store.concs, order=x, copy=True)})
         else:
             args.update({'V_arr': lambda x: np.array(
                 self.store.V, order=x, copy=True),
@@ -2300,15 +2271,12 @@ class SubTest(TestClass):
         self.__run_test_dtdot_de(False)
 
     @with_check_inds(check_inds={
-            1: np.array([1]),
-            2: np.array([1])
-        },
-        custom_checks={
+        1: np.array([1]),
+        2: np.array([1])}, custom_checks={
             # exclude purposefully included nan's
             0: lambda self, conp: np.setdiff1d(
                 np.arange(self.store.test_size), np.unique(np.where(np.isnan(
-                    self.__get_full_jac(conp)))[0]), assume_unique=True)
-        })
+                    self.__get_full_jac(conp)))[0]), assume_unique=True)})
     def __run_test_dedot_de(self, conp):
         # get the full jacobian
         fd_jac = self.__get_full_jac(conp)
@@ -2427,9 +2395,8 @@ class SubTest(TestClass):
         args = {'jac': __set}
 
         comp = get_comparable(ref_answer=[np.zeros(jac_shape)],
-                              compare_mask=[
-                                (slice(None), non_zero_inds[:, 0],
-                                    non_zero_inds[:, 1])],
+                              compare_mask=[(slice(None), non_zero_inds[:, 0],
+                                             non_zero_inds[:, 1])],
                               compare_axis=np.arange(len(jac_shape)),
                               tiling=False)
 

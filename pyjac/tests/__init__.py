@@ -158,10 +158,10 @@ class storage(object):
                                    if isinstance(x, ct.FalloffReaction)])
         self.sri_inds = np.array([i for i, x in enumerate(gas.reactions())
                                   if i in self.fall_inds and isinstance(
-                                    x.falloff, ct.SriFalloff)])
+                                  x.falloff, ct.SriFalloff)])
         self.troe_inds = np.array([i for i, x in enumerate(gas.reactions())
                                    if i in self.fall_inds and isinstance(
-                                    x.falloff, ct.TroeFalloff)])
+                                   x.falloff, ct.TroeFalloff)])
         self.lind_inds = np.array([i for i, x in enumerate(gas.reactions())
                                    if i in self.fall_inds and not
                                    (i in self.troe_inds or i in self.sri_inds)])
@@ -307,7 +307,7 @@ class storage(object):
         pure_fall_inds = np.array([i for i, x in enumerate(gas.reactions())
                                    if isinstance(x, ct.FalloffReaction) and
                                    not isinstance(
-                                        x, ct.ChemicallyActivatedReaction)])
+                                   x, ct.ChemicallyActivatedReaction)])
         pure_fall_inds = np.where(np.in1d(self.fall_inds, pure_fall_inds))[0]
         Pr_poly[:, pure_fall_inds] *= self.ref_Pr[:, pure_fall_inds]
         # finally find the product of the Pr poly and the falloff blending term
@@ -363,7 +363,7 @@ class TestClass(unittest.TestCase):
                 # and apply to gas
                 gas = ct.Solution(thermo='IdealGas', kinetics='GasKinetics',
                                   species=gas.species(), reactions=[
-                                    ct_reacs[i] for i in ordering])
+                                      ct_reacs[i] for i in ordering])
 
             # and reassign
             utils.reassign_species_lists(reacs, specs)
@@ -373,7 +373,8 @@ class TestClass(unittest.TestCase):
                 if platform is None:
                     platform = ''
                     raise OSError
-                platform = build_and_validate('test_platform_schema.yaml', platform)
+                platform = build_and_validate(
+                    'test_platform_schema.yaml', platform)
             except (OSError, IOError):
                 logger = logging.getLogger(__name__)
                 logger.warn('Test platform file {} was not found, reverting '

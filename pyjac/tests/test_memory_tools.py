@@ -484,7 +484,7 @@ def test_strided_copy():
             callgen = callgen.copy(name='test',
                                    input_args={'test': [x for x in lp_arrays
                                                if x not in const]},
-                                   output_args={'test' : []},
+                                   output_args={'test': []},
                                    host_constants={'test': const})
 
             temp_fname = os.path.join(build_dir, 'in' + utils.file_ext[lang])

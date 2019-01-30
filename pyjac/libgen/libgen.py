@@ -226,7 +226,7 @@ def compile(lang, toolchain, files, source_dir='', obj_dir=''):
 
             # compile
             toolchain.build_object(obj_files[-1], [file])
-        except CompileError as e:
+        except CompileError:
             logger = logging.getLogger(__name__)
             logger.error('Error compiling file: {}'.format(file))
             raise CompilationError(file)

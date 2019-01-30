@@ -225,7 +225,7 @@ class indexer(object):
             if isinstance(inds[axi], indexer.array_types):
                 # it's a numpy array, so we can divmod
                 rv[self.offset(self.split_axis)], rv[self.vec_axis] = np_divmod(
-                        inds[axi], self.vec_width, dtype=arc.kint_type)
+                    inds[axi], self.vec_width, dtype=arc.kint_type)
 
         for i, ax in enumerate(axes):
             if i != axi:
@@ -234,7 +234,8 @@ class indexer(object):
                 # check that this is ind is not a slice
                 # if it is we don't need to to anything
                 if isinstance(inds[i], indexer.array_types):
-                    rv[self.offset(ax)] = np.array(inds[i][:]).astype(arc.kint_type)
+                    rv[self.offset(ax)] = np.array(
+                        inds[i][:]).astype(arc.kint_type)
 
         return tuple(rv)
 
@@ -323,7 +324,7 @@ class multi_index_iter(object):
     """
 
     def __init__(self, mask, order, size_limit=_get_test_input(
-                    'working_mem', 2.5e8)):
+            'working_mem', 2.5e8)):
         self.mask = mask[:]
         self.shape = [x.size for x in mask]
         self.total_size = np.prod([x.size for x in mask])
@@ -531,7 +532,8 @@ def get_split_elements(arr, splitter, ref_shape, mask, axes=(1,),
     # ensure the mask / axes are in the form we expect
     mask = utils.listify(mask)
     axes = utils.listify(axes)
-    assert len(axes) == len(mask), "Supplied mask doesn't match given axis/axes"
+    assert len(axes) == len(
+        mask), "Supplied mask doesn't match given axis/axes"
 
     # fill in any missing mask / axes
     full_mask = []
@@ -544,7 +546,8 @@ def get_split_elements(arr, splitter, ref_shape, mask, axes=(1,),
 
     # create multi index iterator & output
     mii = multi_index_iter(full_mask, splitter.data_order)
-    output = np.empty((mii.num_iters, mii.per_iter), dtype=arr.dtype, order='C')
+    output = np.empty((mii.num_iters, mii.per_iter),
+                      dtype=arr.dtype, order='C')
     for i, multi_index in enumerate(mii):
         # convert multi indicies to split indices
         inds = _get_index(multi_index, full_axes)
@@ -860,7 +863,7 @@ def select_elements(arr, mask, axes, tiling=True):
                 inds = inds.astype('int64')
             except (AttributeError, TypeError):
                 pass
-            outv = np.take(outv, inds, axis=ax-ax_fac)
+            outv = np.take(outv, inds, axis=ax - ax_fac)
             if len(outv.shape) != shape:
                 ax_fac += shape - len(outv.shape)
         return outv.squeeze()
@@ -1204,7 +1207,7 @@ class OptionLoopWrapper(object):
                 self.state = state.copy()
                 # and build options
                 opts = loopy_options(**{x: state[x] for x in state
-                                     if x not in self.ignored_state_vals})
+                                        if x not in self.ignored_state_vals})
             except MissingPlatformError:
                 # warn and skip future tests
                 logger = logging.getLogger(__name__)
@@ -1310,10 +1313,10 @@ def _generic_tester(owner, func, kernel_calls, rate_func, do_ratespec=False,
         return 'platform' in state and state['platform'] in bad_platforms
 
     oploops = OptionLoopWrapper.from_get_oploop(
-            owner, do_ratespec=do_ratespec, do_ropsplit=do_ropsplit,
-            langs=langs, do_conp=do_conp, do_sparse=do_sparse,
-            sparse_only=sparse_only, skip_test=__skip_test, yield_index=True,
-            ignored_state_vals=exceptions)
+        owner, do_ratespec=do_ratespec, do_ropsplit=do_ropsplit,
+        langs=langs, do_conp=do_conp, do_sparse=do_sparse,
+        sparse_only=sparse_only, skip_test=__skip_test, yield_index=True,
+        ignored_state_vals=exceptions)
     tested_any = False
     for i, opt in oploops:
         # find rate info
@@ -1397,11 +1400,11 @@ def _full_kernel_test(self, lang, kernel_gen, test_arr_name, test_arr,
     def __skip_test(state):
         return 'platform' in state and state['platform'] in bad_platforms
     oploops = OptionLoopWrapper.from_get_oploop(
-            self, do_conp=True, do_vector=utils.can_vectorize_lang[lang],
-            langs=[lang], skip_test=__skip_test,
-            yield_index=True, ignored_state_vals=exceptions,
-            do_sparse=ktype == KernelType.jacobian,
-            **oploop_kwds)
+        self, do_conp=True, do_vector=utils.can_vectorize_lang[lang],
+        langs=[lang], skip_test=__skip_test,
+        yield_index=True, ignored_state_vals=exceptions,
+        do_sparse=ktype == KernelType.jacobian,
+        **oploop_kwds)
 
     from pyjac.core.create_jacobian import determine_jac_inds
     sparse_answers = {}
@@ -1429,7 +1432,8 @@ def _full_kernel_test(self, lang, kernel_gen, test_arr_name, test_arr,
                     jac_row_inds = inds['jac_inds']['ccs']['row_ind']
                     jac_col_inds = inds['jac_inds']['ccs']['col_ptr']
                 # need a sparse version of the test array
-                sparse = sparsify(full_jac, jac_col_inds, jac_row_inds, opts.order)
+                sparse = sparsify(full_jac, jac_col_inds,
+                                  jac_row_inds, opts.order)
                 sparse_answers[key] = sparse
 
             # generate kernel
@@ -1478,9 +1482,11 @@ def _full_kernel_test(self, lang, kernel_gen, test_arr_name, test_arr,
             tests = []
             if six.callable(test_arr):
                 if opts.jac_format == JacobianFormat.sparse:
-                    test = np.array(sparse_answers[key], copy=True, order=opts.order)
+                    test = np.array(
+                        sparse_answers[key], copy=True, order=opts.order)
                 else:
-                    test = np.array(test_arr(conp), copy=True, order=opts.order)
+                    test = np.array(test_arr(conp), copy=True,
+                                    order=opts.order)
             else:
                 test = np.array(test_arr, copy=True, order=opts.order)
             __saver(test, test_arr_name, tests)
@@ -1498,13 +1504,13 @@ def _full_kernel_test(self, lang, kernel_gen, test_arr_name, test_arr,
                 # fill other ravel locations with tiled test size
                 stride = 1
                 size = np.prod([test.shape[i] for i in range(test.ndim)
-                               if i not in copy_inds])
+                                if i not in copy_inds])
                 for i in [x for x in range(test.ndim) if x not in copy_inds]:
                     repeats = int(np.ceil(size / (test.shape[i] * stride)))
                     ravel_ind[i] = np.tile(np.arange(test.shape[i],
-                                           dtype=arc.kint_type),
+                                                     dtype=arc.kint_type),
                                            (repeats, stride)).flatten(
-                                                order='F')[:size]
+                        order='F')[:size]
                     stride *= test.shape[i]
 
                 # and use multi_ravel to convert to linear for dphi
@@ -1717,9 +1723,9 @@ def skipif(condition, msg=''):
 
         # Allow for both boolean or callable skip conditions.
         if isinstance(condition, collections.Callable):
-            skip_val = lambda: condition()  # noqa
+            def skip_val(): return condition()  # noqa
         else:
-            skip_val = lambda: condition  # noqa
+            def skip_val(): return condition  # noqa
 
         def get_msg(func, msg=None):
             """Skip message with information about function being skipped."""
@@ -1841,9 +1847,9 @@ class runner(object):
         conp = 'conp' if conp else 'conv'
 
         return '{}_{}_{}_{}_{}_{}_{}_{}_{}_{}'.format(
-                desc, loopy_opts.lang, vecsize, loopy_opts.order,
-                vectype, platform, utils.enum_to_string(loopy_opts.rate_spec),
-                split, num_cores, conp) + self.filetype
+            desc, loopy_opts.lang, vecsize, loopy_opts.order,
+            vectype, platform, utils.enum_to_string(loopy_opts.rate_spec),
+            split, num_cores, conp) + self.filetype
 
     def post(self):
         pass
@@ -1881,8 +1887,8 @@ def _run_mechanism_tests(work_dir, test_matrix, prefix, run,
     test_dir = 'test'
 
     # check if validation
-    from pyjac.functional_tester.test import validation_runner
-    for_validation = isinstance(run, validation_runner)
+    from pyjac.functional_tester.test import ValidationRunner
+    for_validation = isinstance(run, ValidationRunner)
 
     # imports needed only for this tester
     from pyjac.tests import get_rxn_sorting

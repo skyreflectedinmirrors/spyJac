@@ -260,7 +260,7 @@ def load_tests(matrix, filename):
             try:
                 EnumType(KernelType)(ttype)
                 return KernelType
-            except:
+            except ArgumentTypeError:
                 EnumType(JacobianFormat)(ttype)
                 return JacobianFormat
 
@@ -270,9 +270,9 @@ def load_tests(matrix, filename):
         descriptors = [test['test-type'] + ' - ' + test['eval-type']]
         if test['eval-type'] == 'both':
             descriptors = [test['test-type'] + ' - ' + enum_to_string(
-                                KernelType.jacobian),
-                           test['test-type'] + ' - ' + enum_to_string(
-                                KernelType.species_rates)]
+                KernelType.jacobian),
+                test['test-type'] + ' - ' + enum_to_string(
+                KernelType.species_rates)]
         if set(descriptors) & dupes:
             raise DuplicateTestException(test['test-type'], test['eval-type'],
                                          filename)
@@ -317,7 +317,7 @@ def load_tests(matrix, filename):
                                     dupes[override], path + override)
 
         # overrides only need to be checked within a test
-        nesteddict = lambda: defaultdict(nesteddict)  # noqa
+        def nesteddict(): return defaultdict(nesteddict)  # noqa
         roverride_check(test, allowed_override_keys, nesteddict())
 
     return tests
@@ -462,7 +462,7 @@ def get_test_matrix(work_dir, test_type, test_matrix, for_validation,
     if not tests:
         raise Exception('No tests found in matrix {} for {} test of {}, '
                         'exiting...'.format(matrix_name, valid_str, enum_to_string(
-                         test_type)))
+                            test_type)))
 
     # get defaults we haven't migrated to schema yet
     rate_spec = ['fixed', 'hybrid'] if test_type != KernelType.jacobian \
@@ -470,11 +470,11 @@ def get_test_matrix(work_dir, test_type, test_matrix, for_validation,
     sparse = ([enum_to_string(JacobianFormat.sparse),
                enum_to_string(JacobianFormat.full)]
               if test_type == KernelType.jacobian else [
-               enum_to_string(JacobianFormat.full)])
+        enum_to_string(JacobianFormat.full)])
     jac_types = [enum_to_string(JacobianType.exact),
                  enum_to_string(JacobianType.finite_difference)] if (
-                    test_type == KernelType.jacobian and not for_validation) else [
-                 enum_to_string(JacobianType.exact)]
+        test_type == KernelType.jacobian and not for_validation) else [
+        enum_to_string(JacobianType.exact)]
     rop_net_kernels = [False]
 
     # and default # of cores, this may be overriden
@@ -494,7 +494,8 @@ def get_test_matrix(work_dir, test_type, test_matrix, for_validation,
                      if plat['platform'] in test['platforms']]
             if len(plats) < len(platforms):
                 logger.debug('Platforms ({}) filtered out for test type: {}'.format(
-                    ', '.join([p['platform'] for p in platforms if p not in plats]),
+                    ', '.join([p['platform']
+                               for p in platforms if p not in plats]),
                     ' - '.join([test['test-type'], test['eval-type']])))
         if not len(plats):
             logger.warn('No platforms found for test {}, skipping...'.format(
@@ -529,14 +530,14 @@ def get_test_matrix(work_dir, test_type, test_matrix, for_validation,
                 def override_log(key, old, new):
                     logging.debug('Replacing {} for test type: {}. Old value:'
                                   ' ({}), New value: ({})'.format(
-                                    key,
-                                    stringify_args([
-                                        ttype, test['eval-type'],
-                                        jtype, stype],
-                                        joiner='.'),
-                                    stringify_args(listify(old)),
-                                    stringify_args(listify(new))
-                                    ))
+                                      key,
+                                      stringify_args([
+                                          ttype, test['eval-type'],
+                                          jtype, stype],
+                                          joiner='.'),
+                                      stringify_args(listify(old)),
+                                      stringify_args(listify(new))
+                                  ))
                 # copy defaults
                 icores = cores[:]
                 iorder = order[:]

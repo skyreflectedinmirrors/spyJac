@@ -122,8 +122,7 @@ def test_codegen_platform_schema_specification():
 
 def test_load_codegen():
     from pyopencl import Platform
-    platform = load_platform(__prefixify(
-            'codegen_platform.yaml', examples_dir))
+    platform = load_platform(__prefixify('codegen_platform.yaml', examples_dir))
     assert isinstance(platform.platform, Platform)
     assert platform.width == 4
     assert not platform.depth

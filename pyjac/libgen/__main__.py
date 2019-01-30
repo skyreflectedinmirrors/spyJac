@@ -7,8 +7,7 @@ from pyjac import utils
 if __name__ == '__main__':
     parser = ArgumentParser(
         description='Generates a shared/static library '
-                    'from previously generated pyJac files using gcc/nvcc.'
-        )
+                    'from previously generated pyJac files using gcc/nvcc.')
     parser.add_argument('-l', '--lang',
                         type=str,
                         choices=utils.langs,
