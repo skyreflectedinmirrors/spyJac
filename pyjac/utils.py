@@ -19,6 +19,7 @@ import textwrap
 import six
 from six.moves import reduce
 import yaml
+import numpy as np
 
 from pyjac.core import exceptions
 
@@ -41,6 +42,33 @@ stdindent = ' ' * 4
 """
 Standard indentation
 """
+
+
+def get_env_val(key, default=''):
+    try:
+        from testconfig import config
+    except ImportError:
+        # not nose
+        config = {}
+
+    value = default
+    in_config = False
+    if key in config:
+        logger = logging.getLogger(__name__)
+        in_config = True
+        logger.debug('Loading value {} = {} from testconfig'.format(
+            key, config[key.lower()]))
+        value = config[key.lower()]
+    if 'PYJAC_' + key.upper() in os.environ:
+        key = 'PYJAC_' + key.upper()
+        logger = logging.getLogger(__name__)
+        logger.debug('{}Loading value {} = {} from environment'.format(
+            'OVERRIDE: ' if in_config else '', key, os.environ[key.upper()]))
+        value = os.environ[key.upper()]
+    if default is not None:
+        return type(default)(value)
+    else:
+        return value
 
 
 def indent(text, prefix, predicate=None):
@@ -143,11 +171,11 @@ def partition(tosplit, predicate):
                   ([], []))
 
 
-file_ext = dict(c='.c', cuda='.cu', opencl='.ocl')
+file_ext = dict(c='.cpp', cuda='.cu', opencl='.ocl')
 """dict: source code file extensions based on language"""
 
 
-header_ext = dict(c='.h', cuda='.cuh', opencl='.oclh')
+header_ext = dict(c='.hpp', cuda='.cuh', opencl='.oclh')
 """dict: header extensions based on language"""
 
 line_end = dict(c=';', cuda=';',
@@ -161,10 +189,15 @@ can_vectorize_lang = {'c': False,
                       'ispc': True}
 """dict: defines whether a language can be 'vectorized' in the loopy sense"""
 
-exp_10_fun = dict(c='exp(log(10) * {val})', cuda='exp10({val})',
-                  opencl='exp10({val})', fortran='exp(log(10) * {val})'
-                  )
+exp_10_fun = dict(c='exp({log10} * {{val}})'.format(log10=np.log(10)),
+                  cuda='exp10({val})',
+                  opencl='exp10({val})')
 """dict: exp10 functions for various languages"""
+
+log_10_fun = dict(c='log10({val})',
+                  cuda='log10({val})',
+                  opencl='log10({val})')
+"""dict: log10 functions for various languages"""
 
 
 def kernel_argument_ordering(args, kernel_type, for_validation=False,
@@ -244,58 +277,21 @@ def kernel_argument_ordering(args, kernel_type, for_validation=False,
     return [mapping[x] for x in ordered]
 
 
-class PowerFunction(object):
-    """
-    A simple wrapper that contains the name of a power function for a given language
-    as well as any options
-    """
-
-    def __init__(self, name, lang, guard_nonzero=False):
-        self.name = name
-        self.lang = lang
-        self.guard_nonzero = guard_nonzero
-
-    def __repr__(self):
-        return self.name
-
-    def __str__(self):
-        return self.__repr__()
-
-    def __call__(self, base, power):
-        template = '{func}({base}, {power})'
-        guard = 'fmax(1e-300d, {base})'
-        if self.guard_nonzero:
-            guard = guard.format(base=base)
-            return template.format(func=self, base=guard, power=power)
-        return template.format(func=self, base=base, power=power)
-
-
-def power_function(lang, is_integer_power=False, is_positive_power=False,
-                   guard_nonzero=False):
-    """
-    Returns the best power function to use for a given :param:`lang` and
-    choice of :param:`is_integer_power` / :param:`is_positive_power`
-    """
-
-    if lang == 'opencl' and is_integer_power:
-        # opencl has it's own integer power function
-        # this also is nice for loopy, as it handles the vectorizability check
-        return PowerFunction('pown', lang, guard_nonzero=guard_nonzero)
-    elif lang == 'opencl' and is_positive_power:
-        # opencl positive power function -- no need for guard
-        return PowerFunction('powr', lang)
-    elif is_integer_power:
-        # use internal integer power function
-        return PowerFunction('fast_powi', lang, guard_nonzero=guard_nonzero)
-    else:
-        # use default
-        return PowerFunction('pow', lang, guard_nonzero=guard_nonzero)
-
-
 inf_cutoff = 1e285
 """float: A cutoff above which values are considered infinite.
           Used in testing and validation to filter values that should only
           be compared as 'large numbers'"""
+
+exp_max = 690.775527898
+"""float: the maximum allowed exponential value (evaluates to ~2e130)
+          useful to avoid FPE's / overflow if necessary.
+          The actual IEEE-standard specifies 709.8, but we use a slightly smaller
+          value for some wiggle-room
+"""
+
+small = 1e-300
+"""float: A 'small' number used to bound values above zero (e.g., for logarithms)
+"""
 
 
 # https://fangpenlin.com/posts/2012/08/26/good-logging-practice-in-python/
@@ -895,14 +891,19 @@ def get_parser():
                         ' is vectorized over each individaul thermo-chemical '
                         'state.  That is, the various work-items (CUDA threads) '
                         'cooperate.')
-    parser.add_argument('-e', '--explicit_simd',
+    parser.add_argument('-se', '--explicit_simd',
                         required=False,
-                        default=False,
+                        default=None,
                         action='store_true',
                         help='Use explicit-SIMD instructions in OpenCL if possible. '
                              'Note: currently available for wide-vectorizations '
                              'only.')
-    parser.add_argument('-u', '--unroll',
+    parser.add_argument('-si', '--implicit_simd',
+                        required=False,
+                        action='store_false',
+                        dest='explicit_simd',
+                        help='Use implict-SIMD vectorization in OpenCL.')
+    parser.add_argument('-unr', '--unroll',
                         type=int,
                         default=None,
                         required=False,
@@ -1019,15 +1020,15 @@ def get_parser():
                         'of "C" and "F" respectively). Choices: {type}'.format(
                             type=str(EnumType(JacobianFormat)))
                         )
-    parser.add_argument('-s', '--work_size',
+    parser.add_argument('-up', '--unique_pointers',
                         required=False,
-                        default=None,
-                        type=int,
-                        help='If specified, this is the number of thermo-chemical '
-                             'states that pyJac should evaluate concurrently in the '
-                             'generated source code. This option is most useful '
-                             'for coupling to an external library that that has '
-                             'already been parallelized, e.g., via OpenMP.'
+                        default=False,
+                        action='store_true',
+                        help='If specified, this indicates that the pointers passed '
+                             'to the generated pyJac methods will be unique (i.e., '
+                             'distinct per OpenMP thread / OpenCL work-group). '
+                             'This option is most useful for coupling to external '
+                             'codes an that have already been parallelized.'
                         )
     parser.add_argument('-m', '--memory_limits',
                         required=False,
@@ -1046,6 +1047,11 @@ def get_parser():
                         dest='loglevel',
                         help='Increase verbosity of logging / output messages.',
                         default=logging.INFO)
+    from pyjac.core.enum_types import reaction_sorting
+    parser.add_argument('--reaction_sorting',
+                        type=EnumType(reaction_sorting),
+                        default=reaction_sorting.none,
+                        help='Enable sorting of reactions [beta].')
     args = parser.parse_args()
     return args
 
@@ -1075,6 +1081,7 @@ def create(**kwargs):
                     jac_type=args.jac_type,
                     jac_format=args.jac_format,
                     mem_limits=args.memory_limits,
-                    work_size=args.work_size,
-                    explicit_simd=args.explicit_simd
+                    unique_pointers=args.unique_pointers,
+                    explicit_simd=args.explicit_simd,
+                    rsort=args.reaction_sorting
                     )

@@ -55,6 +55,9 @@ setup(
     # Choose your license
     license='MIT License',
 
+    # version
+    version=__version__,
+
     # See https://pypi.python.org/pypi?%3Aaction=list_classifiers
     classifiers=[
         'Development Status :: 5 - Production/Stable',
@@ -97,7 +100,8 @@ setup(
           'nose',
           'nose-exclude',
           'nose-testconfig',
-          'parameterized',
+          'nose-timer',
+          'parameterized >= 0.6.3',
           'optionloop >= 1.0.7',
           'cantera >= 2.3.0',
           'scipy',
@@ -124,8 +128,8 @@ setup(
         'pyjac': ['*.yaml'],
         'pyjac.pywrap': ['*.in'],
         'pyjac.functional_tester': ['*.yaml'],
-        'pyjac.kernel_utils.c': ['*.c', '*.h', '*.in'],
-        'pyjac.kernel_utils.common': ['*.c', '*.h', '*.in'],
+        'pyjac.kernel_utils.c': ['*.cpp', '*.hpp', '*.in'],
+        'pyjac.kernel_utils.common': ['*.cpp', '*.hpp', '*.in'],
         'pyjac.kernel_utils.opencl': ['*.ocl', '*.oclh', '*.in'],
         'pyjac.loopy_utils': ['*.in'],
         'pyjac.tests': ['*.cti', '*.inp'],

@@ -17,7 +17,8 @@ from nose import SkipTest
 
 from pyjac.loopy_utils.loopy_utils import (
     get_device_list, kernel_call, populate, auto_run, loopy_options)
-from pyjac.core.enum_types import RateSpecialization, JacobianType, JacobianFormat
+from pyjac.core.enum_types import RateSpecialization, JacobianType, JacobianFormat,\
+    reaction_sorting
 from pyjac.core.exceptions import MissingPlatformError, BrokenPlatformError
 from pyjac.kernel_utils import kernel_gen as k_gen
 from pyjac.core import array_creator as arc
@@ -42,7 +43,7 @@ try:
     np_divmod = np.divmod
 except AttributeError:
     def np_divmod(a, b, **kwargs):
-        div, mod = divmod(a, b)
+        div, mod = divmod(np.array(a), np.array(b))
         return np.asarray(div, **kwargs), np.asarray(mod, **kwargs)
 
 import six
@@ -1016,6 +1017,10 @@ def _get_oploop(owner, do_ratespec=False, do_ropsplit=False, do_conp=False,
     if do_simd:
         oploop += [('is_simd', [True, False])]
 
+    if _get_test_input('unique_pointers', False):
+        # allow specification of unique pointers via the ENV
+        oploop += [('unique_pointers', [True])]
+
     for key in sorted(kwargs.keys()):
         # enable user to pass in additional args
         oploop += [(key, utils.listify(kwargs[key]))]
@@ -1309,6 +1314,7 @@ def _generic_tester(owner, func, kernel_calls, rate_func, do_ratespec=False,
             langs=langs, do_conp=do_conp, do_sparse=do_sparse,
             sparse_only=sparse_only, skip_test=__skip_test, yield_index=True,
             ignored_state_vals=exceptions)
+    tested_any = False
     for i, opt in oploops:
         # find rate info
         rate_info = rate_func(reacs, specs, opt.rate_spec)
@@ -1336,6 +1342,7 @@ def _generic_tester(owner, func, kernel_calls, rate_func, do_ratespec=False,
                             func.__name__))
             continue
 
+        tested_any = True
         # create a dummy kernel generator
         knl = k_gen.make_kernel_generator(
             kernel_type=KernelType.dummy,
@@ -1354,6 +1361,9 @@ def _generic_tester(owner, func, kernel_calls, rate_func, do_ratespec=False,
 
         assert auto_run(knl.kernels, kernel_calls, device=opt.device),\
             'Evaluate {} rates failed'.format(func.__name__)
+
+    if not tested_any:
+        raise SkipTest('No valid platforms found to test.')
 
 
 def _full_kernel_test(self, lang, kernel_gen, test_arr_name, test_arr,
@@ -1395,9 +1405,11 @@ def _full_kernel_test(self, lang, kernel_gen, test_arr_name, test_arr,
 
     from pyjac.core.create_jacobian import determine_jac_inds
     sparse_answers = {}
+    tested_any = False
     for i, opts in oploops:
         with temporary_build_dirs() as (build_dir, obj_dir, lib_dir):
             conp = oploops.state['conp']
+            tested_any = True
 
             key = (conp, opts.jac_type, opts.order)
             if ktype == KernelType.jacobian and \
@@ -1433,8 +1445,7 @@ def _full_kernel_test(self, lang, kernel_gen, test_arr_name, test_arr,
 
             # generate wrapper
             pywrap(opts.lang, build_dir, build_dir=obj_dir,
-                   obj_dir=obj_dir, out_dir=lib_dir,
-                   platform=str(opts.platform), ktype=ktype)
+                   obj_dir=obj_dir, out_dir=lib_dir, ktype=ktype)
 
             # get arrays
             phi = np.array(
@@ -1553,6 +1564,7 @@ def _full_kernel_test(self, lang, kernel_gen, test_arr_name, test_arr,
             num_devices = _get_test_input(
                 'num_threads', psutil.cpu_count(logical=False))
             if platform_is_gpu(opts.platform):
+                # force to one thread
                 num_devices = 1
 
             # and save the data.bin file in case of testing
@@ -1590,6 +1602,9 @@ def _full_kernel_test(self, lang, kernel_gen, test_arr_name, test_arr,
                 logger = logging.getLogger(__name__)
                 logger.debug(oploops.state)
                 assert False, '{} error'.format(kgen.name)
+
+    if not tested_any:
+        raise SkipTest('No valid platforms found to test.')
 
 
 def with_check_inds(check_inds={}, custom_checks={}):
@@ -1870,9 +1885,10 @@ def _run_mechanism_tests(work_dir, test_matrix, prefix, run,
     for_validation = isinstance(run, validation_runner)
 
     # imports needed only for this tester
+    from pyjac.tests import get_rxn_sorting
     from pyjac.tests.test_utils import get_test_matrix as tm
     from pyjac.tests.test_utils import data_bin_writer as dbw
-    from pyjac.core.mech_interpret import read_mech_ct
+    from pyjac.core.mech_interpret import read_mech_ct, sort_reactions
     from pyjac.core.create_jacobian import find_last_species, create_jacobian
     import cantera as ct
 
@@ -1941,16 +1957,25 @@ def _run_mechanism_tests(work_dir, test_matrix, prefix, run,
         gas.basis = 'molar'
 
         # read our species for MW's
-        _, specs, _ = read_mech_ct(gas=gas)
+        _, specs, reacs = read_mech_ct(gas=gas)
 
         # find the last species
         gas_map = find_last_species(specs, return_map=True)
         del specs
+
+        # get the sorted reactions, if applicable
+        rsort = get_rxn_sorting()
+        ct_reacs = gas.reactions()
+        if rsort != reaction_sorting.none:
+            # get ordering
+            ordering = sort_reactions(reacs, rsort, return_order=True)
+            ct_reacs = [reacs[i] for i in range(ordering)]
+
         # update the gas
         specs = gas.species()[:]
         gas = ct.Solution(thermo='IdealGas', kinetics='GasKinetics',
                           species=[specs[x] for x in gas_map],
-                          reactions=gas.reactions())
+                          reactions=ct_reacs)
         del specs
 
         # first load data to get species rates, jacobian etc.

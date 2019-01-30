@@ -121,11 +121,16 @@ class PreambleGen(object):
 
 
 class fastpowi_PreambleGen(PreambleGen):
-    def __init__(self, integer_dtype=np.int32):
+    def __init__(self, lang, integer_dtype=np.int32, vector=None,
+                 name='fast_powi'):
         int_str = 'int' if integer_dtype == np.int32 else 'long'
+        inline = 'static inline ' if lang == 'c' else ''
+        double_str = 'double'
+        if vector:
+            double_str += str(vector)
         # operators
-        self.code = Template("""
-   inline double fast_powi(double val, ${int_str} pow)
+        code = Template("""
+   ${inline}${double_str} ${name}(${double_str} val, ${int_str} pow)
    {
         // account for negatives
         if (pow < 0)
@@ -149,41 +154,55 @@ class fastpowi_PreambleGen(PreambleGen):
             case 5:
                 return val * val * val * val * val;
         }
-        double retval = 1;
-        for (${int_str} i = 0; i < pow; ++i)
+        ${double_str} retval = val * val * val * val * val * val;
+        for (${int_str} i = 6; i < pow; ++i)
         {
             retval *= val;
         }
         return retval;
    }
-            """).substitute(int_str=int_str)
+            """).substitute(int_str=int_str, double_str=double_str,
+                            name=name, inline=inline)
 
         super(fastpowi_PreambleGen, self).__init__(
-            'fast_powi', self.code,
+            name, code,
             (np.float64, integer_dtype),
             (np.float64))
 
     def get_descriptor(self, func_match):
-        return 'cust_funcs_fastpowi'
+        return 'cust_funcs_{}'.format(self.name)
 
 
-def power_function_preambles(loopy_opts, power_function):
-    """
-    Parameters
-    ----------
-    loopy_opts: :class:`loopy_options`
-        unused, included for consistent interface
-    power_function: :class:`PowerFunction` or list thereof
-        The power function used
-    Returns
-    -------
-    gen: list of :class:`PreambleGen`
-        power function preambles for  a given :param:`power_function`.
-    """
+class fastpowiv_PreambleGen(fastpowi_PreambleGen):
+    def __init__(self, lang, integer_dtype=np.int32, vector_width=None):
+        assert vector_width is not None
+        super(fastpowiv_PreambleGen, self).__init__(
+            lang, integer_dtype, vector=vector_width, name='fast_powiv')
 
-    if 'fast_powi' in [x.name for x in utils.listify(power_function)]:
-        return [fastpowi_PreambleGen(arc.kint_type)]
-    return []
+
+class signaware_limiter_PreambleGen(PreambleGen):
+    def __init__(self, lang, limit, vector=None, name='limiter',
+                 is_simd=False):
+        inline = 'static inline ' if lang == 'c' else ''
+        double_str = 'double'
+        if vector and is_simd:
+            double_str += str(vector)
+        # operators
+        code = Template("""
+   ${inline}${double_str} ${name}(${double_str} val)
+   {
+        return (val < 0) ? fmin(-${limit}, val) : fmax(${limit}, val);
+   }
+   """).substitute(inline=inline, double_str=double_str,
+                   name=name, limit=limit)
+
+        super(signaware_limiter_PreambleGen, self).__init__(
+            name, code,
+            (np.float64),
+            (np.float64))
+
+    def get_descriptor(self, func_match):
+        return 'cust_funcs_{}'.format(self.name)
 
 
 class pown(MangleGen):
@@ -208,77 +227,16 @@ class powr(MangleGen):
                                    raise_on_fail=raise_on_fail)
 
 
-def power_function_manglers(loopy_opts, power_functions):
-    """
-    Parameters
-    ----------
-    loopy_opts: :class:`loopy_options`
-        The code-generation options, used for determining vector-width / SIMD
-    power_function: str or list of string
-        The power function used
-    Returns
-    -------
-    manglers: list of :class:`MangleGen`
-        power function manglers for  a given :param:`power_function`.
-    """
-
-    def __manglers(power_function):
-        pow_name = power_function.name
-        if loopy_opts.lang == 'opencl' and 'pow' in pow_name:
-            # opencl only
-            # create manglers
-            manglers = []
-
-            mangler_type = next((
-                mangler for mangler in [pown, powf, powr]
-                if mangler().name == pow_name), None)
-            if mangler_type is None:
-                raise Exception('Unknown OpenCL power function {}'.format(
-                    pow_name))
-            # 1) float and short integer
-            manglers.append(mangler_type())
-            # 2) float and long integer
-            if pow_name == 'pown':
-                manglers.append(mangler_type(arg_dtypes=(np.float64, np.int64)))
-            if loopy_opts.is_simd:
-                from loopy.target.opencl import vec
-                vfloat = vec.types[np.dtype(np.float64), loopy_opts.vector_width]
-                vlong = vec.types[np.dtype(np.int64), loopy_opts.vector_width]
-                vint = vec.types[np.dtype(np.int32), loopy_opts.vector_width]
-                # 3) vector float and short integers
-                # note: return type must be non-vector form (this will converted
-                # by loopy in privatize)
-                if pow_name == 'pown':
-                    manglers.append(mangler_type(arg_dtypes=(vfloat, np.int32),
-                                                 result_dtypes=np.float64))
-                    manglers.append(mangler_type(arg_dtypes=(vfloat, vint),
-                                                 result_dtypes=np.float64))
-                # 4) vector float and long integers
-                    manglers.append(mangler_type(arg_dtypes=(vfloat, np.int64),
-                                                 result_dtypes=np.float64))
-                manglers.append(mangler_type(arg_dtypes=(vfloat, vlong),
-                                             result_dtypes=np.float64))
-            return manglers
-        elif pow_name == 'fast_powi':
-            # skip, handled as preamble
-            return []
-        else:
-            return [powf()]
-
-    # check for fmax guards
-    guards = []
-    if any([power_func.guard_nonzero for power_func in utils.listify(
-            power_functions)]):
-        guards += [fmax()]
-
-    return [mangler for power_func in utils.listify(power_functions)
-            for mangler in __manglers(power_func)] + guards
-
-
 class fmax(MangleGen):
     def __init__(self, name='fmax', arg_dtypes=(np.float64, np.float64),
                  result_dtypes=np.float64):
         super(fmax, self).__init__(name, arg_dtypes, result_dtypes)
+
+
+class fmin(MangleGen):
+    def __init__(self, name='fmin', arg_dtypes=(np.float64, np.float64),
+                 result_dtypes=np.float64):
+        super(fmin, self).__init__(name, arg_dtypes, result_dtypes)
 
 
 class jac_indirect_lookup(PreambleGen):

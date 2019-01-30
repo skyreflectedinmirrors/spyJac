@@ -38,6 +38,7 @@ from pyjac.core.array_creator import work_size as w_size
 from pyjac.core.array_creator import global_ind
 from pyjac.core import array_creator as arc
 from pyjac.core.enum_types import DriverType, KernelType
+from pyjac.core.instruction_creator import PreambleMangler
 
 script_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -418,6 +419,10 @@ class CallgenResult(TargetCheckingRecord, DocumentingRecord):
         The language this kernel is being generated for.
     order: str {'C', 'F'}
         The data ordering
+    species_names : list of str
+        The species names for this model
+    rxn_strings : list of str
+        The stringified versions of the reactions for this model
     dev_mem_type: :class:`DeviceMemoryType`
         The type of device memory to used, 'pinned', or 'mapped'
     type_map: dict of :class:`LoopyType` -> str
@@ -441,8 +446,8 @@ class CallgenResult(TargetCheckingRecord, DocumentingRecord):
 
     def __init__(self, name='', work_arrays=[], input_args={}, output_args={},
                  cl_level='', docs={}, local_size=1, max_ic_per_run=None,
-                 max_ws_per_run=None, order='C', lang='c',
-                 dev_mem_type=DeviceMemoryType.mapped, type_map={},
+                 max_ws_per_run=None, lang='c', order='C', species_names=[],
+                 rxn_strings=[], dev_mem_type=DeviceMemoryType.mapped, type_map={},
                  host_constants={}, source_names={}, platform='', build_options='',
                  device_type=None, input_data_path='', for_validation=False,
                  binname='', language_docs=None):
@@ -453,6 +458,8 @@ class CallgenResult(TargetCheckingRecord, DocumentingRecord):
                                  cl_level=cl_level, docs=docs, local_size=local_size,
                                  max_ic_per_run=max_ic_per_run,
                                  max_ws_per_run=max_ws_per_run, order=order,
+                                 species_names=species_names,
+                                 rxn_strings=rxn_strings,
                                  lang=lang, dev_mem_type=dev_mem_type,
                                  type_map=type_map, host_constants=host_constants,
                                  source_names=source_names, platform=platform,
@@ -762,11 +769,11 @@ class kernel_generator(object):
         return utils.enum_to_string(self.kernel_type)
 
     @property
-    def user_specified_work_size(self):
+    def unique_pointers(self):
         """
-        Return True IFF the user specified the :attr:`loopy_opts.work_size`
+        Return True IFF the user specified the :attr:`loopy_opts.unique_pointers`
         """
-        return self.loopy_opts.work_size is not None
+        return self.loopy_opts.unique_pointers
 
     @property
     def work_size(self):
@@ -775,8 +782,8 @@ class kernel_generator(object):
         user) or the name of the `work_size` variable
         """
 
-        if self.user_specified_work_size:
-            return self.loopy_opts.work_size
+        if self.unique_pointers:
+            return self.vec_width if self.vec_width else 1
         return w_size.name
 
     @property
@@ -867,15 +874,7 @@ class kernel_generator(object):
             List of assumptions to apply to the generated sub kernel
         """
 
-        if self.for_testing or not for_driver:
-            return []
-
-        # set test size
-        assumpt_list = ['{0} > 0'.format(p_size.name)]
-        if bool(self.vec_width):
-            assumpt_list.append('{0} mod {1} = 0'.format(
-                p_size.name, self.vec_width))
-        return assumpt_list
+        return []
 
     def get_inames(self, test_size, for_driver=False):
         """
@@ -904,14 +903,11 @@ class kernel_generator(object):
         pre_split = self.loopy_opts.pre_split
 
         gind = global_ind
-        if not (self.for_testing or for_driver):
+        if not self.for_testing:
             # if we're not testing, or in a driver function the kernel must only be
             # executed once, as the loop over the work-size has been lifted to the
             # driver kernels
             test_size = self.loopy_opts.initial_condition_loopsize
-
-        elif for_driver:
-            test_size = p_size.name
 
         if pre_split:
             gind += '_outer'
@@ -919,12 +915,15 @@ class kernel_generator(object):
         inames = [gind]
         domains = ['0 <= {} < {}'.format(gind, test_size)]
 
-        if pre_split:
+        if self.loopy_opts.pre_split:
+            if self.for_testing or self.unique_pointers:
+                # reduced test size
+                test_size = int(test_size / self.vec_width)
             # add/fixup dummy j_inner domain
             lind = global_ind + '_inner'
             inames[-1] = (gind, lind)
             domains[-1] = ('0 <= {lind} < {vw} and '
-                           '0 <= {lind} + {vw}{gind} < {end}'.format(
+                           '0 <= {gind} < {end}'.format(
                             lind=lind, gind=gind, end=test_size,
                             vw=self.vec_width))
 
@@ -1042,11 +1041,12 @@ class kernel_generator(object):
             extension, see :any:`utils.file_ext`
 
         """
+
         deps = [x for x in os.listdir(scan_path) if os.path.isfile(
             os.path.join(scan_path, x)) and not x.endswith('.in')]
         for dep in deps:
             dep_dest = dep
-            dep_is_header = dep.endswith('.h')
+            dep_is_header = dep.endswith(utils.header_ext['c'])
             ext = (utils.file_ext[self.lang] if not dep_is_header
                    else utils.header_ext[self.lang])
             if change_extension and not dep.endswith(ext):
@@ -1064,7 +1064,7 @@ class kernel_generator(object):
                                               dummy_args=sorting_args)
 
     def generate(self, path, data_order=None, data_filename='data.bin',
-                 for_validation=False):
+                 for_validation=False, species_names=[], rxn_strings=[]):
         """
         Generates wrapping kernel, compiling program (if necessary) and
         calling / executing program for this kernel
@@ -1082,6 +1082,10 @@ class kernel_generator(object):
         for_validation: bool [False]
             If True, this kernel is being generated to validate pyJac, hence we need
             to save output data to a file
+        species_names: list of str
+            The list of species in the model
+        rxn_strings: list of str
+            Stringified versions of the reactions in the model
 
         Returns
         -------
@@ -1095,7 +1099,8 @@ class kernel_generator(object):
         callgen = self._generate_driver_kernel(path, record, result, callgen)
         callgen = self._generate_compiling_program(path, callgen)
         _, callgen = self._generate_calling_program(
-            path, data_filename, callgen, record, for_validation=for_validation)
+            path, data_filename, callgen, record, for_validation=for_validation,
+            species_names=species_names, rxn_strings=rxn_strings)
         self._generate_calling_header(path, callgen)
         self._generate_common(path, record)
 
@@ -1148,12 +1153,12 @@ class kernel_generator(object):
 
         common = os.path.join(script_dir, 'common')
         # generate reader
-        infile = os.path.join(common, 'read_initial_conditions.c.in')
+        infile = os.path.join(common, 'read_initial_conditions.cpp.in')
         outfile = os.path.join(path, 'read_initial_conditions' +
                                utils.file_ext[self.lang])
         run(infile, outfile)
         # generate header
-        infile = os.path.join(common, 'read_initial_conditions.h.in')
+        infile = os.path.join(common, 'read_initial_conditions.hpp.in')
         outfile = os.path.join(path, 'read_initial_conditions' +
                                utils.header_ext[self.lang])
         run(infile, outfile)
@@ -1183,7 +1188,7 @@ class kernel_generator(object):
         with open(callout, 'wb') as file:
             pickle.dump(callgen, file)
 
-        infile = os.path.join(script_dir, 'common', 'kernel.h.in')
+        infile = os.path.join(script_dir, 'common', 'kernel.hpp.in')
         filename = os.path.join(path, self.name + '_main' + utils.header_ext[
                 self.lang])
 
@@ -1223,7 +1228,8 @@ class kernel_generator(object):
         return sorted(set(arr), key=lambda x: arr.index(x))
 
     def _generate_calling_program(self, path, data_filename, callgen, record,
-                                  for_validation=False):
+                                  for_validation=False, species_names=[],
+                                  rxn_strings=[]):
         """
         Needed for all languages, this generates a simple C file that
         reads in data, sets up the kernel call, executes, etc.
@@ -1241,6 +1247,11 @@ class kernel_generator(object):
         for_validation: bool [False]
             If True, this kernel is being generated to validate pyJac, hence we need
             to save output data to a file
+        species_names: list of str
+            The list of species in the model
+        rxn_strings: list of str
+            Stringified versions of the reactions in the model
+
 
         Returns
         -------
@@ -1266,7 +1277,9 @@ class kernel_generator(object):
             lang=self.lang,
             type_map=self.type_map.copy(),
             input_data_path=data_filename,
-            for_validation=for_validation)
+            for_validation=for_validation,
+            species_names=species_names,
+            rxn_strings=rxn_strings)
 
         # any target specific substitutions
         callgen = self._special_kernel_subs(path, callgen)
@@ -1276,7 +1289,7 @@ class kernel_generator(object):
         with open(callout, 'wb') as file:
             pickle.dump(callgen, file)
 
-        infile = os.path.join(script_dir, 'common', 'kernel.c.in')
+        infile = os.path.join(script_dir, 'common', 'kernel.cpp.in')
         filename = os.path.join(path, self.name + '_main' + utils.file_ext[
                 self.lang])
 
@@ -1347,8 +1360,10 @@ class kernel_generator(object):
         """
 
         assert all(x.address_space == scopes.LOCAL for x in ldecls)
-        names = set([x.name for x in ldecls])
-
+        ltemps, largs = utils.partition(ldecls, lambda x: isinstance(
+            x, lp.TemporaryVariable))
+        # only need to process the local temporaries
+        names = set([x.name for x in ltemps])
         return kernel.copy(
             args=kernel.args[:] + [self._temporary_to_arg(x) for x in ldecls],
             temporary_variables={
@@ -1614,6 +1629,10 @@ class kernel_generator(object):
                     local.extend([x for x in lt if x not in local])
                     # and remove from temps
                     temps = [x for x in temps if x not in lt]
+        # and add any local args
+        largs, args = utils.partition(args,
+                                      lambda x: x.address_space == scopes.LOCAL)
+        local.extend(largs)
 
         # finally, separate the constants from the temporaries
         # for opencl < 2.0, a constant global can only be a
@@ -1760,11 +1779,6 @@ class kernel_generator(object):
             # duplicated kernel args are placed at the end and can be safely
             # extracted in the driver
             args = self.order_kernel_args(args)
-            # exclude arguments that are in our own kernel args
-            # note: driver work array contains kernel args in the form of the local
-            # copies
-            if not for_driver:
-                args = [x for x in args if x not in record.kernel_data]
 
             if not (len(args) or for_driver):
                 if result is None:
@@ -1779,7 +1793,8 @@ class kernel_generator(object):
             # get the pointer unpackings
             size_per_wi, static, offsets = self._get_working_buffer(args)
             unpacks = []
-            for k, (dtype, size, offset) in six.iteritems(offsets):
+            for k, (dtype, size, offset, s) in six.iteritems(offsets):
+                assert s == scope
                 unpacks.append(self._get_pointer_unpack(
                     k, size, offset, dtype, scope))
             if not result:
@@ -1819,6 +1834,42 @@ class kernel_generator(object):
             record = record.copy(kernel_data=record.kernel_data + [wb])
 
         return record, codegen
+
+    def _specialize_pointers(self, record, result):
+        """
+        Specialize the base pointers in the :param:`result` such that:
+            1. The pointer unpacks only contain arrays that correspond to the kernels
+               in the calling :class:`kernel_generator`
+            2. The pointer unpacks do not contain any of the calling
+               :class:`kernel_generator`'s input or output args
+
+        Parameters
+        ----------
+        record: :class:`MemoryGenerationResult`
+            The memory record that holds the kernel arguments
+        result: :class:`CodegenResult`
+            The current codegen result containing the pointer unpacks
+
+        Returns
+        -------
+        updated_result: :class:`CodegenResult`
+            The updated code generation result with pointers specialized for
+            the calling :class:`kernel_generator`
+        """
+
+        args = set(self.in_arrays + self.out_arrays)
+        data = set([x.name for x in record.args] + [x.name for x in record.local])
+
+        unpacks = []
+        offsets = {}
+
+        for (arry, offset), unpack in zip(*(six.iteritems(result.pointer_offsets),
+                                            result.pointer_unpacks)):
+            if (arry not in args) and (arry in data):
+                offsets[arry] = offset
+                unpacks.append(unpack)
+
+        return result.copy(pointer_unpacks=unpacks, pointer_offsets=offsets)
 
     def _dummy_wrapper_kernel(self, kernel_data, readonly, vec_width,
                               as_dummy_call=False, for_driver=False):
@@ -1956,9 +2007,16 @@ class kernel_generator(object):
         size_per_work_item = 0
         static_size = 0
         offsets = {}
-        work_size = self.work_size
+        mapping = {}
+        if self.unique_pointers:
+            mapping = {v.name: v
+                       for k, v in six.iteritems(vars(self.namestore))
+                       if isinstance(v, arc.creator)}
 
         def _offset():
+            # if we have unique pointers, the work-size is fixed to an integer, and
+            # will already be baked into the size of the array
+            work_size = self.work_size if not self.unique_pointers else 1
             return '{} * {}'.format(size_per_work_item, work_size)
 
         for arg in args:
@@ -1976,15 +2034,23 @@ class kernel_generator(object):
                 # static size
                 buffer_size = int(np.prod(isizes))
                 offset = _offset()
-                static_size += buffer_size
+                ic_dep = False
+                if self.unique_pointers:
+                    # need to test if this is per work-item or not
+                    if arg.name in mapping and not mapping[arg.name].is_temporary:
+                        size_per_work_item += buffer_size
+                        ic_dep = True
+
+                if not ic_dep:
+                    static_size += buffer_size
 
             # store offset and increment size
-            offsets[arg.name] = (arg.dtype, buffer_size, offset)
+            offsets[arg.name] = (arg.dtype, buffer_size, offset, arg.address_space)
 
         return size_per_work_item, static_size, offsets
 
     def _get_pointer_unpack(self, array, size, offset, dtype, scope=scopes.GLOBAL,
-                            set_null=False):
+                            set_null=False, for_driver=False):
         """
         A method stub to implement the pattern:
         ```
@@ -2006,6 +2072,9 @@ class kernel_generator(object):
             The memory scope
         set_null: bool [False]
             If True, set the unpacked pointer to NULL
+        for_driver: bool [False]
+            If True, this pointer is being unpacked for the driver, as such
+            any value of :attr:`unique_pointers` should be ignored
 
         Returns
         -------
@@ -2411,7 +2480,7 @@ class kernel_generator(object):
         return record.copy(kernel_data=kernel_data)
 
     def _generate_wrapping_kernel(self, path, record=None, result=None,
-                                  kernels=None):
+                                  kernels=None, **kwargs):
         """
         Generates a wrapper around the various subkernels in this
         :class:`kernel_generator` (rather than working through loopy's fusion)
@@ -2426,6 +2495,18 @@ class kernel_generator(object):
         result: :class:`CodegenResult` [None]
             If not None, this wrapping kernel is being generated as a sub-kernel
             (and hence, should reuse the owning kernel's results)
+        kernels: list of :class:`LoopKernel` [None]
+            The kernels to generate, if not supplied (i.e., for the top-level
+            kernel generator) use :attr:`kernels`
+
+        Keyword Arguments
+        -----------------
+        return_codegen_results: bool [False]
+            For testing only -- if True, return the codegen results for each of the
+            dependent :class:`kernel_generator`
+        return_memgen_records: bool [False]
+            For testing only -- if True, return the memory generation results for
+            each of the dependent :class:`kernel_generator`
 
         Returns
         -------
@@ -2444,49 +2525,45 @@ class kernel_generator(object):
         # whether this is the top-level kernel
         is_owner = record is None
         assert (kernels is not None) != is_owner
-        if is_owner:
+        if not kernels:
             kernels = self.kernels
+
+        if is_owner:
+            # we must process the kernel args / memory / host constants on the owner
+            # such that we have a consistent working buffer
             record, kernels = self._process_args(kernels)
             # process memory
             record, mem_limits = self._process_memory(record)
-
             # update subkernels for host constants
             if record.host_constants:
                 kernels = self._migrate_host_constants(
                     kernels, record.host_constants)
-
-            # get the kernel arguments for this :class:`kernel_generator`
-            record = self._set_kernel_data(record)
-
             # generate working buffer
             record, result = self._compress_to_working_buffer(record)
 
-            # get the kernel arguments for this :class:`kernel_generator`
-            record = self._set_kernel_data(record)
-
-            # add work size
-            record = record.copy(kernel_data=record.kernel_data + [self._with_target(
-                w_size)])
-
-            # finally, preprocess kernels such that code-gen in dependencies is
-            # faster
-            kernels = [lp.preprocess_kernel(k) for k in kernels]
+            # specialize the pointers
+            result = self._specialize_pointers(record, result)
         else:
+            # make local copies of inputs
+            result = result.copy()
+            owner_record = record.copy()
 
-            # get our arguments
-            our_record, _ = self._process_args(self.kernels)
-            # set correct kernel data for this record
-            our_record = self._set_kernel_data(our_record)
+            record, _ = self._process_args([x.copy() for x in self.kernels])
 
-            # create a new codegen result that contains only our pointer unpacks
-            our_args = set([x.name for x in our_record.args + our_record.local])
-            pointer_offsets = {k: v for k, v in six.iteritems(
-                result.pointer_offsets) if k in our_args}
-            pointer_unpacks = [x for x in result.pointer_unpacks if any(
-                re.search(r'\b' + y + r'\b', x) for y in pointer_offsets)]
+            # specialize the pointers
+            result = self._specialize_pointers(record, result)
 
-            result = CodegenResult(pointer_unpacks=pointer_unpacks,
-                                   pointer_offsets=pointer_offsets)
+            # add any working buffers from the owner
+            record = record.copy(kernel_data=record.kernel_data + [
+                x for x in owner_record.kernel_data if x.name in [
+                    int_work_name, rhs_work_name, local_work_name]])
+
+        # get the kernel arguments for this :class:`kernel_generator`
+        record = self._set_kernel_data(record)
+
+        # add work size
+        record = record.copy(kernel_data=record.kernel_data + [self._with_target(
+            w_size)])
 
         # get the instructions, preambles and kernel
         result = self._merge_kernels(record, result, kernels=kernels)
@@ -2495,11 +2572,13 @@ class kernel_generator(object):
             results = [result]
             # generate wrapper for deps
             deps = self._get_deps(include_self=False)
+            memgen_records = [record]
             # generate subkernels
             for kgen in deps:
-                _, _, dr = kgen._generate_wrapping_kernel('', record, result,
-                                                          kernels=kernels)
+                _, mr, dr = kgen._generate_wrapping_kernel(path, record, result,
+                                                           kernels=kernels)
                 results.append(dr)
+                memgen_records.append(mr)
             # remove duplicate constant/preamble definitions
             codegen_results = self._deduplicate(record, results)
             # and set sub-kernel dependencies
@@ -2511,6 +2590,12 @@ class kernel_generator(object):
             # write kernels to file
             for dr in codegen_results:
                 source_names.append(self._to_file(path, dr))
+
+        if is_owner and kwargs.get('return_codegen_results', False):
+            return codegen_results
+
+        if is_owner and kwargs.get('return_memgen_records', False):
+            return memgen_records
 
         return CallgenResult(source_names=source_names), record, result
 
@@ -2623,16 +2708,24 @@ class kernel_generator(object):
         def _name(arg):
             return arg.name + arc.local_name_suffix
 
-        unpacks = {_name(x): wrapper.pointer_offsets[x.name] for x in args
-                   if isinstance(x, lp.ArrayArg)}
+        unpacks = [(_name(x), wrapper.pointer_offsets[x.name]) for x in args
+                   if isinstance(x, lp.ArrayArg)]
         for null in null_args:
-            unpacks[null.name] = (null.dtype, 0, 0)
+            unpacks.append((null.name, (null.dtype, 0, 0, scopes.GLOBAL)))
 
-        unpacks = [self._get_pointer_unpack(k, size, offset, dtype, scopes.GLOBAL,
-                                            set_null=any(k == null.name for null
-                                                         in null_args))
-                   for k, (dtype, size, offset) in six.iteritems(unpacks)]
-        return CodegenResult(pointer_unpacks=unpacks)
+        local_unpacks = []
+        for k, (dtype, size, offset, scope) in unpacks:
+            if self.unique_pointers:
+                # reset from inner kernel where each pointer had a single
+                # workgroup / thread under consideration
+                offset = '{} * {}'.format(offset, arc.work_size.name)
+            local_unpacks.append(
+                self._get_pointer_unpack(k, size, offset, dtype, scope,
+                                         set_null=any(k == null.name for null
+                                                      in null_args), for_driver=True)
+                )
+
+        return CodegenResult(pointer_unpacks=local_unpacks)
 
     def _generate_driver_kernel(self, path, wrapper_memory, wrapper_result,
                                 callgen):
@@ -2685,8 +2778,13 @@ class kernel_generator(object):
             Return a copy of the kernel w/ our argument names converted to 'local'
             equivalensts
             """
+            to_local_names = our_arg_names[:]
+            if self.unique_pointers:
+                to_local_names.extend([rhs_work_name, local_work_name,
+                                       int_work_name])
+
             return kernel.copy(args=[
-                x if x.name not in our_arg_names
+                x if x.name not in to_local_names
                 else x.copy(name=x.name + arc.local_name_suffix)
                 for x in kernel.args])
 
@@ -2728,9 +2826,10 @@ class kernel_generator(object):
             elif arry.name in [rhs_work_name, local_work_name, int_work_name]:
                 def _size(a):
                     from pymbolic import substitute
-                    from pymbolic.primitives import Product
+                    from pymbolic.primitives import Product, Sum
                     assert len(a.shape) == 1
-                    if isinstance(a.shape[0], Product):
+                    if isinstance(a.shape[0], Product) or isinstance(
+                            a.shape[0], Sum):
                         return substitute(a.shape[0], **{w_size.name: 1})
                     return a.shape[0]
 
@@ -2742,6 +2841,32 @@ class kernel_generator(object):
         # we need in the driver live
         result = self._get_local_unpacks(driver_result, record.kernel_data,
                                          null_args=[time_array])
+        if self.unique_pointers:
+            # add a local pointer unpack to the working buffers
+            for wrk in [x for x in work_arrays if x.name in [
+                        rhs_work_name, local_work_name, int_work_name]]:
+                # find pointer unpack with smallest matching offset
+                smallest = None
+                for x, (dtype, size, offset, scope) in six.iteritems(
+                        driver_result.pointer_offsets):
+                    if not any(x == y.name for y in record.kernel_data):
+                        continue
+                    if scope != wrk.address_space:
+                        continue
+                    if smallest is None:
+                        smallest = eval(offset)
+                    elif eval(offset) < smallest:
+                        smallest = eval(offset)
+                if smallest is None:
+                    assert len(wrk.shape) == 1  # should be lwk or iwk
+                    smallest = wrk.shape[0]
+
+                # and add a local unpack for the work buffer
+                unpack = self._get_pointer_unpack(
+                    wrk.name + '_local', smallest, '0', dtype,
+                    wrk.address_space, for_driver=True)
+                result = result.copy(pointer_unpacks=result.pointer_unpacks +
+                                     [unpack])
 
         record = record.copy(kernel_data=self.order_kernel_args(
             record.kernel_data + work_arrays + [self._with_target(w_size)]))
@@ -2967,7 +3092,7 @@ class kernel_generator(object):
         # fix parameters
         if info.parameters:
             knl = lp.fix_parameters(knl, **info.parameters)
-        if self.user_specified_work_size:
+        if self.unique_pointers:
             # fix work size
             knl = lp.fix_parameters(knl, **{w_size.name: self.work_size})
         if not knl.loop_priority:
@@ -3149,7 +3274,7 @@ class c_kernel_generator(kernel_generator):
         return [global_ind],  ['0 <= {} < {}'.format(global_ind, test_size)]
 
     def _get_pointer_unpack(self, array, size, offset, dtype, scope=scopes.GLOBAL,
-                            set_null=False):
+                            set_null=False, for_driver=False):
         """
         A method stub to implement the pattern:
         ```
@@ -3172,6 +3297,9 @@ class c_kernel_generator(kernel_generator):
             The memory scope
         set_null: bool [False]
             If True, set the unpacked pointer to NULL
+        for_driver: bool [False]
+            If True, this pointer is being unpacked for the driver, as such
+            any value of :attr:`unique_pointers` should be ignored
 
         Returns
         -------
@@ -3184,13 +3312,17 @@ class c_kernel_generator(kernel_generator):
                 dtype=self.type_map[dtype],
                 array=array)
 
-        return ('{dtype}* __restrict__ {array} = {work} + {offset} + '
-                '{size} * omp_get_thread_num();'.format(
+        unique = ' + {size} * omp_get_thread_num()'.format(size=size)
+        if self.unique_pointers and not for_driver:
+            unique = ''
+
+        return ('{dtype}* __restrict__ {array} = {work} + {offset}'
+                '{unique};'.format(
                     dtype=self.type_map[dtype],
                     array=array,
                     work=rhs_work_name,
                     offset=offset,
-                    size=size))
+                    unique=unique))
 
     @property
     def target_preambles(self):
@@ -3207,9 +3339,6 @@ class c_kernel_generator(kernel_generator):
         premables: list of str
             The string preambles for this :class:`kernel_generator`
         """
-
-        if self.user_specified_work_size:
-            return []
 
         work_size = """
         #ifndef work_size
@@ -3342,9 +3471,6 @@ class opencl_kernel_generator(kernel_generator):
             The string preambles for this :class:`kernel_generator`
         """
 
-        if self.user_specified_work_size:
-            return []
-
         work_size = """
         #ifndef work_size
             #define work_size (({int_type}) get_num_groups(0))
@@ -3354,7 +3480,7 @@ class opencl_kernel_generator(kernel_generator):
         return [work_size]
 
     def _get_pointer_unpack(self, array, size, offset, dtype, scope=scopes.GLOBAL,
-                            set_null=False):
+                            set_null=False, for_driver=False):
         """
         Implement the pattern
         ```
@@ -3376,6 +3502,9 @@ class opencl_kernel_generator(kernel_generator):
             The memory scope
         set_null: bool [False]
             If True, set the unpacked pointer to NULL
+        for_driver: bool [False]
+            If True, this pointer is being unpacked for the driver, as such
+            any value of :attr:`unique_pointers` should be ignored
 
         Returns
         -------
@@ -3403,16 +3532,20 @@ class opencl_kernel_generator(kernel_generator):
                 dtype += str(self.vec_width)
             cast = '({} {}*)'.format(scope_str, dtype)
 
+        unique = ''
+        if self.unique_pointers and for_driver:
+            unique = ' + {} * {}'.format(size, 'get_group_id(0)')
+
         if set_null:
             return '{scope}{volatile} {dtype}* __restrict__ {array} = 0;'.format(
                 scope=scope_str, volatile=volatile,
                 dtype=dtype, array=array)
 
         return ('{scope}{volatile} {dtype}* __restrict__ {array}'
-                ' = {cast}({work_str} + {offset});').format(
+                ' = {cast}({work_str} + {offset}{unique});').format(
             scope=scope_str, volatile=volatile,
             dtype=dtype, array=array, cast=cast,
-            work_str=work_str, offset=offset)
+            work_str=work_str, offset=offset, unique=unique)
 
     def _special_kernel_subs(self, path, callgen):
         """
@@ -3529,7 +3662,7 @@ class opencl_kernel_generator(kernel_generator):
 
         # input
         infile = os.path.join(
-            script_dir, self.lang, 'opencl_kernel_compiler.c.in')
+            script_dir, self.lang, 'opencl_kernel_compiler.cpp.in')
 
         # output
         filename = os.path.join(
@@ -3637,8 +3770,6 @@ class knl_info(object):
     vectorization_specializer : function
         If specified, use this specialization function to fix problems that would
         arise in vectorization
-    preambles : :class:`preamble.PreambleGen`
-        A list of preamble generators to insert code into loopy / opencl
     split_specializer : function
         If specified, run this function to fixup an hanging ends after the
         kernel splits are applied
@@ -3657,10 +3788,10 @@ class knl_info(object):
                  vectorization_specializer=None,
                  can_vectorize=True,
                  manglers=[],
-                 preambles=[],
                  iname_domain_override=[],
                  split_specializer=None,
                  unrolled_vector=False,
+                 preambles=[],
                  **kwargs):
 
         def __listify(arr):
@@ -3683,8 +3814,19 @@ class knl_info(object):
         self.can_vectorize = can_vectorize
         self.vectorization_specializer = vectorization_specializer
         self.split_specializer = split_specializer
-        self.manglers = manglers[:]
-        self.preambles = preambles[:]
+        self.manglers = []
+        # copy if supplied
+        self.preambles = [x for x in preambles]
+        for mangler in manglers:
+            if isinstance(mangler, PreambleMangler):
+                self.manglers.extend(mangler.manglers)
+                self.preambles.extend(mangler.preambles)
+            elif isinstance(mangler, lp_pregen.MangleGen):
+                self.manglers.append(mangler)
+            else:
+                self.preambles.append(mangler)
+                self.manglers.append(mangler.func_mangler)
+
         self.iname_domain_override = iname_domain_override[:]
         self.kwargs = kwargs.copy()
         self.unrolled_vector = unrolled_vector
