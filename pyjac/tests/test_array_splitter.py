@@ -449,7 +449,8 @@ def test_get_split_shape(opts):
 
 
 @parameterized(lambda: opts_loop(skip_non_vec=False),
-               doc_func=_split_doc)
+               doc_func=_split_doc,
+               skip_on_empty=True)
 def test_indexer(opts):
     asplit = array_splitter(opts)
 
