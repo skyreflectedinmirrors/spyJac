@@ -413,7 +413,8 @@ class NonzeroGuard(Guard):
             super(NonzeroGuard, self).__init__(loopy_opts)
         self.is_positive = is_positive
         self.limiter = lp_pregen.signaware_limiter_PreambleGen(
-            loopy_opts.lang, limit=limit, vector=loopy_opts.vector_width)
+            loopy_opts.lang, limit=limit, vector=loopy_opts.vector_width,
+            is_simd=loopy_opts.is_simd)
 
     def __operation__(self, value):
         if self.is_positive is None:
@@ -425,14 +426,14 @@ class NonzeroGuard(Guard):
     def _manglers(self):
         manglers = []
         if self.is_positive is None:
-            manglers += [self.limiter.func_mangler()]
-        return manglers + super(Guard, self).manglers
+            manglers += [self.limiter.func_mangler]
+        return manglers + super(NonzeroGuard, self)._manglers()
 
     def _preambles(self):
         preambles = []
         if self.is_positive is None:
             preambles += [self.limiter]
-        return preambles + super(Guard, self).preambles
+        return preambles + super(NonzeroGuard, self)._preambles()
 
 
 class GuardedExp(Guard):
