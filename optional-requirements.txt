@@ -9,3 +9,5 @@ scipy
 tables
 psutil
 pyopencl
+flake8
+pep8-naming
