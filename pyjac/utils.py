@@ -134,8 +134,12 @@ def platform_is_gpu(platform):
 
 
 def stringify_args(arglist, kwd=False, joiner=', ', use_quotes=False,
-                   remove_empty=True):
-    template = '{}' if not use_quotes else '"{}"'
+                   remove_empty=True, raw=False):
+    template = '{}'
+    if use_quotes:
+        template = '"{}"'
+        if raw:
+            template = 'r"{}"'
     if kwd:
         template = template + '=' + template
         return joiner.join(template.format(str(k), str(v))

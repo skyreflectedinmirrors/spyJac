@@ -22,7 +22,7 @@ from pyjac.loopy_utils.loopy_utils import kernel_call
 from pyjac.core.array_creator import array_splitter, kint_type
 import pyjac.core.array_creator as arc
 from pyjac import utils
-from pyjac.utils import enum_to_string, listify, to_enum
+from pyjac.utils import enum_to_string, listify, to_enum, stringify_args
 from pyjac import utils  # noqa
 from pyjac.core.enum_types import (KernelType, JacobianFormat, JacobianType)
 from pyjac.tests.test_utils import get_comparable, skipif, dense_to_sparse_indicies,\
@@ -385,6 +385,20 @@ def test_kernel_argument_ordering():
     assert utils.kernel_argument_ordering(args, KernelType.species_rates,
                                           for_validation=False) == [
         'a', 'b', arc.forward_rate_of_progress, arc.state_vector]
+
+
+def test_stringify_args():
+    assert stringify_args(['a', 'b']) == 'a, b'
+    assert stringify_args(['a', 'b'], use_quotes=True) == '"a", "b"'
+    assert stringify_args(['a', 'b'], use_quotes=True, raw=True) == 'r"a", r"b"'
+    assert stringify_args(['a', 'b'], raw=True) == 'a, b'
+    assert stringify_args(['a', 'b'], joiner=' | ') == 'a | b'
+    assert stringify_args(['a', 'b', '']) == 'a, b'
+    assert stringify_args(['a', 'b', ''], remove_empty=False) == 'a, b, '
+    assert stringify_args(['a', 'b', ''], remove_empty=False) == 'a, b, '
+    assert stringify_args({'a': 1, "b": 2}, kwd=True) == "a=1, b=2"
+    assert stringify_args({'a': 1, "b": 2}, kwd=True, use_quotes=True) == \
+        '"a"="1", "b"="2"'
 
 
 class TestUtils(object):
