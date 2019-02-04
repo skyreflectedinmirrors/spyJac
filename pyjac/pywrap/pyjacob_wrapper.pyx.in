@@ -26,6 +26,7 @@ cdef extern from "{name}_main{ext}":
 
         vector[const char*] speciesNames() except+
         vector[const char*] reactionStrings() except+
+        vector[const char*] jacobianStrings() except+
         unsigned int numSpecies() except +
         unsigned int numReactions() except +
         unsigned int requiredMemorySize() except +
@@ -72,6 +73,9 @@ cdef class Py{name}:
 
     def num_species(self):
         return self.kernel.numSpecies()
+
+    def jacobian_strings(self):
+        return self.kernel.jacobianStrings()
 
     def required_working_memory(self):
         return self.kernel.requiredMemorySize()

@@ -69,6 +69,10 @@ def get_read_ics_source():
     return __get_template(os.path.join(script_dir, 'read_ic_setup.py.in'))
 
 
+def get_jacobian_strings_source():
+    return __get_template(os.path.join(script_dir, 'test_jacobian_strings.py.in'))
+
+
 @contextmanager
 def temporary_build_dirs(cleanup=True):
     """

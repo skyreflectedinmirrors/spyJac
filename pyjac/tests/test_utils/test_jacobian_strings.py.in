@@ -1,0 +1,23 @@
+"""
+Once we create a python module using the wrapper it becomes difficult to
+manage reloading the module if recreated frequently during testing.
+
+Hence we create this small testing stub that is designed to test importing the module
+"""
+
+import importlib
+import os
+
+if __name__ == '__main__':
+    # find path
+    path = os.path.abspath('${path}')
+    # change to
+    os.chdir(path)
+    # load package
+    package = '${package}'
+    package = importlib.import_module(package)
+
+    jac_strs = [${jac_strs}]
+    kernel = package.Py${kernel}Kernel(1, 1)
+    assert all(x.decode() == y for x, y in zip(
+        *(kernel.jacobian_strings(), jac_strs)))

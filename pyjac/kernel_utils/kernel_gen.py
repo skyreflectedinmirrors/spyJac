@@ -39,6 +39,8 @@ from pyjac.core.array_creator import global_ind
 from pyjac.core import array_creator as arc
 from pyjac.core.enum_types import DriverType, KernelType
 from pyjac.core.instruction_creator import PreambleMangler
+from pyjac.core.array_creator import pressure_array, volume_array, state_vector, \
+    state_vector_rate_of_change, jacobian_array
 
 script_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -303,21 +305,22 @@ class CodegenResult(TargetCheckingRecord):
 
 
 def kernel_arg_docs():
-    return {'phi': ('double', 'The state vector'),
-            'P_arr': ('double', 'The array of pressures.'),
-            'V_arr': ('double', 'The array of volumes'),
-            'dphi': ('double', 'The time rate of change of the state-vector'),
-            'jac': ('double', 'The Jacobian of the time-rate of change of '
-                              'the state vector'),
-            'problem_size': ('size_t', 'The total number of conditions to execute '
-                             'this kernel over')}
+    return {state_vector: ('double', 'The state vector'),
+            pressure_array: ('double', 'The array of pressures.'),
+            volume_array: ('double', 'The array of volumes'),
+            state_vector_rate_of_change: (
+                'double', 'The time rate of change of the state-vector'),
+            jacobian_array: ('double', 'The Jacobian of the time-rate of change of '
+                             'the state vector'),
+            p_size.name: ('size_t', 'The total number of conditions to execute '
+                          'this kernel over')}
 
 
 # heh
 def langue_docs(lang):
     if lang == 'opencl':
         return {
-            'work_size': ('size_t', 'The number of OpenCL groups to launch.\n'
+            w_size.name: ('size_t', 'The number of OpenCL groups to launch.\n'
                                     'If using GPUs, this is the # of CUDA blocks '
                                     'to use.\n'
                                     'If for CPUs, this is the number of logical '
@@ -333,7 +336,7 @@ def langue_docs(lang):
         }
     elif lang == 'c':
         return {
-            'work_size': ('size_t', 'The number of OpenMP threads to use.'),
+            w_size.name: ('size_t', 'The number of OpenMP threads to use.'),
             'do_not_compile': ('bool', 'Unused -- incuded for consistent '
                                'signatures.')
         }
@@ -406,7 +409,7 @@ class CallgenResult(TargetCheckingRecord, DocumentingRecord):
         A dictionary mapping of kernel name -> constant variables to be placed in
         the working buffer
     docs: dict of str->str
-        A mapping of kernel argument names to their
+        A mapping of kernel argument names to their documentation
     local_size: int [1]
         The OpenCL vector width, set to 1 by default for all other languages
     max_ic_per_run: int [None]
@@ -519,6 +522,18 @@ class CallgenResult(TargetCheckingRecord, DocumentingRecord):
         Returns a dictionary kernel name-> complete list of kernel arguments
         """
         return self._get_data(False)
+
+    @property
+    def conp(self):
+        """
+        Returns True if this :class:`CallgenRecord` uses the constant-pressure
+        assumption, and False if constant-volume
+        """
+
+        for kernel in self.kernel_data:
+            if any(x.name == pressure_array for x in self.kernel_data[kernel]):
+                return True
+        return False
 
 
 class CompgenResult(TargetCheckingRecord):

@@ -1,5 +1,6 @@
 import os
 import re
+from string import Template
 
 import numpy as np
 from nose.plugins.attrib import attr
@@ -22,6 +23,32 @@ from pyjac.tests.test_utils import temporary_build_dirs, OptionLoopWrapper, xfai
 
 class SubTest(TestClass):
 
+    def __generate(self, method, loopy_opts, build_dir, obj_dir, lib_dir,
+                   python_wrapper=True, conp=True, ktype=KernelType.species_rates,
+                   shared=False):
+        # write files
+        kgen = method(self.store.reacs, self.store.specs, loopy_opts,
+                      conp=conp)
+        # generate
+        kgen.generate(build_dir, species_names=[
+            x.name for x in self.store.specs], rxn_strings=[
+            str(x) for x in self.store.reacs])
+
+        # write header
+        write_aux(build_dir, loopy_opts, self.store.specs, self.store.reacs)
+        if python_wrapper:
+            # generate wrapper
+            pywrap(loopy_opts.lang, build_dir, obj_dir=obj_dir, out_dir=lib_dir,
+                   ktype=ktype)
+        else:
+            # compile
+            generate_library(loopy_opts.lang, build_dir, obj_dir=obj_dir,
+                             out_dir=lib_dir, shared=shared,
+                             ktype=ktype)
+
+    def __package(self, lang):
+        return 'pyjac_{}'.format(utils.package_lang[lang])
+
     def __run_test(self, method, test_python_wrapper=True,
                    ktype=KernelType.species_rates, **oploop_keywords):
         kwargs = {}
@@ -29,43 +56,27 @@ class SubTest(TestClass):
             kwargs['shared'] = [True, False]
         oploop_keywords.update(kwargs)
         ignored_state_vals = ['conp'] + list(kwargs.keys())
-
         wrapper = OptionLoopWrapper.from_get_oploop(
             self, ignored_state_vals=ignored_state_vals,
             do_conp=False, **oploop_keywords)
         for opts in wrapper:
             with temporary_build_dirs() as (build_dir, obj_dir, lib_dir):
                 # write files
-                # write files
                 conp = wrapper.state['conp']
-                kgen = method(self.store.reacs, self.store.specs, opts,
-                              conp=conp)
-                # generate
-                kgen.generate(build_dir, species_names=[
-                    x.name for x in self.store.specs], rxn_strings=[
-                    str(x) for x in self.store.reacs])
-                # write header
-                write_aux(build_dir, opts, self.store.specs, self.store.reacs)
+                self.__generate(method, opts, build_dir, obj_dir, lib_dir,
+                                python_wrapper=test_python_wrapper, conp=conp,
+                                ktype=ktype, shared=wrapper.state['shared'])
                 if test_python_wrapper:
-                    package = 'pyjac_{}'.format(utils.package_lang[opts.lang])
-                    # test wrapper generation
-                    pywrap(opts.lang, build_dir, obj_dir=obj_dir, out_dir=lib_dir,
-                           ktype=ktype)
-
+                    # import the wrapper
                     imp = test_utils.get_import_source()
                     with open(os.path.join(lib_dir, 'test_import.py'), 'w') as file:
                         file.write(imp.substitute(
-                            path=lib_dir, package=package,
+                            path=lib_dir, package=self.__package(opts.lang),
                             kernel=utils.enum_to_string(ktype).title(),
                             nsp=len(self.store.specs), nrxn=len(self.store.reacs)))
 
                     utils.run_with_our_python([
                         os.path.join(lib_dir, 'test_import.py')])
-                else:
-                    # compile
-                    generate_library(opts.lang, build_dir, obj_dir=obj_dir,
-                                     out_dir=lib_dir, shared=wrapper.state['shared'],
-                                     ktype=ktype)
 
     @attr('verylong')
     def test_specrates_compilation(self):
@@ -100,6 +111,35 @@ class SubTest(TestClass):
                     file = file.read()
                 # and make sure we don't have 'work_size
                 assert not re.search(r'\b{}\b'.format(work_size.name), file)
+
+    def test_jacobian_string_specification(self):
+        from pyjac.loopy_utils import loopy_options
+        with temporary_build_dirs() as (build_dir, obj_dir, lib_dir):
+            ktype = KernelType.jacobian
+            opts = loopy_options(lang='c', order='C', kernel_type=ktype)
+            self.__generate(get_jacobian_kernel, opts, build_dir, obj_dir, lib_dir,
+                            python_wrapper=True, conp=True, ktype=ktype,
+                            shared=False)
+
+            state = ['T', 'V'] + [spec.name for spec in self.store.specs[:-1]]
+            jac_strs = []
+            for row in state:
+                for col in state:
+                    jac_strs.append(Template(
+                        r'\frac{\partial \dot{$top}}{\partial'
+                        r' $bottom}').substitute(
+                            top=row, bottom=col))
+
+            jac = test_utils.get_jacobian_strings_source()
+            with open(os.path.join(lib_dir, 'test_jacobian.py'), 'w') as file:
+                file.write(jac.substitute(
+                    path=lib_dir, package=self.__package(opts.lang),
+                    kernel=utils.enum_to_string(ktype).title(),
+                    jac_strs=utils.stringify_args(jac_strs, use_quotes=True,
+                                                  raw=True)))
+
+            utils.run_with_our_python([
+                os.path.join(lib_dir, 'test_jacobian.py')])
 
     def __write_with_subs(self, file, inpath, outpath, renamer=None, **subs):
         with open(os.path.join(inpath, file), 'r') as read:
