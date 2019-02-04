@@ -203,7 +203,7 @@ class loopy_options(object):
                             cl.platform_info.NAME).lower():
                         self.platform = p
                         break
-                except cl.cffi_cl.RuntimeError:
+                except cl.RuntimeError:
                     pass
             if not self.platform:
                 raise MissingPlatformError(platform)
