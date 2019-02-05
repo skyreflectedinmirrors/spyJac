@@ -391,6 +391,18 @@ class VolumeGuard(Guard):
         super(VolumeGuard, self).__init__(loopy_opts, minv=V_min)
 
 
+class MoleGuard(Guard):
+    """
+    Bound the moles of a species to a reasonable range
+    (for evaluation of concentrations without creating FPE's), i.e.:
+
+        n = min(n_max, max(n_min, n))
+    """
+
+    def __init__(self, loopy_opts, n_min=1e-50, n_max=1e20):
+        super(MoleGuard, self).__init__(loopy_opts, minv=n_min, maxv=n_max)
+
+
 class NonzeroGuard(Guard):
     """
     A (potentially) sign-aware guard against non-zero numbers, may be employed
