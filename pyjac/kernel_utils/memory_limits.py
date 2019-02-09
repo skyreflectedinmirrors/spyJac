@@ -115,7 +115,7 @@ class memory_limits(object):
     Helps determine whether a kernel is using too much constant / shared memory,
     etc.
 
-    Properties
+    Attributes
     ----------
     arrays: dict
             A mapping of :class:`loopy.TemporaryVariable` or :class:`loopy.GlobalArg`
@@ -214,7 +214,7 @@ class memory_limits(object):
         type: :class:`memory_type`
             The type of memory to use
         with_type_changes: dict
-            Updates to apply to :prop:`arrays`
+            Updates to apply to :attr:`arrays`
 
         Returns
         -------

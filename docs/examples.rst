@@ -21,11 +21,28 @@ any cache optimization):
 
     python -m pyjac --lang c --input data/h2o2.inp
 
-CUDA source code can be generated similarly:
+OpenCL source code can be generated similarly:
 
 .. code-block:: bash
 
-    python -m pyjac --lang cuda --input data/h2o2.inp
+    python -m pyjac --lang opencl --input data/h2o2.inp
+
+============
+Unit Testing
+============
+
+The pyJac unit-tests can be run with ``nose``, via:
+
+.. code-block:: bash
+
+    nosetests
+
+To turn off long-running tests, you may insteady use
+
+.. code-block:: bash
+
+    nosetests -A 'not fullkernel and not verylong'
+
 
 ==================
 Functional testing

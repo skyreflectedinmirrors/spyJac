@@ -460,29 +460,28 @@ def get_split_elements(arr, splitter, ref_shape, mask, axes=(1,),
 
     .. _note-above:
 
-    Note
-    ----
+    .. note::
 
-    This method is somewhat similar to :class:`indexer` but differs in a few key
-    respects:
+        This method is somewhat similar to :class:`indexer` but differs in a few key
+        respects:
 
-    1) First, this method returns the desired elements of the split array (instead
-       of indicies).
+        1) First, this method returns the desired elements of the split array (instead
+           of indicies).
 
-    2) Second, this method properly tiles / repeats the indicies for splitting, e.g.,
-       let's say we want to look at the slice 1:3 for axes 0 & 1 for the unsplit
-       array "array":
+        2) Second, this method properly tiles / repeats the indicies for splitting,
+           e.g., let's say we want to look at the slice 1:3 for axes 0 & 1 for the
+           unsplit array "array"::
 
-            array[1:3, 1:3]
+                array[1:3, 1:3]
 
-       Passing a mask of [[1,2,3], [1,2,3]], and axes of (0, 1) to the
-       :class:`indexer` would result in just six split indicies returned i.e., for
-       indicies (1,1), (2,2), and (3,3).
+           Passing a mask of [[1,2,3], [1,2,3]], and axes of (0, 1) to the
+           :class:`indexer` would result in just six split indicies returned i.e.,
+           for indicies (1,1), (2,2), and (3,3).
 
-       :func:`get_split_elements` will tile these indicies such that the elements
-       for each combination of the inputs will be returned.  In our example
-       this would correspond to nine elements, one each for each of (1,1)
-       (1,2), (1,3) ... (3,3).
+           :func:`get_split_elements` will tile these indicies such that the elements
+           for each combination of the inputs will be returned.  In our example
+           this would correspond to nine elements, one each for each of (1,1)
+           (1,2), (1,3) ... (3,3).
 
 
     Parameters
@@ -497,7 +496,7 @@ def get_split_elements(arr, splitter, ref_shape, mask, axes=(1,),
         The axes the mask's correspond to. Must be of the same shape / size as mask.
     tiling: bool [True]
         If False, turns off the tiling discussed in the
-        :ref:`note-above <note above>`_.  In this mode, each entry of the mask must
+        :ref:`note-above`.  In this mode, each entry of the mask must
         be the same length as all other entries
 
     Returns
@@ -562,7 +561,7 @@ def inNd(a, b):
     """
     Helper method that works like in1d, but for N-Dimensional arrays
 
-    Paramaters
+    Parameters
     ----------
     a: :class:`numpy.ndarray`
         A M x N array
@@ -593,7 +592,9 @@ def combination(*arrays, **kwargs):
     Returns
     -------
     combined: :class:`numpy.ndarray`
-        The combined array of shape N x `arrays`[0].size
+        The combined array of shape::
+
+            N x arrays[0].size
     """
 
     # assert np.all([np.array_equal(x.shape, arrays[0].shape) for x in arrays[1:]])
@@ -735,8 +736,7 @@ def dense_to_sparse_indicies(mask, axes, col_inds, row_inds, order, tiling=True)
     order: ['C', 'F']
         The data ordering
     tiling: bool [True]
-        If False, turns off the tiling discussed in
-        :ref:`note-above <get_split_elements>`_.
+        If False, turns off the tiling discussed in :ref:`note-above`.
         In this mode, each entry of the mask must be the same length as all other
         entries.
 
@@ -874,13 +874,12 @@ def select_elements(arr, mask, axes, tiling=True):
 
 class get_comparable(object):
     """
-    A wrapper for the kernel_call's _get_comparable function that fixes
-    comparison for split arrays
+    A wrapper for the :class:`kernel_call` 's :func:`_get_comparable` function that
+    fixes comparison for split arrays
 
     Attributes
     ----------
-    compare_mask: list of :class:`numpy.ndarray` or list of tuples of
-            :class:`numpy.ndarray`
+    compare_mask: list of :class:`numpy.ndarray` or list of tuples of :class:`numpy.ndarray`  # noqa
         The default comparison mask.  If multi-dimensional, should be a list
         of tuples of :class:`numpy.ndarray`'s corresponding to the compare axis
     ref_answer: :class:`numpy.ndarray`

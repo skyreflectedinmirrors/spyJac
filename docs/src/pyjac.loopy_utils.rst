@@ -34,5 +34,5 @@ Module contents
 
 .. automodule:: pyjac.loopy_utils
     :members:
-    :undoc-members: loopy_options
+    :undoc-members:
     :show-inheritance:

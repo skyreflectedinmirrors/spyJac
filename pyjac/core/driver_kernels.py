@@ -62,7 +62,7 @@ def get_driver(loopy_opts, namestore, inputs, outputs, driven,
     unit-tests).  Future versions will allow us to natively wrap test functions
     (i.e., once the new function calling interface is in place in Loopy)
 
-    :see:`driver-function` for more information
+    See :ref:`driver-function` for more information.
 
     Parameters
     ----------
@@ -397,7 +397,7 @@ def queue_driver(loopy_opts, namestore, inputs, outputs, driven,
     unit-tests).  Future versions will allow us to natively wrap test functions
     (i.e., once the new function calling interface is in place in Loopy)
 
-    :see:`driver-function` for more information
+    See :ref:`driver-function` for more information
 
     Parameters
     ----------

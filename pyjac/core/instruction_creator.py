@@ -743,13 +743,19 @@ def wrap_instruction_on_condition(insn, condition, wrapper):
 
     Returns
     -------
-    If condition:
-        `if wrapper
-            insn
-         end
-        `
-    else:
-        insn
+    wrapped_insn: str
+        If the condition evaluates as True, the instruction will be wrapped in the
+        condition, else the base instruction will be returned.
+
+        This roughly follows the psuedo-code::
+
+            If condition
+                if wrapper
+                    insn
+                 end
+            else:
+                insn
+
     """
 
     if condition:

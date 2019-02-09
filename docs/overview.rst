@@ -63,7 +63,7 @@ The Jacobian matrix is then filled by the partial derivaties
 .. math::
     \mathcal{J}_{i,j} = \frac{\partial f_i}{\partial \Phi_j}
 
-The full set of equations solved by pyJac are available in the supplimental derivations_, while more details on version 2 of pyJac can be found in our upcoming paper_
+The full set of equations solved by pyJac are available in the supplimental derivations_, while more details on version 2 of pyJac can be found in the published paper_
 
 .. _derivations: https://arxiv.org/src/1809.01029v1/anc/derivations.pdf
 .. _paper: https://arxiv.org/abs/1809.01029
@@ -81,4 +81,5 @@ Since the user is free to specify two extensive properties, i.e., Volume and mol
 .. math::
     P V = n \mathcal{R} T
 
-One typical choice is to simply pick :math:`V=1 \left[m^3\right]`, :math:`n_k` = :math:`X_k` (the mole fraction of species *k*) and let the total number of moles in the system (*n*) adjust accordingly.
+One typical choice is to simply pick :math:`V=1 \left[m^3\right]`, :math:`n_k` = :math:`X_k` (the mole fraction of species *k*) and let the total number of moles in the system (*n*) adjust accordingly.  Alternatively, if you
+are working on a CFD-problem, a convienient choice is select the volume of each cell in the domain.

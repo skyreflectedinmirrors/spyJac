@@ -23,7 +23,7 @@ class array_splitter(object):
 
     Can handle reshaping of both loopy and numpy arrays to the desired shape
 
-    Properties
+    Attributes
     ----------
     depth: int [None]
         If is not None, the vector-width to use for deep-vectorization
@@ -569,8 +569,8 @@ work_size = lp.ValueArg('work_size', dtype=kint_type)
 """
     The global work size of the generated kernel.
     Roughly speaking, this corresponds to:
-        - The number of cores to utilize on the CPU
-        - The number of blocks to launch on the GPU
+    * The number of cores to utilize on the CPU
+    * The number of blocks to launch on the GPU
     This may be specified at run-time or during kernel-generation.
 """
 
@@ -585,7 +585,7 @@ global_ind = 'j'
 """str: The global initial condition index
 
 This is the string index for the global condition loop in generated kernels
-of :module:`rate_subs`
+of :mod:`rate_subs`
 """
 
 
@@ -593,15 +593,15 @@ var_name = 'i'
 """str: The inner loop index
 
 This is the string index for the inner loops in generated kernels of
-:module:`rate_subs`
+:mod:`rate_subs`
 """
 
 
 default_inds = (global_ind, var_name)
-"""str: The default indicies used in main loops of :module:`rate_subs`
+"""str: The default indicies used in main loops of :mod:`rate_subs`
 
 This is the string indicies for the main loops for generated kernels in
-:module:`rate_subs`
+:mod:`rate_subs`
 """
 
 
@@ -1604,7 +1604,8 @@ class creator(object):
         working_buffer_index: str
             If supplied, the :class:`creator` will replace access to the global index
             with the result of the vector specialization to enable pre-splitting of
-            the loopy arrays / indicies (and avoid index hell). :see:`working-buffer`
+            the loopy arrays / indicies (and avoid index hell).
+            See :ref:`working-buffer`.
         use_local_name: bool [False]
             If True, append '_local" to the created variable to avoid duplicate
             argument names in the driver functions.

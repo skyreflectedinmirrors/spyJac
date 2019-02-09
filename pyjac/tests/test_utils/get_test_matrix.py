@@ -35,8 +35,11 @@ def load_models(work_dir, matrix):
     Returns
     -------
     models : dict
-        A dictionary indicating which models are available for testing,
-        The structure is as follows:
+        A dictionary indicating which models are available for testing, as well
+        as the the limits on the number of conditions that can be evaluated for
+        this mechanism for various eval-types due to memory constraints.
+        The structure is as follows::
+
             mech_name : {'mech' : file path to the Cantera mechanism
                          'ns' : number of species in the mechanism
                          'limits' : {
@@ -44,10 +47,9 @@ def load_models(work_dir, matrix):
                                 'jacobian': {
                                     'sparse': XXX
                                     'full' : XXX}
-                                }
-                            A dictionary of limits on the number of conditions that
-                            can be evaluated for this mechanism for various
-                            eval-types due to memory constraints
+                                    }
+                        }
+
     """
 
     models = matrix[model_key]
@@ -421,14 +423,11 @@ def get_test_matrix(work_dir, test_type, test_matrix, for_validation,
     Returns
     -------
     mechanisms : dict
-        A dictionary indicating which mechanism are available for testing,
-        The structure is as follows:
-            mech_name : {'mech' : file path to the Cantera mechanism
-                         'ns' : number of species in the mechanism
-                         'limits' : {'full': XXX, 'sparse': XXX}}: a dictionary of
-                            limits on the number of conditions that can be evaluated
-                            for this mechanism (full & sparse jacobian respectively)
-                            due to memory constraints
+        A dictionary indicating which models are available for testing, as well
+        as the the limits on the number of conditions that can be evaluated for
+        this mechanism for various eval-types due to memory constraints.
+        See :func:`load_models` for the expected structure.
+
     params  : OrderedDict
         The parameters to put in an oploop
     max_vec_width : int

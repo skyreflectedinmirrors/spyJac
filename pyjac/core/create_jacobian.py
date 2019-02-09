@@ -5277,11 +5277,10 @@ def create_jacobian(lang, mech_name=None, therm_name=None, gas=None,
     kernel_type : :class:`KernelType`
         The type of kernel to generate, defaults to Jacobian
     platform : {'CPU', 'GPU', or other vendor specific name}
-        The OpenCL platform to run on.
-            * If 'CPU' or 'GPU', the first available matching platform will be used
-            * If a vendor specific string, it will be passed to pyopencl to get the
-            platform
-
+        The OpenCL platform to run on:
+        * If 'CPU' or 'GPU', the first available matching platform will be used
+        * If a vendor specific string, it will be passed to pyopencl to get the
+        platform
     data_order : {'C', 'F'}
         The data ordering, 'C' (row-major) recommended for deep vectorizations,
         while 'F' (column-major) recommended for wide vectorizations
@@ -5303,7 +5302,7 @@ def create_jacobian(lang, mech_name=None, therm_name=None, gas=None,
         If specified, the path to the data.bin file that will be used for kernel
         testing
     output_full_rop : bool
-        If ``True``, output forward and reversse rates of progress
+        If True, output forward and reversse rates of progress
         Useful in testing, as there are serious floating point errors for
         net production rates near equilibrium, invalidating direct comparison to
         Cantera
@@ -5322,7 +5321,7 @@ def create_jacobian(lang, mech_name=None, therm_name=None, gas=None,
             threads may run without (weak) synchronziation. If False, the
             threads should run in "lock-step" form (e.g., the global size in
             OpenCL should be equal to the number of initial conditions).
-            See :ref:`driver-types` for more information.
+            See :ref:`driver-function` for more information.
 
     jac_type: ['exact', 'approximate', 'finite_difference']
         The type of Jacobian kernel to generate.
@@ -5330,8 +5329,8 @@ def create_jacobian(lang, mech_name=None, therm_name=None, gas=None,
         .. note::
             An 'approximate' Jacobian ignores derivatives of the last species with
             respect to other species in the mechanism --
-            i.e. :math:`\frac{\partial n_{N_s}}{\partial n_{j}}` -- in the reaction
-            rate derivatives.
+            i.e. :math:`\\frac{\\partial n_{N_s}}{\\partial n_{j}}` -- in the
+            reaction rate derivatives.
 
             This can significantly increase sparsity for mechanisms containing
             reactions  that include the last species directly, or as a third-body
@@ -5374,7 +5373,6 @@ def create_jacobian(lang, mech_name=None, therm_name=None, gas=None,
     Returns
     -------
     None
-
     """
 
     # todo: fix, for some reason loopy yells about broken atomic dtypes

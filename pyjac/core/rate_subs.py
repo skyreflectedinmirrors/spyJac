@@ -89,23 +89,24 @@ def assign_rates(reacs, specs, rate_spec):
 
     For simple Arrhenius evaluations, the rate type keys are:
 
-    if rate_spec == RateSpecialization.full
+    if rate_spec == RateSpecialization.full::
         0 -> kf = A
         1 -> kf = A * T * T * T ...
         2 -> kf = exp(logA + b * logT)
         3 -> kf = exp(logA - Ta / T)
         4 -> kf = exp(logA + b * logT - Ta / T)
 
-    if rate_spec = RateSpecialization.hybrid
+    if rate_spec = RateSpecialization.hybrid::
         0 -> kf = A
         1 -> kf = A * T * T * T ...
         2 -> kf = exp(logA + b * logT - Ta / T)
 
-    if rate_spec == RateSpecialization.fixed
+    if rate_spec == RateSpecialization.fixed::
         0 -> kf = exp(logA + b * logT - Ta / T)
 
-    Note that the reactions in 'fall', 'chem' and 'thd' are also in
-            'simple'
+    .. note::
+        The reactions in 'fall', 'chem' and 'thd' are also in 'simple'.
+
         Further, there are duplicates between 'thd' and 'fall' / 'chem'
 
     Returns
@@ -709,9 +710,9 @@ def get_concentrations(loopy_opts, namestore, conp=True,
 
 def get_molar_rates(loopy_opts, namestore, conp=True,
                     test_size=None):
-    """Generates instructions, kernel arguements, and data for the
-       molar derivatives
-    kernel
+    """
+    Generates instructions, kernel arguements, and data for the
+    molar derivatives.
 
     Parameters
     ----------
@@ -798,10 +799,10 @@ def get_molar_rates(loopy_opts, namestore, conp=True,
 
 def get_extra_var_rates(loopy_opts, namestore, conp=True,
                         test_size=None):
-    """Generates instructions, kernel arguements, and data for the
-       derivative of the "extra" variable -- P or V depending on conV/conP
-       assumption respectively
-    kernel
+    """
+    Generates instructions, kernel arguements, and data for the
+    derivative of the "extra" variable -- P or V depending on conV/conP
+    assumption respectively
 
     Parameters
     ----------
@@ -964,9 +965,9 @@ def get_extra_var_rates(loopy_opts, namestore, conp=True,
 
 def get_temperature_rate(loopy_opts, namestore, conp=True,
                          test_size=None):
-    """Generates instructions, kernel arguements, and data for the
-       temperature derivative
-    kernel
+    """
+    Generates instructions, kernel arguements, and data for the
+    temperature derivative.
 
     Parameters
     ----------
@@ -1080,9 +1081,9 @@ def get_temperature_rate(loopy_opts, namestore, conp=True,
 
 def get_spec_rates(loopy_opts, namestore, conp=True,
                    test_size=None):
-    """Generates instructions, kernel arguements, and data for the
-       temperature derivative
-    kernel
+    """
+    Generates instructions, kernel arguements, and data for the
+    temperature derivative.
 
     Parameters
     ----------

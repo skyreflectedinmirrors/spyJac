@@ -302,7 +302,7 @@ class MemoryManager(object):
         num_ics: str ['per_run']
             The number of initial conditions to evaluated per prun
         num_ics_this_run: str ['this_run']
-            The number of initial conditions to evaluated _in this run_,
+            The number of initial conditions to evaluated *in this run*,
             should be <= `num_ics`.
         offset: str ['offset']
             The initial condition offset

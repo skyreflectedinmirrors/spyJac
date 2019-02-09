@@ -1,12 +1,17 @@
-pyjac.performance_tester package
-================================
+pyjac.performance\_tester package
+=================================
 
 Submodules
 ----------
 
-.. toctree::
+pyjac.performance\_tester.performance\_tester module
+----------------------------------------------------
 
-   pyjac.performance_tester.performance_tester
+.. automodule:: pyjac.performance_tester.performance_tester
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------
