@@ -77,11 +77,11 @@ def assign_rates(reacs, specs, rate_spec):
 
     Parameters
     ----------
-    reacs : list of `ReacInfo`
+    reacs : list of :class:`ReacInfo`
         The reactions in the mechanism
-    specs : list of `SpecInfo`
+    specs : list of :class:`SpecInfo`
         The species in the mechanism
-    rate_spec : `RateSpecialization` enum
+    rate_spec : :class:`RateSpecialization` enum
         The specialization option specified
 
     Notes

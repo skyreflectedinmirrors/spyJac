@@ -45,8 +45,7 @@ extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.viewcode',
     'alabaster',
-    'sphinx.ext.napoleon',
-#    'numpydoc'
+    'sphinx.ext.napoleon'
 ]
 
 autodoc_default_flags = ['members', 'show-inheritance']
@@ -70,7 +69,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'pyJac'
-copyright = '2018, Nicholas Curtis, Kyle Niemeyer'
+copyright = '2019, Nicholas Curtis, Kyle Niemeyer'
 author = 'Nicholas Curtis, Kyle Niemeyer'
 
 # The version info for the project you're documenting, acts as replacement for

@@ -93,7 +93,7 @@ class FakeCall(object):
 
         Params
         ------
-        kernel: class:`loopy.LoopKernel`
+        kernel: :class:`loopy.LoopKernel`
             The kernel to test
         kernel_body: str
             The generated kernel body

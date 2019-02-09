@@ -50,7 +50,7 @@ class Stream(object):
 
         Parameters
         ----------
-        gas : `cantera.Solution`
+        gas : :class:`cantera.Solution`
             Constant thermochemical state of this stream.
         flow : float
             Flow rate of this stream.
@@ -93,7 +93,7 @@ class Particle(object):
 
         Parameters
         ----------
-        gas : `cantera.Solution`
+        gas : :class:`cantera.Solution`
             Initial thermochemical state of particle
 
         Returns
@@ -134,12 +134,12 @@ class Particle(object):
 
         Parameters
         ----------
-        other : `Particle`, `numpy.array`, `int`, `float`
+        other : `Particle`, :class:`numpy.ndarray`, `int`, `float`
             Thermochemical state (enthalpy + mass fractions) to add to current state.
 
         Returns
         -------
-        comp : numpy.array
+        comp : :class:`numpy.ndarray`
             Thermochemical composition of particle (enthalpy + mass fractions).
 
         """
@@ -163,7 +163,7 @@ class Particle(object):
 
         Parameters
         ----------
-        other : `Particle`, `numpy.array`, `int`, `float`
+        other : `Particle`, :class:`numpy.ndarray`, `int`, `float`
             Thermochemical state (enthalpy + mass fractions) to add to current state.
 
         Returns
@@ -192,7 +192,7 @@ class Particle(object):
 
         Parameters
         ----------
-        other : `Particle`, `numpy.array`, `int`, `float`
+        other : `Particle`, :class:`numpy.ndarray`, `int`, `float`
             Thermochemical state (enthalpy + mass fractions) to subtract from
             current state.
 
@@ -222,7 +222,7 @@ class Particle(object):
 
         Parameters
         ----------
-        other : `Particle`, `numpy.array`, `int`, `float`
+        other : `Particle`, :class:`numpy.ndarray`, `int`, `float`
             Thermochemical state from which to subract Particle state.
 
         Returns
@@ -289,7 +289,7 @@ class Particle(object):
 
         Parameters
         ----------
-        other : `Particle`, `numpy.array`, `int`, `float`
+        other : `Particle`, :class:`numpy.ndarray`, `int`, `float`
             Thermochemical state (enthalpy + mass fractions) to add to current state.
 
         Returns
@@ -317,7 +317,7 @@ class Particle(object):
 
         Parameters
         ----------
-        other : `Particle`, `numpy.array`, `int`, `float`
+        other : `Particle`, :class:`numpy.ndarray`, `int`, `float`
             Thermochemical state (enthalpy + mass fractions) to subtract from
             current state.
 
@@ -586,7 +586,7 @@ def reaction_worker(part_tup):
 
     Returns
     -------
-    p : `numpy.array`
+    p : :class:`numpy.ndarray`
         Thermochemical composition of particle following reaction.
 
     """
@@ -723,7 +723,7 @@ def save_data(idx, time, particles, data):
         Current time [s].
     particles : list of `Particle`
         List of `Particle` objects.
-    data : `numpy.ndarray`
+    data : :class:`numpy.ndarray`
         ndarray of particle data for all timesteps.
 
     Returns

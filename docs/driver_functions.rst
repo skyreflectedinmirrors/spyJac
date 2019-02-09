@@ -5,7 +5,7 @@ There are two major types of driver functions for pyJac, queue-based methods and
 lock-step methods. The correct choice of driver function depends on the target language
 and device, and further affects things such as memory usage, and data ordering.
 
-This section will discuss the various driver function types and their rammifications.
+This section will discuss the various driver function types and their ramifications.
 
 .. _driver-function:
 
@@ -16,22 +16,19 @@ Why implement a driver?
 When using pyJac on it's own, we potentially want to evaluate the chemical kinetic
 source rates or Jacobian for many different initial conditions concurrently. To
 achieve this, we need to loop over the initial conditions e.g., as in the following
-psuedo-code:
+psuedo-code::
 
-```
     for i in initial_conditions:
         jacobian[i] = eval_jacobian(phi[i])
     end
-```
 
 where `jacobian` and `phi` represent the chemical kinetic Jacobian and
 thermochemical state vector (a.k.a., $\Phi$).
 
 However, when coupling pyJac to an external code (e.g., to an ODE integration library)
 these arrays may already be created, for instance in CFD codes, one often sees something
-like:
+like::
 
-```
     for icell in cells:
         double phi_local[n_spec + 1] = {0};
         // set temperature
@@ -40,10 +37,9 @@ like:
             // set species
             phi_local[ispecies + 1] = phi[icell, ispecies + 1]
         end
-
         solve_ode(phi_local, pressure[icell])
     end
-```
+
 
 Here the calling code has implicitly assumed that the ODE integrator operates on local
 copies of the global state arrays `phi` and `pressure`.  Hence, pyJac must support
@@ -64,15 +60,19 @@ In pyJac, the work-size is defined as the total number of separate (potentially
 vectorized) evaluations of the chemical kinetic properties / source rates / Jacobian
 happening concurrently.  This is determined automatically per-language via:
 
++---------+-----------------+----------------+
 |Language |OpenMP           |OpenCL          |
-|:-------:|-----------------|----------------|
++=========+=================+================+
 |Work-Size|omp_num_threads()|get_num_groups()|
++---------+-----------------+----------------+
 
 Alternatively, a more intuitive meaning for various devices is a follows:
 
-|Device   |CPU                 |GPU        |
-|:-------:|--------------------|-----------|
-|Work-Size|# of cores / threads|# of blocks|
++---------+-------------------+-------------------+
+|Device   |CPU                |GPU                |
++=========+===================+===================+
+|Work-Size| of cores / threads| of cores / threads|
++---------+-------------------+-------------------+
 
 Where a 'thread block' for a GPU is defined in the CUDA sense.
 
@@ -101,10 +101,10 @@ On a GPU however, typically 100s to 1000s of threads are required to saturate th
 throughput of the device.
 
 In pyJac, a non-input/output array of size (per initial-condition) of `N_s`
-(e.g., the concentrations) is typically shaped:
-```
+(e.g., the concentrations) is typically shaped::
+
     concentrations.shape = (work-size, N_s)
-```
+
 such that all threads have their own working copy of the `concentrations` array to
 work with.
 
@@ -116,10 +116,10 @@ cores (or threads) the user wishes to use, and the allocated memory size can be
 significantly reduced.
 
 For vectorized execution, the shape of the arrays changes slightly to
-(note: assuming a wide-vectorized "C"-ordering :see:`vector_split`):
-```
+(note: assuming a wide-vectorized "C"-ordering :ref:`vector_split`)::
+
     concentrations.shape = (work-size, N_s, vector_width)
-```
+
 where the `vector_width` is typically 2--8 for CPUs and MICs, and 64--1024 for GPUs
 (note: this corresponds to the block-size in CUDA).
 
@@ -130,9 +130,8 @@ Coupling to external codes
 One downside of pyJac's data-storage format is that it requires each OpenMP thread
 / OpenCL work-group to be passed the **addresses to the beginning of the arrays
 that contain memory for the entire set of threads / work-groups.**  In code this
-might look something like this:
+might look something like this::
 
-```
     double* phi = (double*)malloc(work_size * (N_s + 1) * sizeof(double));
     double* dphi = (double*)malloc(work_size * (N_s + 1) * sizeof(double));
     double* rwk = (double*)malloc(work_size * kernel.requiredMemorySize());
@@ -142,11 +141,8 @@ might look something like this:
     ...
     // call source rates
     species_rates(0, phi, dphi, rwk);
-```
 
-However, many codes operate on local-copies of the state vector array, e.g.:
-
-```
+However, many codes operate on local-copies of the state vector array, e.g.::
     double phi[N_s];
     double dphi[N_s];
     double* rwk = (double*)malloc(kernel.requiredMemorySize());
@@ -154,7 +150,6 @@ However, many codes operate on local-copies of the state vector array, e.g.:
     phi[0] = T;
     ...
     species_rates(0, phi, dphi, rwk);
-```
 
 For this sort of code, you may supply the `-up` or `--unique_pointers` flag to the
 command line interface of pyJac.
@@ -165,7 +160,7 @@ Lockstep-based driver
 =====================
 
 This type of driver is very similar to static-based scheduling in OpenMP (
-see `_mp_scheduling`_). Essentially all threads recieve their assigned initial
+see `mp_scheduling`_). Essentially all threads recieve their assigned initial
 conditons at startup, and evaluate the Jacobian or source terms for them.
 
 This doesn't have any scheduling overhead, but if different threads take different
@@ -178,7 +173,7 @@ to complete.
 Queue-based driver
 ==================
 
-This type of driver is based on dynamic scheduling in OpenMP (see `_mp_scheduling`_).
+This type of driver is based on dynamic scheduling in OpenMP (see `mp_scheduling`_).
 Unlike in the lockstep-driver, threads in the queue-based driver recieve their
 assigned initial conditions at runtime.
 Specifically, each thread will perform an atomic integer addition on a global counter

@@ -72,9 +72,9 @@ def determine_jac_inds(reacs, specs, rate_spec, jacobian_type=JacobianType.exact
 
     Parameters
     ----------
-    reacs : list of `ReacInfo`
+    reacs : list of :class:`ReacInfo`
         The reactions in the mechanism
-    specs : list of `SpecInfo`
+    specs : list of :class:`SpecInfo`
         The species in the mechanism
     rate_spec : `RateSpecialization` enum
         The specialization option specified
@@ -91,13 +91,15 @@ def determine_jac_inds(reacs, specs, rate_spec, jacobian_type=JacobianType.exact
     Returns
     -------
     jac_info : dict of parameters
-        Keys are 'jac_inds', which contains:
+        Keys are 'jac_inds', which contains::
+
             'flat': a flattened list of non-zero jacobian indicies.
             'ccs': a dictionary of 'col_ind' and 'row_ptr' representing the indicies
                 in a compressed column storage format
             'crs': a dictionary of 'col_ind' and 'row_ptr' representing the indicies
                 in a compressed row storage format
 
+    .. note::
         Additionally, `jac_info` will contain the results from
         :meth:`pyjac.core.assign_rates`
     """
@@ -4539,8 +4541,8 @@ def finite_difference_jacobian(reacs, specs, loopy_opts, conp=True, test_size=No
                                jac_create=None, mem_limits='', **kwargs):
     """
     Creates a wrapper around the species rates kernels that evaluates a central,
-    forward or backwards finite difference Jacobian of the given :param:`order`,
-    based on perturbations calculated from :param:`rtol` and :param:`atol`
+    forward or backwards finite difference Jacobian of the given    `order`,
+    based on perturbations calculated from `rtol` and `atol`
 
     Parameters
     ----------
@@ -5147,7 +5149,7 @@ def get_jacobian_kernel(reacs, specs, loopy_opts, conp=True, test_size=None,
 def find_last_species(specs, last_spec=None, return_map=False):
     """
     Find a suitable species to move to the end of the mechanism, taking into account
-    a user specified species, :param:`last_spec` if supplied.
+    a user specified species, `last_spec` if supplied.
 
     Notes
     -----
@@ -5163,17 +5165,17 @@ def find_last_species(specs, last_spec=None, return_map=False):
         The name of the last species specified by the user
     return_map: bool [False]
         If True, return a mapping that can be used to map species / data
-        for the mechanism, e.g.:
-            ```
+        for the mechanism, e.g.::
+
             map = find_last_species(specs, return_map=True)
             concs = concs[map]
-            ```
-        If false, an updated species list will be returned
+
+        If False, an updated species list will be returned
 
     Returns
     -------
     map: list of :class:`SpecInfo` or :class:`numpy.ndarray`
-        Depending on value of :param:`return_map`, returns an updated species list
+        Depending on value of `return_map`, returns an updated species list
         or mapping to achieve the same
     """
     logger = logging.getLogger(__name__)
@@ -5239,7 +5241,9 @@ def create_jacobian(lang, mech_name=None, therm_name=None, gas=None,
                     unique_pointers=False, explicit_simd=None,
                     rsort=reaction_sorting.none, **kwargs
                     ):
-    """Create Jacobian subroutine from mechanism.
+    """
+    Generate the Jacobian and source-rate subroutines from the given
+    chemical mechanism, language, and specified arguments.
 
     Parameters
     ----------
@@ -5252,16 +5256,16 @@ def create_jacobian(lang, mech_name=None, therm_name=None, gas=None,
         Thermodynamic database filename (e.g. 'therm.dat')
         or nothing if info in mechanism file.
     gas : cantera.Solution, optional
-        The mechanism to generate the Jacobian for.  This or ``mech_name`` must be
+        The mechanism to generate the Jacobian for.  This or `mech_name` must be
         specified
     width : int
         If supplied, use a 'wide' vectorization strategy.
         The SIMD vector-width to use.  If the targeted platform is a GPU,
-        this is the GPU block size. Cannot be specified along with :param:`depth`.
+        this is the GPU block size. Cannot be specified along with `depth`.
     depth : int
         If supplied, use a 'deep' vectorization strategy.
         The SIMD vector-width to use.  If the targeted platform is a GPU,
-        this is the GPU block size. Cannot be specified along with :param:`width`.
+        this is the GPU block size. Cannot be specified along with `width`.
     unr : int
         If supplied, unroll inner loops (i.e. those that would be affected by a
         deep vectorization). Can be used in conjunction with deep or wide parallelism
@@ -5274,9 +5278,10 @@ def create_jacobian(lang, mech_name=None, therm_name=None, gas=None,
         The type of kernel to generate, defaults to Jacobian
     platform : {'CPU', 'GPU', or other vendor specific name}
         The OpenCL platform to run on.
-        *   If 'CPU' or 'GPU', the first available matching platform will be used
-        *   If a vendor specific string, it will be passed to pyopencl to get the
+            * If 'CPU' or 'GPU', the first available matching platform will be used
+            * If a vendor specific string, it will be passed to pyopencl to get the
             platform
+
     data_order : {'C', 'F'}
         The data ordering, 'C' (row-major) recommended for deep vectorizations,
         while 'F' (column-major) recommended for wide vectorizations
@@ -5286,7 +5291,7 @@ def create_jacobian(lang, mech_name=None, therm_name=None, gas=None,
         'Hybrid' turns off specializations in the exponential term (Ta = 0, b = 0)
         'Fixed' is a fixed expression exp(logA + b logT + Ta / T)
     split_rate_kernels : bool
-        If True, and the :param"`rate_specialization` is not 'Fixed', split different
+        If True, and the `rate_specialization` is not 'Fixed', split different
         valuation types into different kernels
     split_rop_net_kernels : bool
         If True, break different ROP values (fwd / back / pdep) into different
@@ -5309,28 +5314,36 @@ def create_jacobian(lang, mech_name=None, therm_name=None, gas=None,
         be run in serial form, resulting in a poor vectorization.
     use_atomic_ints: bool [False]
         If True, the target language / platform can utilized atomic instructions
-        for integer types.  This affects the driver kernel generated by pyJac.
-        If True, the driver will be generated in "queue" form, and various threads
-        may run without (weak) synchronziation. If False, the threads should run in
-        "lock-step" form (e.g., the global size in OpenCL should be equal to the
-        number of initial conditions).  :see:`Kernel Driver Types` for more
-        information.
+        for integer types.
+
+        .. note::
+            This affects the driver kernel generated by pyJac.
+            If True, the driver will be generated in "queue" form, and various
+            threads may run without (weak) synchronziation. If False, the
+            threads should run in "lock-step" form (e.g., the global size in
+            OpenCL should be equal to the number of initial conditions).
+            See :ref:`driver-types` for more information.
+
     jac_type: ['exact', 'approximate', 'finite_difference']
         The type of Jacobian kernel to generate.
 
-        An 'approximate' Jacobian ignores derivatives of the last species with
-        respect to other species in the mechanism --
-        i.e. :math:`\frac{\partial n_{N_s}}{\partial n_{j}}` -- in the reaction rate
-        derivatives.
+        .. note::
+            An 'approximate' Jacobian ignores derivatives of the last species with
+            respect to other species in the mechanism --
+            i.e. :math:`\frac{\partial n_{N_s}}{\partial n_{j}}` -- in the reaction
+            rate derivatives.
 
-        This can significantly increase sparsity for mechanisms containing reactions
-        that include the last species directly, or as a third-body species with a
-        non-unity efficiency, but gives results in an approxmiate Jacobian, and thus
-        is more suitable to use with implicit integration techniques.
+            This can significantly increase sparsity for mechanisms containing
+            reactions  that include the last species directly, or as a third-body
+            species with a non-unity efficiency, but gives results in an
+            approxmiate Jacobian, and thus is more suitable to use with
+            implicit integration techniques.
 
-        Finally a 'finite_difference' jacobian is computed using finite differences
-        of the species rates kernel.  This is used internally for performance testing
-        comparison, but is also available to the user if desired.
+            Finally a 'finite_difference' jacobian is computed using finite
+            differences of the species rates kernel.  This is used internally
+            for performance testing comparison, but is also available to the
+            user if desired.
+
     jac_format: ['full', 'sparse']
         If 'sparse', the Jacobian will be encoded using a compressed row or column
         storage format (for a data order of 'C' and 'F' respectively).
@@ -5338,11 +5351,11 @@ def create_jacobian(lang, mech_name=None, therm_name=None, gas=None,
         If True, this kernel is being generated to validate pyJac, hence we need
         to save output data to a file
     fd_order: int [1]
-        The order of the finite difference jacobian -- used if :param:`jac_type` ==
+        The order of the finite difference jacobian -- used if `jac_type` ==
         'finite_difference'
     fd_mode: ['forward', 'backward', 'central']
         The mode of the finite difference Jacobian, forward, backwards or central
-        used if :param:`jac_type` == 'finite_difference'
+        used if `jac_type` == 'finite_difference'
     mem_limits: str ['']
         Path to a .yaml file indicating desired memory limits that control the
         desired maximum amount of global / local / or constant memory that

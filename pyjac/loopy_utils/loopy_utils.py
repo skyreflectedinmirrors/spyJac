@@ -768,9 +768,9 @@ def not_is_close(arr1, arr2, **kwargs):
 
     Parameters
     ----------
-    arr1: :class:`np.ndarray`
+    arr1: :class:`numpy.ndarray`
         Array to compare
-    arr2: :class:`np.ndarray`
+    arr2: :class:`numpy.ndarray`
         Reference answer
     **kwargs: dict
         Keyword args for :func:`numpy.isclose`
@@ -778,8 +778,10 @@ def not_is_close(arr1, arr2, **kwargs):
     Returns
     -------
     inds: tuple of :class:`numpy.ndarray`
-        result of:
-        `numpy.where(numpy.logical_not(numpy.isclose(arr1, arr2, **kwargs)))`
+        result of::
+
+            numpy.where(numpy.logical_not(numpy.isclose(arr1, arr2, **kwargs)))
+
     """
 
     return np.where(np.logical_not(np.isclose(arr1, arr2, **kwargs)))

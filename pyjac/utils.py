@@ -520,7 +520,7 @@ def get_nu(isp, rxn):
     ----------
     isp : int
         Species index
-    rxn : `ReacInfo`
+    rxn : :py:class:`ReacInfo`
         Reaction
 
     Returns
@@ -612,15 +612,15 @@ def create_dir(path):
 
 def reassign_species_lists(reacs, specs):
     """
-    Given a list of `ReacInfo`, and `SpecInfo`, this method will update the
-    `ReacInfo` reactants / products / third body list to integers
-    representing the species' index in the list.
+    Given a list of :py:class:`ReacInfo`, and :py:class:`SpecInfo`, this method will
+    update the :py:class:`ReacInfo` reactants / products / third body list to
+    integers representing the species' index in the list.
 
     Parameters
     ----------
-    reacs : list of `ReacInfo`
+    reacs : list of :class:`ReacInfo`
         List of reactions to be updated.
-    specs : list of `SpecInfo`
+    specs : list of :class:`SpecInfo`
         List of species
 
     Returns

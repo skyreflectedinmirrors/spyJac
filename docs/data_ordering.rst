@@ -53,7 +53,7 @@ As described in the pyJac-v2 paper (:ref:`paper`), pyJac uses a vectorized data-
 *  The **vector_axis** results from the splitting, and is of length :ref:`vector-width`.
 *  The **grow_axis** is the array axis that will grow with increasing numbers of initial conditions.
 
-For example purposes, we will consider in this section an array of species concentrations (see :cref:`array_ordering`) for 1000 thermo-chemical states for a model with 20 chemical species and a vector width of 8.
+For example purposes, we will consider in this section an array of species concentrations (see :ref:`array_ordering`) for 1000 thermo-chemical states for a model with 20 chemical species and a vector width of 8.
 The array's shape before splitting is: :math:`\left(1000, 20\right)`.
 
 There are currently three situations where pyJac will automatically utilize a vectorized data ordering:
