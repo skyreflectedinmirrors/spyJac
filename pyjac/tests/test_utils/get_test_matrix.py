@@ -82,7 +82,7 @@ def load_models(work_dir, matrix):
 
 def load_platforms(matrix, langs=get_test_langs(), raise_on_empty=False):
     """
-    Loads test platforms from the :param:`matrix` file, for the :param:`langs`
+    Loads test platforms from the `matrix` file, for the `langs`
 
     Parameters
     ----------
@@ -414,7 +414,7 @@ def get_test_matrix(work_dir, test_type, test_matrix, for_validation,
         If determines which test type to load from the test matrix,
         validation or performance
     raise_on_missing: bool
-        Raise an exception of the specified :param:`test_matrix` file is not found
+        Raise an exception of the specified `test_matrix` file is not found
     langs: list of str
         The allowed languages, modifiable by the :envvar:`TEST_LANGS` or test_langs
         in :file:`test_setup.py`

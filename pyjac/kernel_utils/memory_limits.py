@@ -154,7 +154,7 @@ class memory_limits(object):
         result in an integer overflow in index (mainly, Intel OpenCL).
 
         This is calculated by determining the maximum index of the array, and then
-        dividing the maximum value of :param:`dtype` by this stride
+        dividing the maximum value of `dtype` by this stride
 
         Parameters
         ----------
@@ -194,8 +194,8 @@ class memory_limits(object):
     def arrays_with_type_changes(self, mtype=memory_type.m_constant,
                                  with_type_changes={}):
         """
-        Returns the list of :attr:`arrays` that are of :param:`mtype` with the
-        given :param:`with_type_changes`.  See :func:`can_fit`
+        Returns the list of :attr:`arrays` that are of `mtype` with the
+        given `with_type_changes`.  See :func:`can_fit`
         """
 
         # filter arrays by type
@@ -206,7 +206,7 @@ class memory_limits(object):
 
     def can_fit(self, mtype=memory_type.m_constant, with_type_changes={}):
         """
-        Determines whether the supplied :param:`arrays` of type :param:`type`
+        Determines whether the supplied `arrays` of type `type`
         can fit on the device
 
         Parameters

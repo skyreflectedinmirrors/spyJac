@@ -122,7 +122,7 @@ class loopy_options(object):
     jac_format: :class:`JacobianFormat` [JacobianFormat.full]
         The format of Jacobian kernel (full or sparse) to generate
     is_simd: bool [None]
-        If supplied, override the user-specified flag :param:`explicit_simd`, used
+        If supplied, override the user-specified flag `explicit_simd`, used
         for testing.
     unique_pointers: bool [False]
         If specified, this indicates that the pointers passed to the generated pyJac
@@ -513,7 +513,7 @@ def set_adept_editor(knl,
     knl : :class:`loopy.LoopKernel`
         The kernel to generate code for
     base_kernels : :class:`loopy.LoopKernel`
-        The kernel :param:`knl` and all dependencies required for Jacobian
+        The kernel `knl` and all dependencies required for Jacobian
         evaluation. These kernels, should be generated for a problem_size of 1
         to facilitate indexing in the wrapped kernel
     problem_size : int
@@ -820,11 +820,11 @@ class kernel_call(object):
             Same as the compare_mask, but for the reference answer.
             Necessary for some kernel tests, as the reference answer is not the same
             size as the output, which causes issues for split arrays.
-            If not supplied, the regular :param:`compare_mask` will be used
+            If not supplied, the regular `compare_mask` will be used
         tiling: bool, [True]
-            If True (default), the elements in the :param:`compare_mask` should be
+            If True (default), the elements in the `compare_mask` should be
             combined, e.g., if two arrays [[1, 2] and [3, 4]] are supplied to
-            :param:`compare_mask` with tiling turned on, four resulting indicies will
+            `compare_mask` with tiling turned on, four resulting indicies will
             be compared -- [1, 3], [1, 4], [2, 3], and [2, 4].  If tiling is turned
             of, the compare mask will be treated as a list of indicies, e.g., (for
             the previous example) -- [1, 3] and [2, 4].
@@ -956,11 +956,11 @@ class kernel_call(object):
             The memory layout of the arrays, C (row major) or
             Fortran (column major)
         namestore : :class:`NameStore`
-            Must be supplied if :param:`jac_format` is of type
+            Must be supplied if `jac_format` is of type
             :class:`JacobianFormat.sparse`, in order to pull row / column indicies
             for conversion to / from sparse matricies
         jac_format: :class:`JacobianFormat` [JacobianFormat.full]
-            If sparse, we are testing a sparse matrix (and :param:`namestore` must
+            If sparse, we are testing a sparse matrix (and `namestore` must
             be supplied)
         """
         self.current_order = order

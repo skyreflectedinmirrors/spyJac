@@ -145,7 +145,7 @@ def _get_ad_jacobian(self, test_size, conp=True, pregen=None, return_kernel=Fals
         Used in the validation tester to speed up chunked Jacobian evaluation
     return_kernel: bool [False]
         If True, we want __get_jacobian to return the kernel and kernel call
-        rather than the evaluated array (to be used with :param:`pregen`)
+        rather than the evaluated array (to be used with `pregen`)
     """
 
     class create_arr(object):
@@ -307,7 +307,7 @@ def _get_jacobian(self, func, kernel_call, editor, ad_opts, conp, extra_funcs=[]
     ad_opts: :class:`loopy_options`
         The AD enabled loopy options object
     extra_funcs: list of Callable
-        Additional functions that must be called before :param:`func`.
+        Additional functions that must be called before `func`.
         These can be used to chain together functions to find derivatives of
         complicated values (e.g. ROP)
     return_kernel: bool [False]
@@ -316,7 +316,7 @@ def _get_jacobian(self, func, kernel_call, editor, ad_opts, conp, extra_funcs=[]
         Note: The user is responsible for checking that the arguements are of
             valid shape
     kwargs: dict
-        Additional args for :param:`func
+        Additional args for `func
 
     Returns
     -------

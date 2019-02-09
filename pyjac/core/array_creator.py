@@ -1590,7 +1590,7 @@ class creator(object):
     def __call__(self, *indicies, **kwargs):
         """
         Create a loopy array and corresponding string based on the supplied
-        :param:`indicies` and :param:`kwargs`
+        `indicies` and `kwargs`
 
         Parameters
         ----------
@@ -1609,7 +1609,7 @@ class creator(object):
             If True, append '_local" to the created variable to avoid duplicate
             argument names in the driver functions.
         reshape_to_working_buffer: str [None]
-            If True, and :param:`working_buffer_index` is supplied, the created array
+            If True, and `working_buffer_index` is supplied, the created array
             will be reshaped to the working buffer size.
             If False, the created array will not be reshaped (but the indicies may
             be changed).
@@ -1693,8 +1693,8 @@ class jac_creator(creator):
 
     def __get_offset_and_lookup(self, *indicies):
         """
-        Returns the correct sparse offset and lookup based on :param:`indicies` and
-        our own :param:`order`
+        Returns the correct sparse offset and lookup based on `indicies` and
+        our own `order`
         """
 
         def __lookups(arr, lookup, match):

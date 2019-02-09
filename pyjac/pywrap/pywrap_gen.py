@@ -160,7 +160,7 @@ def generate_wrapper(lang, pyxfile, build_dir, ktype=KernelType.jacobian,
     additional_outputs : list of str
         If supplied, treat these arguments as additional output variables
     nice_name: str [None]
-        If supplied, use this instead of :param:`ktype` to derive the kernel name
+        If supplied, use this instead of `ktype` to derive the kernel name
 
     Returns
     -------
@@ -275,11 +275,11 @@ def pywrap(lang, source_dir, build_dir=None, out_dir=None,
     Keyword Arguments
     -----------------
     file_base: str
-        Used for creation of libraries for :param:`ktype`==KernelType.dummy -- the
+        Used for creation of libraries for `ktype`==KernelType.dummy -- the
         base filename (generator name) for this library
     additional_inputs: list of str [[]]
         Use to supply additional input argument names to the generator process;
-        currently this is only used for :param:`ktype`==KernelType.dummy
+        currently this is only used for `ktype`==KernelType.dummy
 
 
     Returns

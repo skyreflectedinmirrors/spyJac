@@ -195,16 +195,16 @@ class indexer(object):
 
     def _get_index(self, inds, axes):
         """
-        Converts the indicies (:param:`inds`) for the given :param:`axes` to
+        Converts the indicies (`inds`) for the given `axes` to
         their split indicies.
 
         Parameters
         ----------
         inds: list of :class:`np.ndarray` or list of lists
             The integer indicies to convert, each entry in the list should correspond
-            to an entry at the same index in the :param:`axes`
+            to an entry at the same index in the `axes`
         axes: list of ints or :class:`np.ndarray`
-            The axes for each index entry in :param:`inds`
+            The axes for each index entry in `inds`
 
         Returns
         -------
@@ -281,7 +281,7 @@ class indexer(object):
             The indicies in the unsplit array that we want to inspect in the split
             array
         axes: list of list of int or list of :class:`numpy.ndarray`
-            The axes in the unsplit array to which each entry in :param:`inds`
+            The axes in the unsplit array to which each entry in `inds`
             corresponds to
 
         Notes
@@ -505,7 +505,7 @@ def get_split_elements(arr, splitter, ref_shape, mask, axes=(1,),
     sliced: :class:`numpy.ndarray`
         A flattened array of length NxM containing the desired elements of the
         split array, where N is the number of initial conditions of
-        :param:`ref_shape` (i.e., ref_shape[0]), and M the number of elements
+        `ref_shape` (i.e., ref_shape[0]), and M the number of elements
         obtained by the combined mask arrays (see the above note)
     """
 
@@ -593,7 +593,7 @@ def combination(*arrays, **kwargs):
     Returns
     -------
     combined: :class:`numpy.ndarray`
-        The combined array of shape N x :param:`arrays`[0].size
+        The combined array of shape N x `arrays`[0].size
     """
 
     # assert np.all([np.array_equal(x.shape, arrays[0].shape) for x in arrays[1:]])
@@ -620,9 +620,9 @@ def combination(*arrays, **kwargs):
 # helper methods
 def sparse_to_dense_indices(col_inds, row_inds, order, as_inds=True):
     """
-    Converts the supplied :param:`col_inds` and :param:`row_inds` to a sparse matrix
+    Converts the supplied `col_inds` and `row_inds` to a sparse matrix
     of format :class:`scipy.coo_matrix`and returns an array (or tuple, for
-    :param:`as_inds` == False) of the dense indicies that correspond to the supplied
+    `as_inds` == False) of the dense indicies that correspond to the supplied
     sparse indicies.
 
     Notes
@@ -631,14 +631,14 @@ def sparse_to_dense_indices(col_inds, row_inds, order, as_inds=True):
     that is, with identically-zero dense-indicies removed.  Additionally, this
     handles ordering concerns for flattening of dense matricies (i.e., returns the
     proper dense indicies for conversion to a :class:`scipy.csr_matrix` or
-    class:`scipy.csc_matrix` depending on :param:`order`)
+    class:`scipy.csc_matrix` depending on `order`)
 
     Parameters
     ----------
     col_inds: :class:`numpy.ndarray`
-        Either the column pointer or column index list (depending on :param:`order`)
+        Either the column pointer or column index list (depending on `order`)
     row_inds: :class:`numpy.ndarray`
-        Either the row pointer or row index list (depending on :param:`order`)
+        Either the row pointer or row index list (depending on `order`)
     order: ['C', 'F']
         The data ordering
     as_inds: bool [True]
@@ -650,7 +650,7 @@ def sparse_to_dense_indices(col_inds, row_inds, order, as_inds=True):
     -------
     dense_inds: :class:`numpy.ndarray` or tuple
         The "filtered", ordered dense indicies corresponding to the supplied sparse
-        indicies.  Numpy array of shape [Nx2] if :param:`as_inds`, else tuple
+        indicies.  Numpy array of shape [Nx2] if `as_inds`, else tuple
 
     """
     # setup dummy sparse matrix
@@ -672,7 +672,7 @@ def sparse_to_dense_indices(col_inds, row_inds, order, as_inds=True):
 
 def sparsify(array, col_inds, row_inds, order):
     """
-    Returns a sparse version of the dense :param:`array`.
+    Returns a sparse version of the dense `array`.
     Useful to convert reference answers to sparse format before splitting / selecting
     elements for comparison.
 
@@ -681,9 +681,9 @@ def sparsify(array, col_inds, row_inds, order):
     array: :class:`np.ndarray`
         The dense array to convert to sparse representation
     col_inds: :class:`numpy.ndarray`
-        Either the column pointer or column index list (depending on :param:`order`)
+        Either the column pointer or column index list (depending on `order`)
     row_inds: :class:`numpy.ndarray`
-        Either the row pointer or row index list (depending on :param:`order`)
+        Either the row pointer or row index list (depending on `order`)
     order: ['C', 'F']
         The data ordering
 
@@ -710,8 +710,8 @@ def dense_to_sparse_indicies(mask, axes, col_inds, row_inds, order, tiling=True)
 
     Note
     ----
-    The :param:`col_inds` and :param:`row_inds` are either a row/column pointer
-    or row/column indicies depending on the :param:`order`.  A "C"-ordered matrix
+    The `col_inds` and `row_inds` are either a row/column pointer
+    or row/column indicies depending on the `order`.  A "C"-ordered matrix
     implies use of a compressed-row sparse matrix, while an "F"-ordered matrix uses
     a compressed-column sparse matrix.
 
@@ -722,16 +722,16 @@ def dense_to_sparse_indicies(mask, axes, col_inds, row_inds, order, tiling=True)
     ----------
     mask: list of :class:`numpy.ndarray`
         The dense Jacobian indicies to convert to sparse indicies.  Each entry in
-        :param:`mask` should correspond to an axis in :param:`axes`.
+        `mask` should correspond to an axis in `axes`.
     axes: list or tuple of int, or -1
-        The axes index of the Jacobian array that each entry of :param:`mask`
+        The axes index of the Jacobian array that each entry of `mask`
         corresponds to.
-        If :param:`axes` is -1, this indicates that the :param:`mask` consists of
+        If `axes` is -1, this indicates that the `mask` consists of
         row & column indicies, but don't need to be combined via :func:`combination`
     col_inds: :class:`numpy.ndarray`
-        Either the column pointer or column index list (depending on :param:`order`)
+        Either the column pointer or column index list (depending on `order`)
     row_inds: :class:`numpy.ndarray`
-        Either the row pointer or row index list (depending on :param:`order`)
+        Either the row pointer or row index list (depending on `order`)
     order: ['C', 'F']
         The data ordering
     tiling: bool [True]
@@ -793,18 +793,18 @@ def dense_to_sparse_indicies(mask, axes, col_inds, row_inds, order, tiling=True)
 
 def select_elements(arr, mask, axes, tiling=True):
     """
-    Selects elements in the rows/columns of the :param:`arr` that match the given
-    :param:`mask.
+    Selects elements in the rows/columns of the `arr` that match the given
+    `mask.
 
     Notes
     -----
     This method is built for not-split arrays _only_, and is significantly simpler
     than :func:`get_split_elements`.
 
-    As with :func:`get_split_elements`, each entry in the :param:`mask` corresponds
-    to an axis given in :param:`axes`.  However, the mask here simply tells us which
-    entries in an axis to select.  For example, for a 3x3 :param:`arr`, with
-    :param:`mask` == [[1, 2], [1]] and :param:`axes` == (0, 1), the result will be
+    As with :func:`get_split_elements`, each entry in the `mask` corresponds
+    to an axis given in `axes`.  However, the mask here simply tells us which
+    entries in an axis to select.  For example, for a 3x3 `arr`, with
+    `mask` == [[1, 2], [1]] and `axes` == (0, 1), the result will be
     arr[[1, 2], [1]]:
 
     .. doctest::
@@ -823,7 +823,7 @@ def select_elements(arr, mask, axes, tiling=True):
     mask: list of :class:`numpy.ndarray`
         The selection mask
     axes: list of int
-        The integer index of the axes to select from, each entry in :param:`mask`
+        The integer index of the axes to select from, each entry in `mask`
         should correspond to an axis in this parameter.
     tiling: bool [True]
         Whether tiling mode is turned on, see
@@ -920,7 +920,7 @@ class get_comparable(object):
             :class:`kernel_call`, used for determining which mask / answer should be
             used
         is_answer: bool [False]
-            If True, :param:`outv` is a reference answer.  This affects how the split
+            If True, `outv` is a reference answer.  This affects how the split
             indicies are calculated for Jacobian comparison
         """
         mask = list(self.compare_mask[index][:])
@@ -957,7 +957,7 @@ class get_comparable(object):
 
 def reduce_oploop(base, add=None):
     """
-    Convenience method to turn :param:`base` into an :class:`oploopconcat`
+    Convenience method to turn `base` into an :class:`oploopconcat`
 
     Parameters
     ----------
@@ -1033,7 +1033,7 @@ def _get_oploop(owner, do_ratespec=False, do_ropsplit=False, do_conp=False,
 
 def _should_skip_oploop(state, skip_test=None, skip_deep_simd=True):
     """
-    A unified method to determine whether the :param:`state` is a viable
+    A unified method to determine whether the `state` is a viable
     configuration for initializing a :class:`loopy_options`
 
     Parameters
@@ -1041,7 +1041,7 @@ def _should_skip_oploop(state, skip_test=None, skip_deep_simd=True):
     state: dict
         The state of the :class:`optionloop`
     skip_test: six.callable
-        Callable functions that take as the arguement the :param:`state` and
+        Callable functions that take as the arguement the `state` and
         return True IFF the state should be skipped
     skip_deep_simd: bool [True]
         If true, skip explicit-SIMD tests w/ deep vectorizations (not currently
@@ -1093,17 +1093,17 @@ class OptionLoopWrapper(object):
         The base option loop to iterate over.
     skip_test: six.callable [None]
         If not none, a callable function that takes as the arguement the
-        current :param:`state` of the option loop and returns True IFF the state
+        current `state` of the option loop and returns True IFF the state
         should be skipped
     yield_index: bool [False]
         If true, yield a tuple of the (index, state) of the oploop enumeration
     skip_deep_simd: bool [None]
         If true, skip deep-SIMD vectorization tests, defaults to value of
-        :param:`from_get_oploop`
+        `from_get_oploop`
 
     Notes
     -----
-    A copy will be made of the :param:`oploop_base` such that the original
+    A copy will be made of the `oploop_base` such that the original
     option loop remains intact
 
     Yields
@@ -1291,7 +1291,7 @@ def _generic_tester(owner, func, kernel_calls, rate_func, do_ratespec=False,
     sparse_only: bool [False]
             Test only the sparse jacobian (e.g. for testing indexing)
     kwargs: dict
-        Any additional arguements to pass to the :param:`func`
+        Any additional arguements to pass to the `func`
     """
 
     if langs is None:
@@ -1872,7 +1872,7 @@ def _run_mechanism_tests(work_dir, test_matrix, prefix, run,
     prefix: str
         a prefix within the work directory to store the output of this run
     raise_on_missing: bool
-        Raise an exception of the specified :param:`test_matrix` file is not found
+        Raise an exception of the specified `test_matrix` file is not found
 
     Returns
     -------

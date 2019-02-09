@@ -89,7 +89,7 @@ class FakeCall(object):
 
     def match(self, kernel, kernel_body):
         """
-        Return true IFF :param:`kernel` matches :attr:`replace_in`
+        Return true IFF `kernel` matches :attr:`replace_in`
 
         Params
         ------
@@ -136,7 +136,7 @@ def make_kernel_generator(loopy_opts, *args, **kwargs):
     """
     Factory generator method to return the appropriate
     :class:`kernel_generator` type based on the target language in the
-    :param:`loopy_opts`
+    `loopy_opts`
 
     Parameters
     ----------
@@ -357,7 +357,7 @@ class DocumentingRecord(object):
 
     def get_docs(self, arg):
         """
-        Returns the :attr:`docs` matching this :param:`arg`'s :attr:`name`,
+        Returns the :attr:`docs` matching this `arg`'s :attr:`name`,
         if available, or else a default place-holder string.
 
         Parameters
@@ -946,7 +946,7 @@ class kernel_generator(object):
 
     def _with_target(self, kernel_arg, for_atomic=False):
         """
-        Returns a copy of :param:`kernel_arg` with it's :attr:`dtype.target` set
+        Returns a copy of `kernel_arg` with it's :attr:`dtype.target` set
         for proper pickling
 
         Parameters
@@ -1329,7 +1329,7 @@ class kernel_generator(object):
     def _temporary_to_arg(cls, temp):
         """
         Returns the :class:`loopy.ArrayArg` version of the
-        :class:`loopy.TemporaryVariable` :param:`temp`
+        :class:`loopy.TemporaryVariable` `temp`
         """
 
         assert isinstance(temp, lp.TemporaryVariable)
@@ -1340,8 +1340,8 @@ class kernel_generator(object):
 
     def _migrate_locals(self, kernel, ldecls):
         """
-        Migrates local variables in :param:`ldecls` to the arguements of the
-        given :param:`kernel`
+        Migrates local variables in `ldecls` to the arguements of the
+        given `kernel`
 
         Parameters
         ----------
@@ -1413,10 +1413,10 @@ class kernel_generator(object):
 
     def _get_kernel_call(self, knl=None, passed_locals=[]):
         """
-        Returns a function call for the given kernel :param:`knl` to be used
+        Returns a function call for the given kernel `knl` to be used
         as an instruction.
 
-        If :param:`knl` is None, returns the kernel call for
+        If `knl` is None, returns the kernel call for
         this :class:`kernel_generator`
 
         Parameters
@@ -1463,7 +1463,7 @@ class kernel_generator(object):
         """
         Convenience method to test equality of :class:`loopy.KernelArgument`s
 
-        Returns true IFF :param:`arg1` == :param:`arg2`, OR they differ only in
+        Returns true IFF `arg1` == `arg2`, OR they differ only in
         their atomicity
         """
 
@@ -1492,7 +1492,7 @@ class kernel_generator(object):
         - The list of local arguments in the returned :class:`MemoryGenerationResult`
         `record` will be non-empty IFF the kernel generator's :attr:`hoist_locals`
         is true
-        - If :param:`allowed_conflicts` is supplied, we are assumed to be in a driver
+        - If `allowed_conflicts` is supplied, we are assumed to be in a driver
         kernel, and only the 'global' (i.e., `problem_size`'d) variable will be kept,
         as the `work_size`'d variable is assumed to be a local copy
 
@@ -1840,7 +1840,7 @@ class kernel_generator(object):
 
     def _specialize_pointers(self, record, result):
         """
-        Specialize the base pointers in the :param:`result` such that:
+        Specialize the base pointers in the `result` such that:
             1. The pointer unpacks only contain arrays that correspond to the kernels
                in the calling :class:`kernel_generator`
             2. The pointer unpacks do not contain any of the calling
@@ -1974,7 +1974,7 @@ class kernel_generator(object):
 
     def _get_working_buffer(self, args):
         """
-        Determine the size of the working buffer required to store the :param:`args`
+        Determine the size of the working buffer required to store the `args`
         in a global working array, and return offsets for determing array indexing
 
         Parameters
@@ -1985,10 +1985,10 @@ class kernel_generator(object):
         Returns
         -------
         size_per_work_item: int
-            The size (in number of values of dtype of :param:`args`)
+            The size (in number of values of dtype of `args`)
             of the working buffer per work-group item
         static_size: int
-            The size (in number of values of dtype of :param:`args`) of the working
+            The size (in number of values of dtype of `args`) of the working
             buffer (independent of # of work-group items)
         offsets: dict of str -> (dtype, size, offset)
             A mapping of kernel argument names to:
@@ -2093,7 +2093,7 @@ class kernel_generator(object):
     def _remove_const_array(cls, text, arry):
         """
         Similar to :func:`_remove_work_array_consts`, but for removing const defn
-        of the given :param:`array`
+        of the given `array`
         """
 
         replacers = [(re.compile(r'(double(?:\d+)?)\s*const\s*\*__restrict__\s*{}'.
@@ -2128,7 +2128,7 @@ class kernel_generator(object):
 
     def deconstify(self, text, readonly=None):
         """
-        Convenience method to run :param:`text` through :func:`_remove_const_array`
+        Convenience method to run `text` through :func:`_remove_const_array`
         for all of :attr`in_arrays`and :attr:`out_arrays`
         """
         if readonly is None:
@@ -2395,7 +2395,7 @@ class kernel_generator(object):
         -------
         results: list of :class:`CodegenResult`
             The code-generation results for sub-kernels, with constants & preambles
-            deduplicated. Note that the modified version of :param:`result` is
+            deduplicated. Note that the modified version of `result` is
             stored in results[0]
         """
 
@@ -2445,7 +2445,7 @@ class kernel_generator(object):
 
     def _set_kernel_data(self, record, for_driver=False):
         """
-        Updates the :param:`record` to contain the correct :param:`kernel_data`
+        Updates the `record` to contain the correct `kernel_data`
 
         Parameters
         ----------
@@ -2697,7 +2697,7 @@ class kernel_generator(object):
 
     def _get_local_unpacks(self, wrapper, args, null_args=[]):
         """
-        Converts pointer unpacks from :param:`wrapper` to '_local' versions
+        Converts pointer unpacks from `wrapper` to '_local' versions
         for the driver kernel
 
         Parameters
@@ -3172,7 +3172,7 @@ class kernel_generator(object):
 
         iname_map: dict
             A dictionary mapping inames -> tags, only returned if
-            :param:`get_specialization` is True
+            `get_specialization` is True
         """
 
         # before doing anything, find vec width

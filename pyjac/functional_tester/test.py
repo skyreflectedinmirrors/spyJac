@@ -99,7 +99,7 @@ class HDF5Store(object):
 
     def open_for_chunked_write(self, filename, shape, num_conds):
         """
-        Opens a new file :param:`filename` and creates an :class:`pytables.EArray`
+        Opens a new file `filename` and creates an :class:`pytables.EArray`
         (extendable array) for writing
 
         Parameters
@@ -172,7 +172,7 @@ class HDF5Store(object):
                            filename=None, pytables_name=None,
                            num_conditions=None):
         """
-        Converts the binary output file in :param:`filename` to a HDF5 pytables file
+        Converts the binary output file in `filename` to a HDF5 pytables file
         in order to avoid memory errors
 
         Note
@@ -192,10 +192,10 @@ class HDF5Store(object):
             The storage order of the data in the binary file
         filename: str [None]
             The filename of the output, if not supplied it will be assumed to be
-            :param:`dir`/name.bin
+            `dir`/name.bin
         pytables_name: str [None]
             The filename of the pytables_output.  If not supplied, it will be the
-            same as :param:`filename` with the '.bin' prefix replaced with
+            same as `filename` with the '.bin' prefix replaced with
             '.hdf5'
         num_conditions: int [None]
             If specified, a limit on the number of conditions that were tested
@@ -1325,7 +1325,7 @@ class jacobian_eval(eval):
 @nottest
 def species_rate_tester(work_dir='error_checking', test_matrix=None, prefix=''):
     """Runs validation testing on pyJac's species_rate kernel, reading a series
-    of mechanisms and datafiles from the :param:`work_dir`, and outputting
+    of mechanisms and datafiles from the `work_dir`, and outputting
     a numpy zip file (.npz) with the error of various outputs (rhs vector, ROP, etc.)
     as compared to Cantera, for each configuration tested.
 
@@ -1357,7 +1357,7 @@ def species_rate_tester(work_dir='error_checking', test_matrix=None, prefix=''):
 @nottest
 def jacobian_tester(work_dir='error_checking', test_matrix=None, prefix=''):
     """Runs validation testing on pyJac's jacobian kernel, reading a series
-    of mechanisms and datafiles from the :param:`work_dir`, and outputting
+    of mechanisms and datafiles from the `work_dir`, and outputting
     a numpy zip file (.npz) with the error of Jacobian as compared to a
     autodifferentiated reference answer, for each configuration tested.
 

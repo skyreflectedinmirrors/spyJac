@@ -21,7 +21,7 @@ asserts = {'c': Template('cassert(${call}, "${message}");'),
 
 def guarded_call(lang, call, message='Error'):
     """
-    Returns a call guarded by error checking for the given :param:`lang`
+    Returns a call guarded by error checking for the given `lang`
     """
     return asserts[lang].safe_substitute(call=call, message=message)
 
@@ -202,7 +202,7 @@ class MemoryManager(object):
 
     def get_signature(self, device, arr):
         """
-        Returns the stringified version of :param:`arg`, for a use in a function
+        Returns the stringified version of `arg`, for a use in a function
         signature definition.
         """
 
@@ -252,7 +252,7 @@ class MemoryManager(object):
 
     def alloc(self, device, arr, readonly=False, num_ics='per_run', **kwargs):
         """
-        Return an allocation for a buffer in the given :param:`lang`
+        Return an allocation for a buffer in the given `lang`
 
         Parameters
         ----------
@@ -303,7 +303,7 @@ class MemoryManager(object):
             The number of initial conditions to evaluated per prun
         num_ics_this_run: str ['this_run']
             The number of initial conditions to evaluated _in this run_,
-            should be <= :param:`num_ics`.
+            should be <= `num_ics`.
         offset: str ['offset']
             The initial condition offset
         Returns
@@ -739,7 +739,7 @@ class PinnedMemory(MappedMemory):
     def alloc(self, device, arr, readonly=False, num_ics='per_run',
               namer=None, **kwargs):
         """
-        Return an allocation for a buffer in the given :param:`lang`
+        Return an allocation for a buffer in the given `lang`
 
         Parameters
         ----------
@@ -751,7 +751,7 @@ class PinnedMemory(MappedMemory):
             Changes memory flags / allocation type (e.g., for OpenCL)
         namer: :class:`six.Callable` [None]
             A callable function to generate the name of the buffer to be allocated.
-            If not specified, simply use :param:`arr.name`.
+            If not specified, simply use `arr.name`.
 
         Returns
         -------
@@ -814,7 +814,7 @@ class PinnedMemory(MappedMemory):
             The number of initial conditions to evaluated per prun
         namer: :class:`six.Callable` [None]
             A callable function to generate the name of the buffer to be allocated.
-            If not specified, simply use :param:`arr.name`.
+            If not specified, simply use `arr.name`.
 
         Note
         ----

@@ -33,8 +33,8 @@ def make_parameter_docs(callgen, argnames):
 
 def make_doc_str(callgen, argnames, func_desc, comment_type='c'):
     """
-    Returns a documentation string for the given :param:`argnames` for the
-    function w/ description :param:`func_desc`
+    Returns a documentation string for the given `argnames` for the
+    function w/ description `func_desc`
     """
 
     if comment_type == 'c':
