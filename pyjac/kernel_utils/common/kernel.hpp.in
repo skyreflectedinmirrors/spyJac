@@ -62,6 +62,8 @@ Global declarations for Cog:
 #include <cstdlib>
 #include <cstdio>
 #include <string>
+#include <cstring>
+#include <sstream>
 #include <vector>
 
 /*[[[cog
@@ -107,7 +109,7 @@ public:
           [[[end]]]*/
     }
 
-    //! \\brief Returns the list of reaction strings in the chemical model
+    //! \brief Returns the list of reaction strings in the chemical model
     static std::vector<const char*> reactionStrings()
     {
         /*[[[cog
@@ -117,23 +119,82 @@ public:
           [[[end]]]*/
     }
 
-    //! \\brief Return the data-ordering used in this kernel, either 'C' (row-major)
+    //! \brief Return the data-ordering used in this kernel, either 'C' (row-major)
     //!        or 'F' (column-major)
     static const char* order()
     {
         return _order;
     }
 
-    //! \\brief Return the number of species in the mode;
+    //! \brief Return the number of species in the mode;
     static unsigned int numSpecies()
     {
         return _nsp;
     }
 
-    //! \\brief Return the number of species in the mode;
+    //! \brief Return the number of species in the mode;
     static unsigned int numReactions()
     {
         return _nrxn;
+    }
+
+    /** \brief  Return a string representation of the Jacobian entries
+      *
+      *         Returns a simple string (LaTeX) version of the Jacobian entries
+      *         in proper data-ordering (as determined by \ref order).
+      *
+      * \note   This function does not take into account whether the generated kernel
+      *         actually implements a Jacobian call, and is for information purposes
+      *         only.
+      *
+      */
+    static std::vector<const char*> jacobianStrings()
+    {
+        // get species names
+        std::vector<const char*> state = Kernel::speciesNames();
+        /*[[[cog
+             cog.outl('bool conp = {};'.format('true' if callgen.conp else 'false'))
+          ]]]
+          [[[end]]]*/
+        const char* extra = conp ? "V" : "P";
+        // add temperature and extra value to the state vector
+        state.insert(state.begin(), extra);
+        state.insert(state.begin(), "T");
+        // and remove final species
+        state.pop_back();
+
+        // get order
+        const char* order = Kernel::order();
+        bool c_ordered = std::string(order) == std::string("C");
+
+        // now generate the latex strings
+        std::vector<const char*> jacobian;
+        for (size_t i = 0; i < state.size(); ++i)
+        {
+            for (size_t j = 0; j < state.size(); ++j)
+            {
+                size_t row, col;
+                if (c_ordered)
+                {
+                    col = j;
+                    row = i;
+                }
+                else
+                {
+                    row = i;
+                    col = j;
+                }
+                std::stringstream ss;
+
+                ss << "\\frac{\\partial \\dot{" << state[row] << "}}";
+                ss << "{\\partial " << state[col] << "}";
+                std::string jac_entry = ss.str();
+                char* copy = new char[jac_entry.length() + 1];
+                std::strcpy(copy, jac_entry.c_str());
+                jacobian.push_back(copy);
+            }
+        }
+        return jacobian;
     }
 
     /*[[[cog

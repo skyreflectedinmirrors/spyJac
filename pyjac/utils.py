@@ -134,8 +134,12 @@ def platform_is_gpu(platform):
 
 
 def stringify_args(arglist, kwd=False, joiner=', ', use_quotes=False,
-                   remove_empty=True):
-    template = '{}' if not use_quotes else '"{}"'
+                   remove_empty=True, raw=False):
+    template = '{}'
+    if use_quotes:
+        template = '"{}"'
+        if raw:
+            template = 'r"{}"'
     if kwd:
         template = template + '=' + template
         return joiner.join(template.format(str(k), str(v))
@@ -937,10 +941,10 @@ def get_parser():
                         default='',
                         type=str,
                         help='The name (or subset thereof) of the OpenCL platform '
-                             'to run on, e.g. "Intel", "nvidia", "pocl". '
-                             'Must be supplied to properly generate the compilation '
-                             'wrapper for OpenCL code, but may be ignored if not '
-                             'using the OpenCL target.'),
+                             'to run on, e.g. "Intel", "nvidia", or "portable" (for '
+                             'the PoCL runtime). Must be supplied to properly '
+                             'generate the compilation wrapper for OpenCL code, '
+                             'but may be ignored if not using the OpenCL target.'),
     parser.add_argument('-o', '--data_order',
                         default='C',
                         type=str,
