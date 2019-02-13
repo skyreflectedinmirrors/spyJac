@@ -762,9 +762,10 @@ def get_code(knl, opts=None):
 
 def not_is_close(arr1, arr2, **kwargs):
     """
-    A utility method that returns the result of:
+    A utility method that returns the result of::
         numpy.where(numpy.logical_not(numpy.isclose(arr1, arr2, **kwargs)))
-    Since I use if often in testing
+
+    which is often used in testing.
 
     Parameters
     ----------
@@ -772,7 +773,7 @@ def not_is_close(arr1, arr2, **kwargs):
         Array to compare
     arr2: :class:`numpy.ndarray`
         Reference answer
-    **kwargs: dict
+    kwargs: dict
         Keyword args for :func:`numpy.isclose`
 
     Returns
@@ -1264,8 +1265,8 @@ def auto_run(knl, kernel_calls, device='0'):
         The masks / ref_answers, etc. to use in testing
     device : str
         The pyopencl string denoting the device to use, defaults to '0'
-    input_args : dict of `numpy.array`s
-        The arguements to supply to the kernel
+    input_args : dict of :class:`numpy.ndarray`'s
+        The arguments to supply to the kernel
 
     Returns
     -------

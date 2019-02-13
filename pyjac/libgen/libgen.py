@@ -68,8 +68,9 @@ def get_toolchain(lang, shared=True, executable=True, **kwargs):
         If true, build a shared library
     executable: bool [True]
         If true, build a _executable_ shared library; note: requires
-        `shared`=True
-    **kwargs:
+        ``shared==True``
+    kwargs: dict
+        Dictionary arguments to pass to the generated toolchain
     """
 
     # compilation flags
@@ -301,13 +302,13 @@ def generate_library(lang, source_dir, obj_dir=None, out_dir=None, shared=None,
     ktype: :class:`KernelType` [KernelType.jacobian]
         The type of library being built
     as_executable: bool [False]
-        If true, the generated library should use the '-fPIE' flag (or equivalent)
-        to be executable
+        If ``True``, the generated library should use the '-fPIE' flag
+        (or equivalent) to be executable
 
     Keyword Arguments
     -----------------
     file_base: str
-        Used for creation of libraries for `ktype`==KernelType.dummy -- the
+        Used for creation of libraries for ``ktype == KernelType.dummy`` -- the
         base filename (generator name) for this library
 
     Returns
