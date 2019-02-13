@@ -33,7 +33,7 @@ To fix this, add the following to your ``siteconf.py``::
 I get Segmentation Faults when testing the Jacobian with nosetests!
 -------------------------------------------------------------------
 
-This issue is (likely) due to `incompatibilities in GLIBC`_ between the build servers
+This issue is (likely) due to `incompatibilities in GLIBC <https://github.com/conda-forge/adept-feedstock/issues/2>`_ between the build servers
 used by Conda-Forge used to compile the binary Adept library for distribution and your
 system.  This bug has typically been reported on Ubuntu systems.
 
@@ -49,6 +49,3 @@ and install Adept to the currently active Conda environment::
     make -j 2
     make check
     make install
-
-
-.. _incompatibilties in GLIBC: https://stackoverflow.com/a/45640803/1667311
