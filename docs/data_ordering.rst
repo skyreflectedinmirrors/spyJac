@@ -14,40 +14,61 @@ The array has :math:`N_{\text{state}}` (:math:`j = 1 \ldots N_{\text{state}}`) r
 
 This row / column layout is the one applied for the row-major / column-major layout.
 
+.. _vector-width:
+
+============
+Vector Width
+============
+
+pyJac is capable of achieving vectorized execution on the CPU, GPU and other accelerators via the OpenCL framework (opencl_).
+In OpenCL, groups of data are processed together on specialized vector processors (e.g., via simd_).
+
+A SIMD or SIMT vector is similar to a fixed-length array e.g., a "double8" intrinsic OpenCL type (simd_types_)::
+
+    double8 x = {0, 0, 0, 0, 0, 0, 0, 0};
+
+is like a double array of length 8. This length is known as the vector-width.
+A given OpenCL runtime is then responsible for translating operations over a vector to native vector instructions for
+the given device.
+
+
+.. _opencl: `https://www.khronos.org/opencl/`
+.. _simd: `https://en.wikipedia.org/wiki/SIMD`
+.. _simt: `https://en.wikipedia.org/wiki/Single_instruction,_multiple_threads`
 
 =======================================================
 Data Ordering for use with Python or Executable Library
 =======================================================
 
-When calling pyJac from either the generated Python wrapper or executable library (See :ref:`interface_vs_exe`), the state vectors / Jacobians should be interpreted using standard "C" \ "F"-ordering.
+When calling pyJac from either the generated Python wrapper or via the driver functions (:ref:`driver-function`),
+the state vectors / Jacobians should be interpreted using standard "C" \ "F"-ordering.
 For example, to apply an F-ordering for a CONV state vector in `numpy`_:
 
-```
-# create phi array
-phi = np.zeros(n_state, n_spec + 1)
-# populate the phi array
-# index 0 is the temperature
-phi[:, 0] = temperatures[:]
-# index 1 is the pressure
-phi[:, 1] = pressures[:]
-# and indicies 2...n_spec are the moles of the species in the model (excluding the last species)
-phi[:, 2:] = moles[:, :-1]
-# and finally, convert to F-order
-phi = np.copy(phi, order='F')
-```
+.. code-block:: python
+
+    # create phi array
+    phi = np.zeros(n_state, n_spec + 1)
+    # populate the phi array
+    # index 0 is the temperature
+    phi[:, 0] = temperatures[:]
+    # index 1 is the pressure
+    phi[:, 1] = pressures[:]
+    # and indicies 2...n_spec are the moles of the species in the model (excluding the last species)
+    phi[:, 2:] = moles[:, :-1]
+    # and finally, convert to F-order
+    phi = np.copy(phi, order='F')
+
 
 .. _numpy: http://numpy.org
-.. _interface_vs_exe: `Difference between Interface and Executable Libraries`
-
 .. _vector_split:
 
 =================================================================
 Data Ordering for Calling pyJac from Other Codes (Interface Mode)
 =================================================================
 
-When calling pyJac's generated source-term \ Jacobian codes directly from another code (see :ref:`interface_vs_exe`), the supplied data must be in pyJac's own internal data-format.
+When calling pyJac's generated source-term \ Jacobian codes directly from another code, the supplied data must be in pyJac's own internal data-format.
 
-As described in the pyJac-v2 paper (:ref:`paper`), pyJac uses a vectorized data-ordering for some cases.  Here we will define some terms to improve clarity:
+As described in the pyJac-v2 paper (paper_), pyJac uses a vectorized data-ordering for some cases.  Here we will define some terms to improve clarity:
 
 *  The **split_axis** is the axis in the array (**Note: before the split is applied**) that will be split into two new axes, a vector axis and another axis (which may or may not be important).
 *  The **vector_axis** results from the splitting, and is of length :ref:`vector-width`.
@@ -87,7 +108,7 @@ This corresponds to ordering:
 for a vector width ":math:`vw`".  This data-layout orders the concentrations for a given thermo-chemical state :math:`j` for :math:`vw` species sequentially in memory, followed by the thermo-chemical state :math:`j + 1` for the same species.  This is important to ensure coalesced memory accesses on the GPU.
 
 
-3)  Explicit-SIMD (:ref:`simd`) is used, and neither of the previous two cases apply.  In this case, the axes of the array may be padded (but not re-ordered) to ensure that the array can properly be vectorized.  For example, again using the species concentration array from :ref:`array_ordering`,  let us consider an array of 20 species, for 1000 thermo-chemical states, and a vector-width of 8.  If a "C"-ordering is used:
+3)  Explicit-SIMD (simd_types_) is used, and neither of the previous two cases apply.  In this case, the axes of the array may be padded (but not re-ordered) to ensure that the array can properly be vectorized.  For example, again using the species concentration array from :ref:`array_ordering`,  let us consider an array of 20 species, for 1000 thermo-chemical states, and a vector-width of 8.  If a "C"-ordering is used:
 
 * The **split_axis** will be the species axis in unsplit array (axis one).
 * After the split, the array will be resized to shape :math:`\left(1000, 3, 8\right)` such that the species axis can be properly vectorized, and:
@@ -101,6 +122,5 @@ Conversely, if a "F"-ordering is used:
 * The **vector_axis** is the first axis of the array of the split array (axis zero).
 * The **grow_axis** is axis one.
 
-.. _paper: `dummy`
-.. _simd: `dummy2`
-.. _vecwidth: `vector-width`
+.. _paper: `https://arxiv.org/abs/1809.01029`
+.. _simd_types: `https://www.khronos.org/registry/OpenCL/sdk/1.2/docs/man/xhtml/vectorDataTypes.html`
