@@ -48,7 +48,7 @@ this sort of memory format.
 In addition, reacting-flow codes may use different state-variables, e.g., mass-fractions,
 mole-fractions, concentrations, etc.!  The driver function provides a natural place to
 enable conversion to/from the calling code's state variables to pyJac's state-vector
-(see :ref:`state-vector`).
+(see :ref:`state_vec`).
 
 .. _work-size:
 
@@ -75,11 +75,6 @@ Alternatively, a more intuitive meaning for various devices is a follows:
 +---------+-------------------+-------------------+
 
 Where a 'thread block' for a GPU is defined in the CUDA sense.
-
-.. note::
-    While the work-size may be specified at run-time, if it is specified during the
-    generation process via the :ref:`work_size_flag`, more optimized code will be
-    generated.
 
 For vectorized codes, the work-size is not exactly equal to the number of
 thermochemical states that are being evaluated concurrently.  For example, if
@@ -130,7 +125,9 @@ Coupling to external codes
 One downside of pyJac's data-storage format is that it requires each OpenMP thread
 / OpenCL work-group to be passed the **addresses to the beginning of the arrays
 that contain memory for the entire set of threads / work-groups.**  In code this
-might look something like this::
+might look something like this:
+
+.. code-block::c
 
     double* phi = (double*)malloc(work_size * (N_s + 1) * sizeof(double));
     double* dphi = (double*)malloc(work_size * (N_s + 1) * sizeof(double));
@@ -142,7 +139,10 @@ might look something like this::
     // call source rates
     species_rates(0, phi, dphi, rwk);
 
-However, many codes operate on local-copies of the state vector array, e.g.::
+However, many codes operate on local-copies of the state vector array, e.g.:
+
+.. code-block::c
+
     double phi[N_s];
     double dphi[N_s];
     double* rwk = (double*)malloc(kernel.requiredMemorySize());

@@ -23,7 +23,9 @@ however this will not enable pyJac's unit-testing capabilities.
     correct version of ``loo.py`` installed.
 
 Alteratively, you may install pyJac via ``conda`` to easily obtain the full list
-of depenencies required for unit-testing and native ``OpenCL`` execution ..code-block:: bash
+of depenencies required for unit-testing and native ``OpenCL`` execution:
+
+..code-block:: bash
 
     conda create -y -n pyjac python=3 llvmdev clangdev cantera ocl-icd=*=h14c3975_1001 islpy pyyaml scipy pyopencl numpy Cython pytables flake8 pep8-naming pocl adept=*=he6fcbdd_3
     source activate pyjac
@@ -47,6 +49,7 @@ The siteconf.py file can be generated using ..code-block::
     python configure.py
 
 where addition arguments can be include to:
+
 * Set the OpenCL version to be used (``--cl-version``)
 * Set the path to the OpenCL headers (``--cl-inc-dir``)
 * Set the name of the OpenCL library to use (``--cl-libname``), defaults to ``libOpenCL.so``
