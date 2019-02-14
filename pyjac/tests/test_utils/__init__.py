@@ -460,13 +460,14 @@ def get_split_elements(arr, splitter, ref_shape, mask, axes=(1,),
 
     .. _note-above:
 
-    .. note::
+    Notes
+    -----
 
         This method is somewhat similar to :class:`indexer` but differs in a few key
         respects:
 
-        1) First, this method returns the desired elements of the split array (instead
-           of indicies).
+        1) First, this method returns the desired elements of the split array
+           (instead of indicies).
 
         2) Second, this method properly tiles / repeats the indicies for splitting,
            e.g., let's say we want to look at the slice 1:3 for axes 0 & 1 for the
@@ -496,8 +497,8 @@ def get_split_elements(arr, splitter, ref_shape, mask, axes=(1,),
         The axes the mask's correspond to. Must be of the same shape / size as mask.
     tiling: bool [True]
         If False, turns off the tiling discussed in the
-        :ref:`note-above`.  In this mode, each entry of the mask must
-        be the same length as all other entries
+        :ref:`note-above`.  In this mode, each entry of the
+        mask must be the same length as all other entries
 
     Returns
     -------
@@ -736,7 +737,8 @@ def dense_to_sparse_indicies(mask, axes, col_inds, row_inds, order, tiling=True)
     order: ['C', 'F']
         The data ordering
     tiling: bool [True]
-        If False, turns off the tiling discussed in :ref:`note-above`.
+        If False, turns off the tiling discussed in
+        :ref:`note-above <get_split_elements>`.
         In this mode, each entry of the mask must be the same length as all other
         entries.
 
@@ -827,7 +829,7 @@ def select_elements(arr, mask, axes, tiling=True):
         should correspond to an axis in this parameter.
     tiling: bool [True]
         Whether tiling mode is turned on, see
-        :ref:`note-above <get_split_elements>`_.  By default this is True.
+        :ref:`note-above <get_split_elements>`.  By default this is True.
 
     Returns
     -------
