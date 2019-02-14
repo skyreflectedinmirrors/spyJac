@@ -185,8 +185,8 @@ the GRI-Mech 3.0 model as:
     #evaluate the Jacobian
     pyjacob.py_eval_jacobian(0, P, y, jac)
 
-The above uses the state vector discussed in (:ref:`ordering`), as well as the
-reordering in (:ref:`cantera_comp`) to enable direct comparison to Cantera.
+The above uses the state vector discussed in (:ref:`state_vec`), as well as the
+reordering in (:ref:`array_ordering`) to enable direct comparison to Cantera.
 Also note that we can pass a dummy time of 0, as explained in
 (:ref:`param_names`).
 

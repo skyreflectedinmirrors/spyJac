@@ -74,7 +74,6 @@ def load_platform(codegen):
 
 
 class loopy_options(object):
-
     """
     Loopy Objects class
 
@@ -82,16 +81,16 @@ class loopy_options(object):
     ----------
     width : int
         If not None, the SIMD lane/SIMT block width.
-        Cannot be specified along with depth
+        Cannot be specified along with ``depth``
     depth : int
         If not None, the SIMD lane/SIMT block depth.
-        Cannot be specified along with width
+        Cannot be specified along with ``width``
     ilp : bool
         If True, use the ILP tag on the species loop.
-        Cannot be specified along with unr
+        Cannot be specified along with ``unr``
     unr : int
         If not None, the unroll length to apply to the species loop.
-        Cannot be specified along with ilp
+        Cannot be specified along with ``ilp``
     order : {'C', 'F'}
         The memory layout of the arrays, C (row major)
         or Fortran (column major)
@@ -106,11 +105,11 @@ class loopy_options(object):
         If True, break different ROP values (fwd / back / pdep) into different
         kernels
     platform : {'CPU', 'GPU', or other vendor specific name}
-        The OpenCL platform to run on.
-        *   If 'CPU' or 'GPU', the first available matching platform will be
-            used
-        *   If a vendor specific string, it will be passed to pyopencl to get
-            the platform
+        The OpenCL platform to run on:
+            * If 'CPU' or 'GPU', the first available matching platform will be
+              used
+            * If a vendor specific string, it will be passed to pyopencl to get
+              the platform
     use_atomic_doubles : bool [True]
         Use atomic updates where necessary for proper deep-vectorization
         If not, a sequential deep-vectorization (with only one thread/lane
@@ -763,6 +762,7 @@ def get_code(knl, opts=None):
 def not_is_close(arr1, arr2, **kwargs):
     """
     A utility method that returns the result of::
+
         numpy.where(numpy.logical_not(numpy.isclose(arr1, arr2, **kwargs)))
 
     which is often used in testing.
@@ -1131,7 +1131,7 @@ def populate(knl, kernel_calls, device='0',
              editor=None):
     """
     This method runs the supplied :class:`loopy.LoopKernel` (or list thereof),
-    and is often used by :function:`auto_run`
+    and is often used by :func:`auto_run`
 
     Parameters
     ----------

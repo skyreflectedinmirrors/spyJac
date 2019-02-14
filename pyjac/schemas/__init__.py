@@ -74,7 +74,8 @@ class CustomValidator(Validator):
         """ Test that the specified value is a proper vector size
 
         The rule's arguments are validated against this schema:
-        {'type': 'boolean'}
+            {'type': 'boolean'}
+
         """
         # TODO: implement per-platform vecsize checks
         # valid values include any power of two (or 3 for OpenCL)
@@ -87,7 +88,7 @@ class CustomValidator(Validator):
         """ Test that the specified value is a proper vector width
 
         The rule's arguments are validated against this schema:
-        {'type': 'boolean'}
+            {'type': 'boolean'}
         """
         allowed = ['par', 'wide', 'deep']
         self.__internal_validator(
@@ -99,7 +100,8 @@ class CustomValidator(Validator):
         """ Test that the specified value is a proper vector width
 
         The rule's arguments are validated against this schema:
-        {'type': 'boolean'}
+            {'type': 'boolean'}
+
         """
 
         self.__internal_validator(
@@ -110,7 +112,7 @@ class CustomValidator(Validator):
 
     def _validate_type_bytestr(self, value):
         """
-        Enables validation for `bytestr` schema attribute.
+        Enables validation for the ``bytestr`` schema attribute.
         :param value: field value.
         """
 
@@ -121,7 +123,7 @@ class CustomValidator(Validator):
         """ Test that the specified value is an ok platform
 
         The rule's arguments are validated against this schema:
-        {'type': 'boolean'}
+            {'type': 'boolean'}
         """
 
         # todo implement
