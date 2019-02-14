@@ -20,14 +20,6 @@ pyjac.tests.test\_utils.get\_test\_matrix module
     :undoc-members:
     :show-inheritance:
 
-pyjac.tests.test\_utils.read\_ic\_wrapper module
-------------------------------------------------
-
-.. automodule:: pyjac.tests.test_utils.read_ic_wrapper
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 
 Module contents
 ---------------
