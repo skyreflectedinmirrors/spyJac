@@ -101,7 +101,7 @@ setup(
           'nose-exclude',
           'nose-testconfig',
           'nose-timer',
-          'parameterized',
+          'parameterized >= 0.6.3',
           'optionloop >= 1.0.7',
           'cantera >= 2.3.0',
           'scipy',

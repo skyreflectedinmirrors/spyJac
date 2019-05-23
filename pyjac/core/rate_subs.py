@@ -670,7 +670,7 @@ def get_concentrations(loopy_opts, namestore, conp=True,
            ${conc_ns_str} = ${P_str} / (R_u * ${T_val}) {id=cns_init}
         """).substitute(**locals())
 
-    mole_guard = ic.Guard(loopy_opts, minv=utils.small)
+    mole_guard = ic.MoleGuard(loopy_opts)
     n_guarded = mole_guard(n_str)
     nsp_guarded = mole_guard('n_sum')
 

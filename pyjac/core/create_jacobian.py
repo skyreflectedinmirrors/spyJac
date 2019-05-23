@@ -526,7 +526,7 @@ def __dcidE(loopy_opts, namestore, test_size=None,
     # compute guarded exponentials / logs
     expg = ic.GuardedExp(loopy_opts)
     logg = ic.GuardedLog(loopy_opts)
-    guard = ic.Guard(loopy_opts, minv=utils.small)
+    nonzero_guard = ic.NonzeroGuard(loopy_opts)
     if rxn_type != reaction_type.thd:
         # update factors
         factor = 'dci_fall_dE'
@@ -560,7 +560,7 @@ def __dcidE(loopy_opts, namestore, test_size=None,
                 namestore.Fcent, *default_inds)
             kernel_data.extend([Atroe_lp, Btroe_lp, Fcent_lp])
 
-            Pr_g = guard(Pr_str)
+            Pr_g = nonzero_guard(Pr_str)
             log_fcent = logg(Fcent_str)
             dFi_instructions = Template("""
                 <> absqsq = ${Atroe_str} * ${Atroe_str} + \
@@ -594,7 +594,7 @@ def __dcidE(loopy_opts, namestore, test_size=None,
 
             sri_fac = Template(inner).safe_substitute(**locals())
             log_pr = logg(Pr_str)
-            Pr_g = guard(Pr_str)
+            Pr_g = nonzero_guard(Pr_str)
 
             # create insns
             dFi_instructions = Template("""
@@ -648,7 +648,7 @@ def __dcidE(loopy_opts, namestore, test_size=None,
         """).safe_substitute(**locals())
 
     # and update manglers
-    manglers.extend([precompute, expg, logg, guard])
+    manglers.extend([precompute, expg, logg, nonzero_guard])
     rop_net_rev_update = ic.get_update_instruction(
         mapstore, namestore.rop_rev,
         Template(
@@ -2282,7 +2282,7 @@ def __dcidT(loopy_opts, namestore, test_size=None,
     # compute guarded exponentials / logs
     expg = ic.GuardedExp(loopy_opts)
     logg = ic.GuardedLog(loopy_opts)
-    guard = ic.Guard(loopy_opts, minv=utils.small)
+    nonzero_guard = ic.NonzeroGuard(loopy_opts)
     if rxn_type != reaction_type.thd:
         # update factors
         factor = 'dci_fall_dT'
@@ -2334,7 +2334,7 @@ def __dcidT(loopy_opts, namestore, test_size=None,
             exp_T3 = expg('-Tval * {troe_T3_str}'.format(troe_T3_str=troe_T3_str))
             exp_T2 = expg('-{troe_T2_str} * Tinv'.format(troe_T2_str=troe_T2_str))
             log_fcent = logg(Fcent_str)
-            Pr_g = guard(Pr_str)
+            Pr_g = nonzero_guard(Pr_str)
 
             dFi_instructions = Template("""
                 <> dFcent = -${troe_a_str} * ${troe_T1_str} * \
@@ -2366,7 +2366,7 @@ def __dcidT(loopy_opts, namestore, test_size=None,
 
             exp_cinv = expg('-Tval * cinv')
             exp_b = expg('-{b_str} * Tinv'.format(b_str=b_str))
-            Pr_g = guard(Pr_str)
+            Pr_g = nonzero_guard(Pr_str)
             log_pr = logg(Pr_str)
             log_val = Template('${a_str} * ${exp_b} + ${exp_cinv}').safe_substitute(
                 **locals())
@@ -2386,7 +2386,7 @@ def __dcidT(loopy_opts, namestore, test_size=None,
         else:
             dFi_instructions = '<> dFi = 0 {id=dFi_final}'
 
-        manglers.extend([expg, logg, guard, precompute])
+        manglers.extend([expg, logg, nonzero_guard, precompute])
 
         fall_instructions = Template("""
         if ${fall_type_str}
@@ -3775,7 +3775,7 @@ def __dci_dnj(loopy_opts, namestore, do_ns=False, fall_type=falloff_form.none,
 
     expg = ic.GuardedExp(loopy_opts)
     logg = ic.GuardedLog(loopy_opts)
-    guard = ic.Guard(loopy_opts, minv=utils.small)
+    nonzero_guard = ic.NonzeroGuard(loopy_opts)
 
     fall_update = ''
     # if we have a falloff term, need to calcule the dFi
@@ -3819,7 +3819,7 @@ def __dci_dnj(loopy_opts, namestore, do_ns=False, fall_type=falloff_form.none,
                 **locals())
             log_val = logg(inner)
             log_pr = logg(Pr_str)
-            pr_g = guard(Pr_str)
+            pr_g = nonzero_guard(Pr_str)
 
             dFi = Template(
                 """
@@ -3840,7 +3840,7 @@ def __dci_dnj(loopy_opts, namestore, do_ns=False, fall_type=falloff_form.none,
             kernel_data.extend([Atroe_lp, Btroe_lp, Fcent_lp])
 
             log_fcent = logg(Fcent_str)
-            pr_g = guard(Pr_str)
+            pr_g = nonzero_guard(Pr_str)
 
             dFi = Template(
                 """
@@ -3888,7 +3888,7 @@ def __dci_dnj(loopy_opts, namestore, do_ns=False, fall_type=falloff_form.none,
         # use a no-op to simplify the dependencies
         fall_update = '... nop {id=fall}'
 
-    manglers.extend([expg, logg, guard])
+    manglers.extend([expg, logg, nonzero_guard])
 
     # create the jacobian update
     jac_update_insn = Template(

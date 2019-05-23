@@ -181,16 +181,17 @@ class fastpowiv_PreambleGen(fastpowi_PreambleGen):
 
 
 class signaware_limiter_PreambleGen(PreambleGen):
-    def __init__(self, lang, limit, vector=None, name='limiter'):
+    def __init__(self, lang, limit, vector=None, name='limiter',
+                 is_simd=False):
         inline = 'static inline ' if lang == 'c' else ''
         double_str = 'double'
-        if vector:
+        if vector and is_simd:
             double_str += str(vector)
         # operators
         code = Template("""
    ${inline}${double_str} ${name}(${double_str} val)
    {
-        return (val < 0) ? (fmin(-${limit}, val) ? fmax(${limit}, val));
+        return (val < 0) ? fmin(-${limit}, val) : fmax(${limit}, val);
    }
    """).substitute(inline=inline, double_str=double_str,
                    name=name, limit=limit)
