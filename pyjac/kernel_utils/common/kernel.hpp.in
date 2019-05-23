@@ -98,43 +98,19 @@ public:
     void resize(size_t problem_size, size_t work_size, bool do_not_compile=false);
 
     //! \\brief Returns the ordered list of species names in the chemical model
-    static std::vector<const char*> speciesNames()
-    {
-        /*[[[cog
-             cog.outl('return std::vector<const char*>(_species_names, '
-                      '_species_names + {});'.format(len(callgen.species_names)))
-          ]]]
-          [[[end]]]*/
-    }
+    static std::vector<const char*> speciesNames();
 
     //! \\brief Returns the list of reaction strings in the chemical model
-    static std::vector<const char*> reactionStrings()
-    {
-        /*[[[cog
-             cog.outl('return std::vector<const char*>(_rxn_strings, '
-                      '_rxn_strings + {});'.format(len(callgen.rxn_strings)))
-          ]]]
-          [[[end]]]*/
-    }
-
+    static std::vector<const char*> reactionStrings();
     //! \\brief Return the data-ordering used in this kernel, either 'C' (row-major)
     //!        or 'F' (column-major)
-    static const char* order()
-    {
-        return _order;
-    }
+    static const char* order();
 
     //! \\brief Return the number of species in the mode;
-    static unsigned int numSpecies()
-    {
-        return _nsp;
-    }
+    static unsigned int numSpecies();
 
     //! \\brief Return the number of species in the mode;
-    static unsigned int numReactions()
-    {
-        return _nrxn;
-    }
+    static unsigned int numReactions();
 
     /*[[[cog
          if can_vectorize_lang[callgen.lang]:

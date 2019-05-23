@@ -38,6 +38,49 @@ Global declarations for Cog:
  ]]]
  [[[end]]]*/
 
+// static definitions (to ensure symbols can be found)
+
+
+//! \\brief Returns the ordered list of species names in the chemical model
+std::vector<const char*> Kernel::speciesNames()
+{
+    /*[[[cog
+         cog.outl('return std::vector<const char*>(_species_names, '
+                  '_species_names + {});'.format(len(callgen.species_names)))
+      ]]]
+      [[[end]]]*/
+}
+
+//! \\brief Returns the list of reaction strings in the chemical model
+std::vector<const char*> Kernel::reactionStrings()
+{
+    /*[[[cog
+         cog.outl('return std::vector<const char*>(_rxn_strings, '
+                  '_rxn_strings + {});'.format(len(callgen.rxn_strings)))
+      ]]]
+      [[[end]]]*/
+}
+
+//! \\brief Return the data-ordering used in this kernel, either 'C' (row-major)
+//!        or 'F' (column-major)
+const char* Kernel::order()
+{
+    return Kernel::_order;
+}
+
+//! \\brief Return the number of species in the mode;
+unsigned int Kernel::numSpecies();
+{
+    return Kernel::_nsp;
+}
+
+//! \\brief Return the number of species in the mode;
+unsigned int Kernel::numReactions()
+{
+    return Kernel::_nrxn;
+}
+
+
 Kernel::Kernel():
     initialized(false),
     compiled(false),
