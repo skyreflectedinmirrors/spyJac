@@ -69,7 +69,7 @@ const char* Kernel::order()
 }
 
 //! \\brief Return the number of species in the mode;
-unsigned int Kernel::numSpecies();
+unsigned int Kernel::numSpecies()
 {
     return Kernel::_nsp;
 }
