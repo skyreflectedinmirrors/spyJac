@@ -452,7 +452,7 @@ class GuardedExp(Guard):
     """
     Take the guarded exponent of a value, i.e.:
 
-        exp(fmin(exp_max, value))
+        exp(fmax(-exp_max, fmin(exp_max, value)))
 
     Attributes
     ----------
@@ -461,9 +461,10 @@ class GuardedExp(Guard):
 
     """
 
-    def __init__(self, loopy_opts, maxv=utils.exp_max, exptype='exp({val})'):
+    def __init__(self, loopy_opts, maxv=utils.exp_max,
+                 minv=-utils.exp_max, exptype='exp({val})'):
         self.exptype = exptype
-        super(GuardedExp, self).__init__(loopy_opts, maxv=maxv)
+        super(GuardedExp, self).__init__(loopy_opts, maxv=maxv, minv=minv)
 
     def __operation__(self, value):
         return self.exptype.format(val=value)
