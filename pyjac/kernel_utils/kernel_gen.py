@@ -442,6 +442,8 @@ class CallgenResult(TargetCheckingRecord, DocumentingRecord):
         If true, save copies of local arrays to file(s) for validation testing.
     binname: str
         The path to the compiled OpenCL binary, if applicable
+    host_constant_map: dict
+        Dictionary of dtype to host constant name
     """
 
     def __init__(self, name='', work_arrays=[], input_args={}, output_args={},
@@ -450,7 +452,7 @@ class CallgenResult(TargetCheckingRecord, DocumentingRecord):
                  rxn_strings=[], dev_mem_type=DeviceMemoryType.mapped, type_map={},
                  host_constants={}, source_names={}, platform='', build_options='',
                  device_type=None, input_data_path='', for_validation=False,
-                 binname='', language_docs=None):
+                 binname='', language_docs=None, host_constant_map={}):
 
         docs = self.init_docs(lang, docs=docs, language_docs=language_docs)
         ImmutableRecord.__init__(self, name=name, work_arrays=work_arrays,
@@ -467,7 +469,8 @@ class CallgenResult(TargetCheckingRecord, DocumentingRecord):
                                  device_type=device_type,
                                  input_data_path=input_data_path,
                                  for_validation=for_validation,
-                                 binname=binname)
+                                 binname=binname,
+                                 host_constant_map=host_constant_map)
 
     def _get_data(self, include_work=False):
         data = {}
@@ -560,11 +563,15 @@ class ReadgenRecord(TargetCheckingRecord):
         The data ordering
     type_map: dict of :class:`LoopyType` -> str
         The mapping of loopy types to ctypes
+    host_constant_map: dict
+        Dictionary of dtype to host constant name
     """
 
-    def __init__(self, lang='', type_map={}, order='', inputs=[]):
+    def __init__(self, lang='', type_map={}, order='', inputs=[],
+                 host_constant_map={}):
         ImmutableRecord.__init__(self, lang=lang, order=order, inputs=inputs,
-                                 type_map=type_map)
+                                 type_map=type_map,
+                                 host_constant_map=host_constant_map)
 
     @property
     def dev_mem_type(self):
@@ -688,6 +695,14 @@ class kernel_generator(object):
         self.type_map[to_loopy_type(np.float64, target=self.target)] = 'double'
         self.type_map[to_loopy_type(np.int32, target=self.target)] = 'int'
         self.type_map[to_loopy_type(np.int64, target=self.target)] = 'long int'
+
+        self.host_constant_map = {}
+        self.host_constant_map[to_loopy_type(
+            np.float64, target=self.target)] = rhs_work_name
+        self.host_constant_map[to_loopy_type(
+            np.int32, target=self.target)] = int_work_name
+        self.host_constant_map[to_loopy_type(
+            np.int64, target=self.target)] = int_work_name
 
         self.depends_on = depends_on[:]
         self.array_props = array_props.copy()
@@ -1132,7 +1147,8 @@ class kernel_generator(object):
             lang=self.loopy_opts.lang,
             type_map=self.type_map,
             order=self.loopy_opts.order,
-            inputs=inputs)
+            inputs=inputs,
+            host_constant_map=self.host_constant_map)
 
         # serialize
         readout = os.path.join(path, 'readgen.pickle')
@@ -1276,6 +1292,7 @@ class kernel_generator(object):
             order=self.loopy_opts.order,
             lang=self.lang,
             type_map=self.type_map.copy(),
+            host_constant_map=self.host_constant_map.copy(),
             input_data_path=data_filename,
             for_validation=for_validation,
             species_names=species_names,
@@ -1765,9 +1782,9 @@ class kernel_generator(object):
             inames = set([i.name for i in iargs])
             dnames = set([d.name for d in dargs])
             for hc in record.host_constants:
-                if hc.dtype == itype and not set([hc.name]) & inames:
+                if hc.dtype == itype and set([hc.name]) & inames:
                     iargs += [hc]
-                elif not set([hc.name]) & dnames:
+                elif hc.dtype == itype and set([hc.name]) & dnames:
                     dargs += [hc]
 
         # and create buffers for all
@@ -2013,11 +2030,14 @@ class kernel_generator(object):
                        for k, v in six.iteritems(vars(self.namestore))
                        if isinstance(v, arc.creator)}
 
-        def _offset():
+        def _offset(static=None):
             # if we have unique pointers, the work-size is fixed to an integer, and
             # will already be baked into the size of the array
-            work_size = self.work_size if not self.unique_pointers else 1
-            return '{} * {}'.format(size_per_work_item, work_size)
+            if static is None:
+                work_size = self.work_size if not self.unique_pointers else 1
+                return '{} * {}'.format(size_per_work_item, work_size)
+
+            return '{}'.format(static_size)
 
         for arg in args:
             buffer_size = None
@@ -2033,7 +2053,7 @@ class kernel_generator(object):
             elif not len(ssizes):
                 # static size
                 buffer_size = int(np.prod(isizes))
-                offset = _offset()
+                offset = _offset(static=True)
                 ic_dep = False
                 if self.unique_pointers:
                     # need to test if this is per work-item or not
@@ -3512,11 +3532,12 @@ class opencl_kernel_generator(kernel_generator):
             The stringified pointer unpacking statement
         """
 
-        dtype = self.type_map[dtype]
+        mdtype = self.type_map[dtype]
         if scope == scopes.GLOBAL:
             scope_str = 'global'
             volatile = ''
-            work_str = rhs_work_name
+            itype = to_loopy_type(arc.kint_type, target=self.target)
+            work_str = rhs_work_name if dtype != itype else int_work_name
         elif scope == scopes.LOCAL:
             scope_str = 'local'
             volatile = ' volatile'
@@ -3529,8 +3550,8 @@ class opencl_kernel_generator(kernel_generator):
         if self.loopy_opts.is_simd:
             # convert to double4 etc
             if not set_null:
-                dtype += str(self.vec_width)
-            cast = '({} {}*)'.format(scope_str, dtype)
+                mdtype += str(self.vec_width)
+            cast = '({} {}*)'.format(scope_str, mdtype)
 
         unique = ''
         if self.unique_pointers and for_driver:
@@ -3539,12 +3560,12 @@ class opencl_kernel_generator(kernel_generator):
         if set_null:
             return '{scope}{volatile} {dtype}* __restrict__ {array} = 0;'.format(
                 scope=scope_str, volatile=volatile,
-                dtype=dtype, array=array)
+                dtype=mdtype, array=array)
 
         return ('{scope}{volatile} {dtype}* __restrict__ {array}'
                 ' = {cast}({work_str} + {offset}{unique});').format(
             scope=scope_str, volatile=volatile,
-            dtype=dtype, array=array, cast=cast,
+            dtype=mdtype, array=array, cast=cast,
             work_str=work_str, offset=offset, unique=unique)
 
     def _special_kernel_subs(self, path, callgen):
