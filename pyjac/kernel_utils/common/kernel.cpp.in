@@ -530,17 +530,23 @@ void {kernel_name}::mem_init(size_t problem_size, size_t work_size)
     if callgen.lang == 'opencl':
         cog.out("""
     /* Finalization of our current queue / kernel */
-    check_err(clFlush(this->queue));
-    check_err(clReleaseKernel(this->kernel));
-    check_err(clFinish(this->queue));
-    """, dedent=False, trimblanklines=True)
+    if (this->initialized)
+    {
+        check_err(clFlush(this->queue));
+        check_err(clReleaseKernel(this->kernel));
+        check_err(clFinish(this->queue));
 
-    cog.outl(indent('/* Free Memory */', stdindent))
+        /* Free Memory */
+    """, dedent=False, trimblanklines=True)
 
     for arr in callgen.kernel_data[kernel]:
         if not (isinstance(arr, lp.ValueArg) or
                 arr.address_space == lp.AddressSpace.LOCAL):
-            cog.outl(indent(kmem.free(True, arr), stdindent))
+            cog.outl(indent(kmem.free(True, arr), stdindent * 2))
+
+    cog.out("""
+    }
+    """, dedent=False, trimblanklines=True)
 
     cog.outl('}\n')
 
