@@ -1658,8 +1658,8 @@ class SubTest(TestClass):
             other_args['maxP'] = np.max(rate_info['cheb']['num_P'])
             other_args['maxT'] = np.max(rate_info['cheb']['num_T'])
 
-        rtol = 1e-3
-        atol = 1e-7
+        rtol = 4e-5
+        atol = 1e-2
 
         def _small_compare(kc, our_vals, ref_vals, mask):
             # get the condition extractor

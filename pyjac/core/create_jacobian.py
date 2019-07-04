@@ -1061,7 +1061,8 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
             pmod_deps = ':'.join(['dE_update'] if rev_update else [])
             pres_mod_update = '... nop {{id=dE_final, dep={pmod_deps}}}'.format(
                 pmod_deps=pmod_deps)
-            if rxn_type not in [reaction_type.plog, reaction_type.cheb]:
+            if rxn_type not in [reaction_type.plog, reaction_type.cheb]\
+                    and namestore.pres_mod is not None:
                 pres_mod_update = ic.get_update_instruction(
                     mapstore, namestore.pres_mod,
                     Template(
