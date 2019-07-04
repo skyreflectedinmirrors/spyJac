@@ -1510,17 +1510,21 @@ class SubTest(TestClass):
         kr = self.__get_kr(kf)
 
         args = {
-            'pres_mod': lambda x: np.array(
-                self.store.ref_pres_mod, order=x, copy=True),
             'conc': lambda x: np.zeros_like(self.store.concs, order=x),
             'wdot': lambda x: np.zeros_like(self.store.species_rates, order=x),
             'rop_fwd': lambda x: np.zeros_like(
                 self.store.fwd_rxn_rate, order=x),
-            'rop_rev': lambda x: np.zeros_like(
-                self.store.rev_rxn_rate, order=x),
             'rop_net': lambda x: np.zeros_like(self.store.rxn_rates, order=x),
             'jac': lambda x: np.zeros(namestore.jac.shape, order=x),
         }
+
+        if namestore.rop_rev is not None:
+            args.update({'rop_rev': lambda x: np.zeros_like(
+                self.store.rev_rxn_rate, order=x)})
+
+        if namestore.pres_mod is not None:
+            args.update({'pres_mod': lambda x: np.array(
+                self.store.ref_pres_mod, order=x, copy=True)})
 
         if test_variable and (rxn_type == reaction_type.elementary or conp):
             args.update({
@@ -1587,14 +1591,19 @@ class SubTest(TestClass):
         # setup args
         args = {
             'rop_fwd': lambda x: np.array(fwd_removed, order=x, copy=True),
-            'rop_rev': lambda x: np.array(rev_removed, order=x, copy=True),
-            'pres_mod': lambda x: np.array(
-                self.store.ref_pres_mod, order=x, copy=True),
             'kf': lambda x: np.array(kf, order=x, copy=True),
             'kr': lambda x: np.array(kr, order=x, copy=True),
             'jac': lambda x: np.zeros(namestore.jac.shape, order=x),
             'conc': lambda x: np.array(self.store.concs, order=x, copy=True)
         }
+
+        if namestore.rop_rev is not None:
+            args.update({'rop_rev': lambda x: np.zeros_like(
+                self.store.rev_rxn_rate, order=x)})
+
+        if namestore.pres_mod is not None:
+            args.update({'pres_mod': lambda x: np.array(
+                self.store.ref_pres_mod, order=x, copy=True)})
 
         if conp:
             args.update({

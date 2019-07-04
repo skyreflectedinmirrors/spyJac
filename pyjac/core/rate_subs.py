@@ -1299,27 +1299,39 @@ def get_rop_net(loopy_opts, namestore, test_size=None):
         """).safe_substitute(rop_fwd_str=rop_fwd_str,
                              rop_net_str=rop_strs['fwd'])
 
-        # reverse update
-        rev_update_instructions = ic.get_update_instruction(
-            __get_map('rev'), namestore.rop_rev,
-            Template(
-                """
-            net_rate = net_rate - ${rop_rev_str} \
-                {id=rate_update_rev, dep=rate_update}
-            """).safe_substitute(
-                rop_rev_str=rop_rev_str))
+        rev_update_instructions = None
+        if namestore.rop_rev is not None:
+            # reverse update
+            rev_update_instructions = ic.get_update_instruction(
+                __get_map('rev'), namestore.rop_rev,
+                Template(
+                    """
+                net_rate = net_rate - ${rop_rev_str} \
+                    {id=rate_update_rev, dep=rate_update}
+                """).safe_substitute(
+                    rop_rev_str=rop_rev_str))
+        rev_update_instructions = ic.instruction_if_condition(
+            rev_update_instructions, namestore.rop_rev is not None,
+            'rate_update_rev', deps=['rate_update'])
 
         # pmod update
-        pmod_update_instructions = ic.get_update_instruction(
-            __get_map('pres_mod'), namestore.pres_mod,
-            Template(
-                """
-            net_rate = net_rate * ${pres_mod_str} \
-                {id=rate_update_pmod, dep=rate_update${rev_dep}}
-            """).safe_substitute(
-                rev_dep=':rate_update_rev' if namestore.rop_rev is not None
-                    else '',
-                pres_mod_str=pres_mod_str))
+        pmod_update_instructions = None
+        if namestore.pres_mod is not None:
+            pmod_update_instructions = ic.get_update_instruction(
+                __get_map('pres_mod'), namestore.pres_mod,
+                Template(
+                    """
+                net_rate = net_rate * ${pres_mod_str} \
+                    {id=rate_update_pmod, dep=rate_update${rev_dep}}
+                """).safe_substitute(
+                    rev_dep=':rate_update_rev' if namestore.rop_rev is not None
+                        else '',
+                    pres_mod_str=pres_mod_str))
+
+        pmod_update_instructions = ic.instruction_if_condition(
+            pmod_update_instructions, namestore.pres_mod is not None,
+            'rate_update_pmod', deps=['rate_update'] + (
+                ['rate_update_rev'] if namestore.rop_rev is not None else []))
 
         instructions = Template(instructions).safe_substitute(
             rev_update=rev_update_instructions,

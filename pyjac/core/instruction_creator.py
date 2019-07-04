@@ -735,6 +735,40 @@ def get_update_instruction(mapstore, mask_arr, base_update_insn):
     return base_update_insn
 
 
+def instruction_if_condition(insn, condition, id, deps=[]):
+    """
+    Utility function to emit the `insn` IFF if `condition` is True
+
+    Parameters
+    ----------
+    insn: str
+        The instruction to execute
+    condition: bool or Callable
+        If true, `insn` will be emitted, else a noop will be emitted
+    id: str
+        The ID of the instruction be emitted (for noop anchoring)
+    deps: list of str
+        The IDs of instructions this depends on (for noop anchroing)
+    Returns
+    -------
+    If condition:
+        `if wrapper
+            insn
+         end
+        `
+    else:
+        insn
+    """
+
+    if condition:
+        return insn
+
+    _i = '... nop {{id={id}'
+    if deps:
+        _i += ', dep={deps}'.format(deps=':'.join(deps))
+    return (_i + '}}').format(id=id)
+
+
 def wrap_instruction_on_condition(insn, condition, wrapper):
     """
     Utility function to wrap the :param:`insn` in the supplied :param:`wrapper`
