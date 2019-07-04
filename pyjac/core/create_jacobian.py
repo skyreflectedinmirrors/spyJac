@@ -2691,8 +2691,9 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
     # thd_mask depends on actual reaction index
     mapstore.check_and_add_transform(namestore.thd_mask, rxn_range)
     # pres mod is on thd_mask
-    mapstore.check_and_add_transform(
-        namestore.pres_mod, namestore.thd_mask)
+    if namestore.pres_mod is not None:
+        mapstore.check_and_add_transform(
+            namestore.pres_mod, namestore.thd_mask)
     # nu's are on the actual rxn index
     mapstore.check_and_add_transform(
         namestore.rxn_to_spec_offsets, rxn_range)
@@ -2722,11 +2723,15 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
     # get rev / thd mask
     rev_mask_lp, rev_mask_str = mapstore.apply_maps(
         namestore.rev_mask, var_name)
-    thd_mask_lp, thd_mask_str = mapstore.apply_maps(
-        namestore.thd_mask, var_name)
-    pres_mod_lp, pres_mod_str = mapstore.apply_maps(
-        namestore.pres_mod, *default_inds)
-    # nu offsets
+    thd_mask_lp = None
+    if namestore.thd_mask is not None:
+        thd_mask_lp, thd_mask_str = mapstore.apply_maps(
+            namestore.thd_mask, var_name)
+    pres_mod_lp = None
+    if namestore.pres_mod is not None:
+        pres_mod_lp, pres_mod_str = mapstore.apply_maps(
+            namestore.pres_mod, *default_inds)
+        # nu offsets
     nu_offset_lp, nu_offset_str = mapstore.apply_maps(
         namestore.rxn_to_spec_offsets, var_name)
     _, nu_offset_next_str = mapstore.apply_maps(
@@ -2743,8 +2748,9 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
         namestore.rxn_to_spec, k_ind)
 
     # add to data
-    kernel_data.extend([T_lp, V_lp, rev_mask_lp, thd_mask_lp, pres_mod_lp,
-                        nu_offset_lp, nu_lp, spec_lp])
+    kernel_data.extend([x for x in
+                        [T_lp, V_lp, rev_mask_lp, thd_mask_lp, pres_mod_lp,
+                         nu_offset_lp, nu_lp, spec_lp] if x is not None])
     # create a precomputed instruction generator
     precompute = ic.PrecomputedInstructions(loopy_opts)
 
@@ -2991,6 +2997,11 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
                 '<> dkf = (${beta_str} + ${Ta_str} * Tinv) * Tinv {id=dkf}'
             ).safe_substitute(**locals())
 
+        thd_mask_update = ic.get_update_instruction(
+            mapstore, namestore.thd_mask, Template(
+                'ci = ${pres_mod_str} {id=ci, dep=ci_init}').safe_substitute(
+            **locals()))
+
         # and put together instructions
         instructions = Template("""
         ${dkf_instructions}
@@ -3006,9 +3017,7 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
             dRopidT = dRopidT - ${rop_rev_str} * \
                 (dkf - dBk_sum) {id=rev, dep=init:up}
         end
-        if ${thd_mask_str} >= 0
-            ci = ${pres_mod_str} {id=ci, dep=ci_init}
-        end
+        ${thd_mask_update}
         dRopidT = dRopidT * ci * ${V_str} {id=Ropi_final, dep=rev:ci*}
         """).safe_substitute(**locals())
     else:

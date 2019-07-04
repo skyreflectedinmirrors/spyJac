@@ -706,7 +706,7 @@ def get_update_instruction(mapstore, mask_arr, base_update_insn):
         mapstore.finalize()
 
     # empty mask
-    if mask_arr is None or not len(mask_arr):
+    if not mask_arr:
         # get insn options for nop anchor
         options = re.search(r'{([^}]+)}\s*$', base_update_insn)
         return '... nop {{{options}}}'.format(options=options.group(1))
