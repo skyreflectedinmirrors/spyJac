@@ -338,7 +338,9 @@ def clean_dir(dirname, remove_dir=True):
 
 
 @contextmanager
-def temporary_directory(cleanup=True):
+def temporary_directory(cleanup=None):
+    if cleanup is None:
+        cleanup = not get_env_val('KEEP_TEMPORARY', False)
     dirpath = tempfile.mkdtemp()
     owd = os.getcwd()
     try:

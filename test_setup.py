@@ -35,3 +35,5 @@ config['test_langs'] = 'opencl,c'
 # config['test_size'] = 8192
 # Set the type of reaction sorting to utilize
 # config['rxn_sort'] = 'simd'
+# Keep temporary files?
+# config['KEEP_TEMPORARY'] = True
