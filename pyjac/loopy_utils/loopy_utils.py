@@ -241,8 +241,8 @@ class loopy_options(object):
                     raise BrokenPlatformError(self)
                 # otherwise, simply warn
                 logger = logging.getLogger(__name__)
-                logger.warn('Some GPU implementation(s)--NVIDIA--give incorrect'
-                            'values sporadically without either a deep or wide'
+                logger.warn('Some GPU implementation(s)--NVIDIA--give incorrect '
+                            'values sporadically without either a deep or wide '
                             'vectorization. Use at your own risk.')
             if self.width and not self.is_simd and \
                     self.device_type == cl.device_type.CPU:
