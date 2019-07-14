@@ -527,11 +527,12 @@ void {kernel_name}::mem_init(size_t problem_size, size_t work_size)
     {{
     """.format(kernel_name=kernel_name), dedent=True, trimblanklines=True)
 
+    cog.out("""
+    if (this->initialized)
+    {""", dedent=False, trimblanklines=True)
     if callgen.lang == 'opencl':
         cog.out("""
     /* Finalization of our current queue / kernel */
-    if (this->initialized)
-    {
         check_err(clFlush(this->queue));
         check_err(clReleaseKernel(this->kernel));
         check_err(clFinish(this->queue));
