@@ -1016,7 +1016,7 @@ def get_parser():
     parser.add_argument('-jf', '--jac_format',
                         type=EnumType(JacobianFormat),
                         required=False,
-                        default='sparse',
+                        default='full',
                         help='If "sparse", the Jacobian will be encoded using a '
                         'compressed row or column storage format (for a data order '
                         'of "C" and "F" respectively). Choices: {type}'.format(
