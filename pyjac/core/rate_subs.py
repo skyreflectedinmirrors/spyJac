@@ -1838,10 +1838,15 @@ def get_thd_body_concs(loopy_opts, namestore, test_size=None):
     # get third body concentrations (by defn same as third reactions)
     thd_lp, thd_str = mapstore.apply_maps(namestore.thd_conc, *default_inds)
 
+    precompute = ic.PrecomputedInstructions(loopy_opts)
+
     # get T and P arrays
     T_arr, T_str = mapstore.apply_maps(namestore.T_arr, global_ind)
     P_arr, P_str = mapstore.apply_maps(namestore.P_arr, global_ind)
 
+    Tinv = 'Tinv'
+    preinstructs = [precompute(Tinv, T_str, 'INV', guard=ic.TemperatureGuard(
+                        loopy_opts))]
     # and the third body descriptions
 
     # efficiency list
@@ -1880,7 +1885,7 @@ def get_thd_body_concs(loopy_opts, namestore, test_size=None):
 <int32> not_spec = ${thd_type} != ${species}
 <> ${offset_name} = ${offset} {id=offset}
 <> spec_end = ${offset_next} {id=num0}
-<> thd_temp = ${P_str} * not_spec / (R * ${T_str}) {id=thd1, dep=num0}
+<> thd_temp = ${P_str} * not_spec  * ${Tinv} * Rinv {id=thd1, dep=num0}
 for ${spec_loop}
     <> ${spec_ind} = ${thd_spec} {id=ind1}
     thd_temp = thd_temp + (${thd_eff} - not_spec) * ${conc_thd_spec} {id=thdcalc,\
@@ -1900,16 +1905,18 @@ ${thd_str} = thd_temp {dep=thd*}
         P_str=P_str,
         T_str=T_str,
         thd_type=thd_type_str,
-        species=int(thd_body_type.species)
+        species=int(thd_body_type.species),
+        Tinv=Tinv
     )
 
     # create info
     return k_gen.knl_info('eval_thd_body_concs',
                           instructions=instructions,
+                          pre_instructions=preinstructs,
                           var_name=var_name,
                           kernel_data=kernel_data,
                           extra_inames=extra_inames,
-                          parameters={'R': chem.RU},
+                          parameters={'Rinv': 1./chem.RU},
                           mapstore=mapstore)
 
 
