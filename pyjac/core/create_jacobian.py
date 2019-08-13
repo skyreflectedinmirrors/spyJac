@@ -524,6 +524,7 @@ def __dcidE(loopy_opts, namestore, test_size=None,
     # the pressure modification term to use (pres_mod for thd, Pr for falloff)
     fall_instructions = ''
     # create a precomputed instruction generator
+    Tguard = ic.TemperatureGuard(loopy_opts)
     precompute = ic.PrecomputedInstructions(loopy_opts)
     # compute guarded exponentials / logs
     expg = ic.GuardedExp(loopy_opts)
@@ -580,8 +581,8 @@ def __dcidE(loopy_opts, namestore, test_size=None,
             b_lp, b_str = mapstore.apply_maps(namestore.sri_b, var_name)
             c_lp, c_str = mapstore.apply_maps(namestore.sri_c, var_name)
             kernel_data.extend([X_lp, a_lp, b_lp, c_lp])
-            pre_instructions.append(precompute('Tval', T_str, 'VAL'))
-            pre_instructions.append(precompute('Tinv', T_str, 'INV'))
+            pre_instructions.append(precompute('Tval', T_str, 'VAL', guard=Tguard))
+            pre_instructions.append(precompute('Tinv', T_str, 'INV', guard=Tguard))
 
             if conp:
                 exp_cinv = expg('Tval * cinv')
@@ -1035,6 +1036,7 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
     pre_instructions = []
     manglers = []
     # create a precomputed instruction generator
+    Tguard = ic.TemperatureGuard(loopy_opts)
     precompute = ic.PrecomputedInstructions(loopy_opts)
 
     if not do_ns:
@@ -1130,8 +1132,8 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
                 # add plog instruction
                 pre_instructions.extend([
                     precompute('logP', P_str, 'LOG'),
-                    precompute('logT', T_str, 'LOG'),
-                    precompute('Tinv', T_str, 'INV')])
+                    precompute('logT', T_str, 'LOG', guard=Tguard),
+                    precompute('Tinv', T_str, 'INV', guard=Tguard)])
 
                 plog_preloads = ''
                 if loopy_opts.is_simd:
@@ -1241,7 +1243,7 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
                 # preinstructions
                 pre_instructions.extend(
                     [precompute('logP', P_str, 'LOG'),
-                     precompute('Tinv', T_str, 'INV')])
+                     precompute('Tinv', T_str, 'INV', guard=Tguard)])
 
                 # various strings for preindexed limits, params, etc
                 _, Pmin_str = mapstore.apply_maps(
@@ -1950,6 +1952,7 @@ def dTdotdT(loopy_opts, namestore, test_size=None, conp=True, jac_create=None):
                         spec_energy_lp, mw_lp, conc_lp, V_lp, wdot_lp, T_lp])
 
     # create a precomputed instruction generator
+    Tguard = ic.TemperatureGuard(loopy_opts)
     precompute = ic.PrecomputedInstructions(loopy_opts)
 
     pre_instructions = Template("""
@@ -1959,7 +1962,7 @@ def dTdotdT(loopy_opts, namestore, test_size=None, conp=True, jac_create=None):
     """).safe_substitute(**locals()).split('\n')
     pre_instructions.extend([
         precompute('Vinv', V_str, 'INV'),
-        precompute('Tinv', T_str, 'INV')])
+        precompute('Tinv', T_str, 'INV', guard=Tguard)])
 
     # add create molar rate update insn
     jac_update = Template("""
@@ -2061,9 +2064,10 @@ def dEdotdT(loopy_opts, namestore, test_size=None, conp=False, jac_create=None):
         mapstore, namestore.jac, global_ind, 0, 0,
         warn=False)
     # create a precomputed instruction generator
+    Tguard = ic.TemperatureGuard(loopy_opts)
     precompute = ic.PrecomputedInstructions(loopy_opts)
     pre_instructions = ['<> sum = 0 {id=init}',
-                        precompute('Tinv', T_str, 'INV')]
+                        precompute('Tinv', T_str, 'INV', guard=Tguard)]
 
     if conp:
         pre_instructions.append(
@@ -2282,7 +2286,8 @@ def __dcidT(loopy_opts, namestore, test_size=None,
                         T_lp, V_lp, P_lp])
     # create a precomputed instruction generator
     precompute = ic.PrecomputedInstructions(loopy_opts)
-    pre_instructions = [precompute('Tinv', T_str, 'INV')]
+    Tguard = ic.TemperatureGuard(loopy_opts)
+    pre_instructions = [precompute('Tinv', T_str, 'INV', guard=Tguard)]
     parameters = {}
     manglers = []
     # by default we are using the third body factors (these may be changed
@@ -2341,7 +2346,7 @@ def __dcidT(loopy_opts, namestore, test_size=None,
                 namestore.troe_T3, var_name)
             kernel_data.extend([Atroe_lp, Btroe_lp, Fcent_lp, troe_a_lp,
                                 troe_T1_lp, troe_T2_lp, troe_T3_lp])
-            pre_instructions.append(precompute('Tval', T_str, 'VAL'))
+            pre_instructions.append(precompute('Tval', T_str, 'VAL', guard=Tguard))
             # compute exponentials / logs
             exp_T1 = expg(
                 '-Tval * {troe_T1_str}'.format(troe_T1_str=troe_T1_str))
@@ -2378,7 +2383,7 @@ def __dcidT(loopy_opts, namestore, test_size=None,
             d_lp, d_str = mapstore.apply_maps(namestore.sri_d, var_name)
             e_lp, e_str = mapstore.apply_maps(namestore.sri_e, var_name)
             kernel_data.extend([X_lp, a_lp, b_lp, c_lp, d_lp, e_lp])
-            pre_instructions.append(precompute('Tval', T_str, 'VAL'))
+            pre_instructions.append(precompute('Tval', T_str, 'VAL', guard=Tguard))
 
             exp_cinv = expg('-Tval * cinv')
             exp_b = expg('-{b_str} * Tinv'.format(b_str=b_str))
@@ -2752,6 +2757,7 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
                         [T_lp, V_lp, rev_mask_lp, thd_mask_lp, pres_mod_lp,
                          nu_offset_lp, nu_lp, spec_lp] if x is not None])
     # create a precomputed instruction generator
+    Tguard = ic.TemperatureGuard(loopy_opts)
     precompute = ic.PrecomputedInstructions(loopy_opts)
 
     extra_inames = [
@@ -2778,7 +2784,7 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
         kernel_data.extend([
             beta_lp, Ta_lp, rop_fwd_lp, rop_rev_lp, dB_lp])
 
-        pre_instructions = [precompute('Tinv', T_str, 'INV')]
+        pre_instructions = [precompute('Tinv', T_str, 'INV', guard=Tguard)]
         if rxn_type == reaction_type.plog:
             lo_ind = 'lo'
             hi_ind = 'hi'
@@ -2814,8 +2820,7 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
             kernel_data.extend([P_lp, plog_num_param_lp, plog_params_lp])
 
             # add plog instruction
-            pre_instructions.append(precompute(
-                'logP', P_str, 'LOG'))
+            pre_instructions.append(precompute('logP', P_str, 'LOG'))
 
             plog_preloads = ''
             if loopy_opts.is_simd:
@@ -3339,11 +3344,12 @@ def dEdot_dnj(loopy_opts, namestore, test_size=None,
     T_lp, T_str = mapstore.apply_maps(
         namestore.T_arr, global_ind)
 
+    Tguard = ic.TemperatureGuard(loopy_opts)
     precompute = ic.PrecomputedInstructions(loopy_opts)
     T_inv = 'T_inv'
     T_val = 'T_val'
-    pre_instructions = [precompute(T_inv, T_str, 'INV'),
-                        precompute(T_val, T_str, 'VAL')]
+    pre_instructions = [precompute(T_inv, T_str, 'INV', guard=Tguard),
+                        precompute(T_val, T_str, 'VAL', guard=Tguard)]
 
     # dnk/dnj jacobian set
     dnkdnj_insn = Template(
