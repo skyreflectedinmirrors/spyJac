@@ -399,7 +399,7 @@ class MoleGuard(Guard):
         n = min(n_max, max(n_min, n))
     """
 
-    def __init__(self, loopy_opts, n_min=1e-50, n_max=1e20):
+    def __init__(self, loopy_opts, n_min=1e-30, n_max=1e20):
         super(MoleGuard, self).__init__(loopy_opts, minv=n_min, maxv=n_max)
 
 
