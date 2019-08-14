@@ -174,14 +174,14 @@ def build_schema(schema, includes=['common_schema.yaml'],
         return root
 
     with open(__prefixify(schema), 'r') as file:
-        schema = yaml.load(file)
+        schema = yaml.load(file, Loader=yaml.FullLoader)
 
     for include in includes:
         include = __prefixify(include)
         if not isfile(include):
             raise IOError('Schema file {} does not exist.'.format(include))
         with open(include, 'r') as file:
-            common = yaml.load(file)
+            common = yaml.load(file, Loader=yaml.FullLoader)
 
         # rather than use the schema registry, it's safer to directly replace
         for key, value in six.iteritems(common):
@@ -210,7 +210,7 @@ def validate(validator, source, filename=''):
 
     # make data
     with open(source, 'r') as file:
-        sourcedict = yaml.load(file)
+        sourcedict = yaml.load(file, Loader=yaml.FullLoader)
     # and validate
     if not validator.validate(sourcedict):
         logger = logging.getLogger(__name__)

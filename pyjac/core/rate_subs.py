@@ -1299,27 +1299,39 @@ def get_rop_net(loopy_opts, namestore, test_size=None):
         """).safe_substitute(rop_fwd_str=rop_fwd_str,
                              rop_net_str=rop_strs['fwd'])
 
-        # reverse update
-        rev_update_instructions = ic.get_update_instruction(
-            __get_map('rev'), namestore.rop_rev,
-            Template(
-                """
-            net_rate = net_rate - ${rop_rev_str} \
-                {id=rate_update_rev, dep=rate_update}
-            """).safe_substitute(
-                rop_rev_str=rop_rev_str))
+        rev_update_instructions = None
+        if namestore.rop_rev is not None:
+            # reverse update
+            rev_update_instructions = ic.get_update_instruction(
+                __get_map('rev'), namestore.rop_rev,
+                Template(
+                    """
+                net_rate = net_rate - ${rop_rev_str} \
+                    {id=rate_update_rev, dep=rate_update}
+                """).safe_substitute(
+                    rop_rev_str=rop_rev_str))
+        rev_update_instructions = ic.instruction_if_condition(
+            rev_update_instructions, namestore.rop_rev is not None,
+            'rate_update_rev', deps=['rate_update'])
 
         # pmod update
-        pmod_update_instructions = ic.get_update_instruction(
-            __get_map('pres_mod'), namestore.pres_mod,
-            Template(
-                """
-            net_rate = net_rate * ${pres_mod_str} \
-                {id=rate_update_pmod, dep=rate_update${rev_dep}}
-            """).safe_substitute(
-                rev_dep=':rate_update_rev' if namestore.rop_rev is not None
-                    else '',
-                pres_mod_str=pres_mod_str))
+        pmod_update_instructions = None
+        if namestore.pres_mod is not None:
+            pmod_update_instructions = ic.get_update_instruction(
+                __get_map('pres_mod'), namestore.pres_mod,
+                Template(
+                    """
+                net_rate = net_rate * ${pres_mod_str} \
+                    {id=rate_update_pmod, dep=rate_update${rev_dep}}
+                """).safe_substitute(
+                    rev_dep=':rate_update_rev' if namestore.rop_rev is not None
+                        else '',
+                    pres_mod_str=pres_mod_str))
+
+        pmod_update_instructions = ic.instruction_if_condition(
+            pmod_update_instructions, namestore.pres_mod is not None,
+            'rate_update_pmod', deps=['rate_update'] + (
+                ['rate_update_rev'] if namestore.rop_rev is not None else []))
 
         instructions = Template(instructions).safe_substitute(
             rev_update=rev_update_instructions,
@@ -1826,10 +1838,15 @@ def get_thd_body_concs(loopy_opts, namestore, test_size=None):
     # get third body concentrations (by defn same as third reactions)
     thd_lp, thd_str = mapstore.apply_maps(namestore.thd_conc, *default_inds)
 
+    precompute = ic.PrecomputedInstructions(loopy_opts)
+
     # get T and P arrays
     T_arr, T_str = mapstore.apply_maps(namestore.T_arr, global_ind)
     P_arr, P_str = mapstore.apply_maps(namestore.P_arr, global_ind)
 
+    Tinv = 'Tinv'
+    preinstructs = [precompute(Tinv, T_str, 'INV', guard=ic.TemperatureGuard(
+                        loopy_opts))]
     # and the third body descriptions
 
     # efficiency list
@@ -1868,7 +1885,7 @@ def get_thd_body_concs(loopy_opts, namestore, test_size=None):
 <int32> not_spec = ${thd_type} != ${species}
 <> ${offset_name} = ${offset} {id=offset}
 <> spec_end = ${offset_next} {id=num0}
-<> thd_temp = ${P_str} * not_spec / (R * ${T_str}) {id=thd1, dep=num0}
+<> thd_temp = ${P_str} * not_spec  * ${Tinv} * Rinv {id=thd1, dep=num0}
 for ${spec_loop}
     <> ${spec_ind} = ${thd_spec} {id=ind1}
     thd_temp = thd_temp + (${thd_eff} - not_spec) * ${conc_thd_spec} {id=thdcalc,\
@@ -1888,16 +1905,18 @@ ${thd_str} = thd_temp {dep=thd*}
         P_str=P_str,
         T_str=T_str,
         thd_type=thd_type_str,
-        species=int(thd_body_type.species)
+        species=int(thd_body_type.species),
+        Tinv=Tinv
     )
 
     # create info
     return k_gen.knl_info('eval_thd_body_concs',
                           instructions=instructions,
+                          pre_instructions=preinstructs,
                           var_name=var_name,
                           kernel_data=kernel_data,
                           extra_inames=extra_inames,
-                          parameters={'R': chem.RU},
+                          parameters={'Rinv': 1./chem.RU},
                           mapstore=mapstore)
 
 

@@ -338,7 +338,9 @@ def clean_dir(dirname, remove_dir=True):
 
 
 @contextmanager
-def temporary_directory(cleanup=True):
+def temporary_directory(cleanup=None):
+    if cleanup is None:
+        cleanup = not get_env_val('KEEP_TEMPORARY', False)
     dirpath = tempfile.mkdtemp()
     owd = os.getcwd()
     try:
@@ -1014,7 +1016,7 @@ def get_parser():
     parser.add_argument('-jf', '--jac_format',
                         type=EnumType(JacobianFormat),
                         required=False,
-                        default='sparse',
+                        default='full',
                         help='If "sparse", the Jacobian will be encoded using a '
                         'compressed row or column storage format (for a data order '
                         'of "C" and "F" respectively). Choices: {type}'.format(

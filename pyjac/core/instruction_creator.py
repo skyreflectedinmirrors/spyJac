@@ -399,7 +399,7 @@ class MoleGuard(Guard):
         n = min(n_max, max(n_min, n))
     """
 
-    def __init__(self, loopy_opts, n_min=1e-50, n_max=1e20):
+    def __init__(self, loopy_opts, n_min=1e-30, n_max=1e20):
         super(MoleGuard, self).__init__(loopy_opts, minv=n_min, maxv=n_max)
 
 
@@ -452,7 +452,7 @@ class GuardedExp(Guard):
     """
     Take the guarded exponent of a value, i.e.:
 
-        exp(fmin(exp_max, value))
+        exp(fmax(-exp_max, fmin(exp_max, value)))
 
     Attributes
     ----------
@@ -461,9 +461,10 @@ class GuardedExp(Guard):
 
     """
 
-    def __init__(self, loopy_opts, maxv=utils.exp_max, exptype='exp({val})'):
+    def __init__(self, loopy_opts, maxv=utils.exp_max,
+                 minv=-utils.exp_max, exptype='exp({val})'):
         self.exptype = exptype
-        super(GuardedExp, self).__init__(loopy_opts, maxv=maxv)
+        super(GuardedExp, self).__init__(loopy_opts, maxv=maxv, minv=minv)
 
     def __operation__(self, value):
         return self.exptype.format(val=value)
@@ -706,9 +707,9 @@ def get_update_instruction(mapstore, mask_arr, base_update_insn):
 
     # empty mask
     if not mask_arr:
-        # get id for noop anchor
-        idx = re.search(r'id=([^,}]+)', base_update_insn)
-        return '... nop {{id={id}}}'.format(id=idx.group(1))
+        # get insn options for nop anchor
+        options = re.search(r'{([^}]+)}\s*$', base_update_insn)
+        return '... nop {{{options}}}'.format(options=options.group(1))
 
     # ensure mask array in domains
     assert mask_arr in mapstore.domain_to_nodes, (
@@ -732,6 +733,40 @@ def get_update_instruction(mapstore, mask_arr, base_update_insn):
 
     # else return the base update insn
     return base_update_insn
+
+
+def instruction_if_condition(insn, condition, id, deps=[]):
+    """
+    Utility function to emit the `insn` IFF if `condition` is True
+
+    Parameters
+    ----------
+    insn: str
+        The instruction to execute
+    condition: bool or Callable
+        If true, `insn` will be emitted, else a noop will be emitted
+    id: str
+        The ID of the instruction be emitted (for noop anchoring)
+    deps: list of str
+        The IDs of instructions this depends on (for noop anchroing)
+    Returns
+    -------
+    If condition:
+        `if wrapper
+            insn
+         end
+        `
+    else:
+        insn
+    """
+
+    if condition:
+        return insn
+
+    _i = '... nop {{id={id}'
+    if deps:
+        _i += ', dep={deps}'.format(deps=':'.join(deps))
+    return (_i + '}}').format(id=id)
 
 
 def wrap_instruction_on_condition(insn, condition, wrapper):

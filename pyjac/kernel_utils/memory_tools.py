@@ -12,6 +12,8 @@ import numpy as np
 from pyjac.utils import indent, stdindent
 from pyjac.core.enum_types import DeviceMemoryType
 from pyjac.core.array_creator import problem_size
+from pyjac.kernel_utils.kernel_gen import rhs_work_name, local_work_name, \
+    int_work_name
 
 
 asserts = {'c': Template('cassert(${call}, "${message}");'),
@@ -130,10 +132,9 @@ class MemoryManager(object):
     def __init__(self, lang, order, type_map, alloc={}, sync={}, copy_in_1d={},
                  copy_in_2d={}, copy_out_1d={}, copy_out_2d={}, free={}, memset={},
                  alloc_flags={}, host_const_in={}, host_namer=None,
-                 device_namer=None):
+                 device_namer=None, host_constant_map={}):
         self.order = order
         self.type_map = type_map.copy()
-        self.def_map = {}
         self.alloc_template = alloc
         self.sync_template = sync
         self.copy_in_1d = copy_in_1d
@@ -150,6 +151,7 @@ class MemoryManager(object):
         self.device_namer = device_namer
         self.definition = {'c': Template('${mem_type} ${name};'),
                            'opencl': Template('${mem_type} ${name};')}
+        self.host_constant_map = host_constant_map.copy()
 
         self.mem_type = {'c': self.determine_c_mem_type,
                          'opencl': self.determine_cl_mem_type}
@@ -192,12 +194,17 @@ class MemoryManager(object):
             kwargs['subs'] = subs
         return StrideCalculator(self.type_map).non_ic_size(arr, **kwargs)
 
-    def get_name(self, device, arr, **kwargs):
+    def get_name(self, device, arr, host_constant=False, **kwargs):
         namer = self.device_namer if device else self.host_namer
-        try:
-            name = arr.name
-        except AttributeError:
-            name = arr
+
+        if host_constant and device:
+            name = self.host_constant_map[arr.dtype]
+        else:
+            try:
+                name = arr.name
+            except AttributeError:
+                name = arr
+
         return name if not namer else namer(name, **kwargs)
 
     def get_signature(self, device, arr):
@@ -297,8 +304,7 @@ class MemoryManager(object):
         arr: :class:`loopy.ArrayArg`
             The buffer to use for transfering between host and device
         host_constant: bool [False]
-            If True, we are transferring a host constant, hence set any offset
-            in the host buffer to zero
+            If True, we are transferring a host constant
         num_ics: str ['per_run']
             The number of initial conditions to evaluated per prun
         num_ics_this_run: str ['this_run']
@@ -333,13 +339,14 @@ class MemoryManager(object):
             buff_size = self.buffer_size(True, arr, num_ics=num_ics)
         else:
             kwargs['offset'] = '0'
+            # the device
             buff_size = self.buffer_size(False, arr)
 
         if not template:
             return ''
 
-        host_name = self.get_name(False, arr)
-        dev_name = self.get_name(True, arr)
+        host_name = self.get_name(False, arr, host_constant=host_constant)
+        dev_name = self.get_name(True, arr, host_constant=host_constant)
 
         return template.safe_substitute(
             host_name=host_name, dev_name=dev_name, buff_size=buff_size,
@@ -851,7 +858,9 @@ def get_memory(callgen, host_namer=None, device_namer=None):
 
     if callgen.dev_mem_type == DeviceMemoryType.pinned:
         return PinnedMemory(callgen.lang, callgen.order, callgen.type_map,
-                            host_namer=host_namer, device_namer=device_namer)
+                            host_namer=host_namer, device_namer=device_namer,
+                            host_constant_map=callgen.host_constant_map)
     else:
         return MappedMemory(callgen.lang, callgen.order, callgen.type_map,
-                            host_namer=host_namer, device_namer=device_namer)
+                            host_namer=host_namer, device_namer=device_namer,
+                            host_constant_map=callgen.host_constant_map)

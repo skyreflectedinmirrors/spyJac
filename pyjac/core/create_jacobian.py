@@ -194,7 +194,7 @@ def determine_jac_inds(reacs, specs, rate_spec, jacobian_type=JacobianType.exact
             rev = rxn in rev_map
             if not rev:
                 # forward irreversible -- need to look at nu
-                nu = nu_map[2 * num_specs_in_rxn[rxn]:2 * num_specs_in_rxn[rxn + 1]]
+                nu = nu_map[2 * num_specs_in_rxn[rxn]                            :2 * num_specs_in_rxn[rxn + 1]]
                 is_prod = [nu[2 * i] != 0 for i in range(len(deriv_specs))]
                 is_reac = [nu[2 * i + 1] != 0 for i in range(len(deriv_specs))]
                 # find out which this species is
@@ -307,7 +307,8 @@ def reset_arrays(loopy_opts, namestore, test_size=None):
     kernel_data = []
 
     # add problem size
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     if loopy_opts.jac_format == JacobianFormat.sparse:
         # simply loop over the whole jacobian array
@@ -392,7 +393,8 @@ def __dcidE(loopy_opts, namestore, test_size=None,
     """
 
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     num_range_dict = {reaction_type.thd: namestore.num_thd_only,
                       falloff_form.lind: namestore.num_lind,
@@ -522,6 +524,7 @@ def __dcidE(loopy_opts, namestore, test_size=None,
     # the pressure modification term to use (pres_mod for thd, Pr for falloff)
     fall_instructions = ''
     # create a precomputed instruction generator
+    Tguard = ic.TemperatureGuard(loopy_opts)
     precompute = ic.PrecomputedInstructions(loopy_opts)
     # compute guarded exponentials / logs
     expg = ic.GuardedExp(loopy_opts)
@@ -578,8 +581,8 @@ def __dcidE(loopy_opts, namestore, test_size=None,
             b_lp, b_str = mapstore.apply_maps(namestore.sri_b, var_name)
             c_lp, c_str = mapstore.apply_maps(namestore.sri_c, var_name)
             kernel_data.extend([X_lp, a_lp, b_lp, c_lp])
-            pre_instructions.append(precompute('Tval', T_str, 'VAL'))
-            pre_instructions.append(precompute('Tinv', T_str, 'INV'))
+            pre_instructions.append(precompute('Tval', T_str, 'VAL', guard=Tguard))
+            pre_instructions.append(precompute('Tinv', T_str, 'INV', guard=Tguard))
 
             if conp:
                 exp_cinv = expg('Tval * cinv')
@@ -928,7 +931,8 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
 
     # indicies
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     # check rxn type
     if rxn_type in [reaction_type.plog, reaction_type.cheb] and do_ns:
@@ -972,8 +976,9 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
     # thd_mask depends on actual reaction index
     mapstore.check_and_add_transform(namestore.thd_mask, rxn_range)
     # pres mod is on thd_mask
-    mapstore.check_and_add_transform(
-        namestore.pres_mod, namestore.thd_mask)
+    if namestore.pres_mod is not None:
+        mapstore.check_and_add_transform(
+            namestore.pres_mod, namestore.thd_mask)
     # nu's are on the actual rxn index
     mapstore.check_and_add_transform(
         namestore.rxn_to_spec_offsets, rxn_range)
@@ -1000,8 +1005,10 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
     # Volume
     V_lp, V_str = mapstore.apply_maps(namestore.V_arr, global_ind)
     # pressure mod term
-    pres_mod_lp, pres_mod_str = mapstore.apply_maps(
-        namestore.pres_mod, *default_inds)
+    pres_mod_lp = None
+    if namestore.pres_mod:
+        pres_mod_lp, pres_mod_str = mapstore.apply_maps(
+            namestore.pres_mod, *default_inds)
     # nu offsets
     nu_offset_lp, nu_offset_str = mapstore.apply_maps(
         namestore.rxn_to_spec_offsets, var_name)
@@ -1019,7 +1026,8 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
         namestore.rxn_to_spec, k_ind)
 
     # add to data
-    kernel_data.extend([T_lp, V_lp, pres_mod_lp, nu_offset_lp, nu_lp, spec_lp])
+    kernel_data.extend([x for x in [T_lp, V_lp, pres_mod_lp, nu_offset_lp,
+                                    nu_lp, spec_lp] if x is not None])
 
     extra_inames = [
         (net_ind, 'offset <= {} < offset_next'.format(net_ind)),
@@ -1028,6 +1036,7 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
     pre_instructions = []
     manglers = []
     # create a precomputed instruction generator
+    Tguard = ic.TemperatureGuard(loopy_opts)
     precompute = ic.PrecomputedInstructions(loopy_opts)
 
     if not do_ns:
@@ -1054,7 +1063,8 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
             pmod_deps = ':'.join(['dE_update'] if rev_update else [])
             pres_mod_update = '... nop {{id=dE_final, dep={pmod_deps}}}'.format(
                 pmod_deps=pmod_deps)
-            if rxn_type not in [reaction_type.plog, reaction_type.cheb]:
+            if rxn_type not in [reaction_type.plog, reaction_type.cheb]\
+                    and namestore.pres_mod is not None:
                 pres_mod_update = ic.get_update_instruction(
                     mapstore, namestore.pres_mod,
                     Template(
@@ -1122,8 +1132,8 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
                 # add plog instruction
                 pre_instructions.extend([
                     precompute('logP', P_str, 'LOG'),
-                    precompute('logT', T_str, 'LOG'),
-                    precompute('Tinv', T_str, 'INV')])
+                    precompute('logT', T_str, 'LOG', guard=Tguard),
+                    precompute('Tinv', T_str, 'INV', guard=Tguard)])
 
                 plog_preloads = ''
                 if loopy_opts.is_simd:
@@ -1233,7 +1243,7 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
                 # preinstructions
                 pre_instructions.extend(
                     [precompute('logP', P_str, 'LOG'),
-                     precompute('Tinv', T_str, 'INV')])
+                     precompute('Tinv', T_str, 'INV', guard=Tguard)])
 
                 # various strings for preindexed limits, params, etc
                 _, Pmin_str = mapstore.apply_maps(
@@ -1623,7 +1633,8 @@ def dTdotdE(loopy_opts, namestore, test_size, conp=True, jac_create=None):
 
     # indicies
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     mapstore = arc.MapStore(loopy_opts, namestore.num_specs_no_ns, test_size)
 
@@ -1766,7 +1777,8 @@ def dEdotdE(loopy_opts, namestore, test_size, conp=True, jac_create=None):
 
     # indicies
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     mapstore = arc.MapStore(loopy_opts, namestore.net_nonzero_spec, test_size)
 
@@ -1873,7 +1885,8 @@ def dTdotdT(loopy_opts, namestore, test_size=None, conp=True, jac_create=None):
 
     # indicies
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     ns = namestore.num_specs[-1]
 
@@ -1939,6 +1952,7 @@ def dTdotdT(loopy_opts, namestore, test_size=None, conp=True, jac_create=None):
                         spec_energy_lp, mw_lp, conc_lp, V_lp, wdot_lp, T_lp])
 
     # create a precomputed instruction generator
+    Tguard = ic.TemperatureGuard(loopy_opts)
     precompute = ic.PrecomputedInstructions(loopy_opts)
 
     pre_instructions = Template("""
@@ -1948,7 +1962,7 @@ def dTdotdT(loopy_opts, namestore, test_size=None, conp=True, jac_create=None):
     """).safe_substitute(**locals()).split('\n')
     pre_instructions.extend([
         precompute('Vinv', V_str, 'INV'),
-        precompute('Tinv', T_str, 'INV')])
+        precompute('Tinv', T_str, 'INV', guard=Tguard)])
 
     # add create molar rate update insn
     jac_update = Template("""
@@ -2027,7 +2041,8 @@ def dEdotdT(loopy_opts, namestore, test_size=None, conp=False, jac_create=None):
     """
 
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     ns = namestore.num_specs[-1]
 
@@ -2049,9 +2064,10 @@ def dEdotdT(loopy_opts, namestore, test_size=None, conp=False, jac_create=None):
         mapstore, namestore.jac, global_ind, 0, 0,
         warn=False)
     # create a precomputed instruction generator
+    Tguard = ic.TemperatureGuard(loopy_opts)
     precompute = ic.PrecomputedInstructions(loopy_opts)
     pre_instructions = ['<> sum = 0 {id=init}',
-                        precompute('Tinv', T_str, 'INV')]
+                        precompute('Tinv', T_str, 'INV', guard=Tguard)]
 
     if conp:
         pre_instructions.append(
@@ -2144,7 +2160,8 @@ def __dcidT(loopy_opts, namestore, test_size=None,
     """
 
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     num_range_dict = {reaction_type.thd: namestore.num_thd_only,
                       falloff_form.lind: namestore.num_lind,
@@ -2269,7 +2286,8 @@ def __dcidT(loopy_opts, namestore, test_size=None,
                         T_lp, V_lp, P_lp])
     # create a precomputed instruction generator
     precompute = ic.PrecomputedInstructions(loopy_opts)
-    pre_instructions = [precompute('Tinv', T_str, 'INV')]
+    Tguard = ic.TemperatureGuard(loopy_opts)
+    pre_instructions = [precompute('Tinv', T_str, 'INV', guard=Tguard)]
     parameters = {}
     manglers = []
     # by default we are using the third body factors (these may be changed
@@ -2328,11 +2346,14 @@ def __dcidT(loopy_opts, namestore, test_size=None,
                 namestore.troe_T3, var_name)
             kernel_data.extend([Atroe_lp, Btroe_lp, Fcent_lp, troe_a_lp,
                                 troe_T1_lp, troe_T2_lp, troe_T3_lp])
-            pre_instructions.append(precompute('Tval', T_str, 'VAL'))
+            pre_instructions.append(precompute('Tval', T_str, 'VAL', guard=Tguard))
             # compute exponentials / logs
-            exp_T1 = expg('-Tval * {troe_T1_str}'.format(troe_T1_str=troe_T1_str))
-            exp_T3 = expg('-Tval * {troe_T3_str}'.format(troe_T3_str=troe_T3_str))
-            exp_T2 = expg('-{troe_T2_str} * Tinv'.format(troe_T2_str=troe_T2_str))
+            exp_T1 = expg(
+                '-Tval * {troe_T1_str}'.format(troe_T1_str=troe_T1_str))
+            exp_T3 = expg(
+                '-Tval * {troe_T3_str}'.format(troe_T3_str=troe_T3_str))
+            exp_T2 = expg(
+                '-{troe_T2_str} * Tinv'.format(troe_T2_str=troe_T2_str))
             log_fcent = logg(Fcent_str)
             Pr_g = nonzero_guard(Pr_str)
 
@@ -2362,7 +2383,7 @@ def __dcidT(loopy_opts, namestore, test_size=None,
             d_lp, d_str = mapstore.apply_maps(namestore.sri_d, var_name)
             e_lp, e_str = mapstore.apply_maps(namestore.sri_e, var_name)
             kernel_data.extend([X_lp, a_lp, b_lp, c_lp, d_lp, e_lp])
-            pre_instructions.append(precompute('Tval', T_str, 'VAL'))
+            pre_instructions.append(precompute('Tval', T_str, 'VAL', guard=Tguard))
 
             exp_cinv = expg('-Tval * cinv')
             exp_b = expg('-{b_str} * Tinv'.format(b_str=b_str))
@@ -2630,7 +2651,8 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
 
     # indicies
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     # check rxn type
     if rxn_type in [reaction_type.plog, reaction_type.cheb] and do_ns:
@@ -2674,8 +2696,9 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
     # thd_mask depends on actual reaction index
     mapstore.check_and_add_transform(namestore.thd_mask, rxn_range)
     # pres mod is on thd_mask
-    mapstore.check_and_add_transform(
-        namestore.pres_mod, namestore.thd_mask)
+    if namestore.pres_mod is not None:
+        mapstore.check_and_add_transform(
+            namestore.pres_mod, namestore.thd_mask)
     # nu's are on the actual rxn index
     mapstore.check_and_add_transform(
         namestore.rxn_to_spec_offsets, rxn_range)
@@ -2705,11 +2728,15 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
     # get rev / thd mask
     rev_mask_lp, rev_mask_str = mapstore.apply_maps(
         namestore.rev_mask, var_name)
-    thd_mask_lp, thd_mask_str = mapstore.apply_maps(
-        namestore.thd_mask, var_name)
-    pres_mod_lp, pres_mod_str = mapstore.apply_maps(
-        namestore.pres_mod, *default_inds)
-    # nu offsets
+    thd_mask_lp = None
+    if namestore.thd_mask is not None:
+        thd_mask_lp, thd_mask_str = mapstore.apply_maps(
+            namestore.thd_mask, var_name)
+    pres_mod_lp = None
+    if namestore.pres_mod is not None:
+        pres_mod_lp, pres_mod_str = mapstore.apply_maps(
+            namestore.pres_mod, *default_inds)
+        # nu offsets
     nu_offset_lp, nu_offset_str = mapstore.apply_maps(
         namestore.rxn_to_spec_offsets, var_name)
     _, nu_offset_next_str = mapstore.apply_maps(
@@ -2726,9 +2753,11 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
         namestore.rxn_to_spec, k_ind)
 
     # add to data
-    kernel_data.extend([T_lp, V_lp, rev_mask_lp, thd_mask_lp, pres_mod_lp,
-                        nu_offset_lp, nu_lp, spec_lp])
+    kernel_data.extend([x for x in
+                        [T_lp, V_lp, rev_mask_lp, thd_mask_lp, pres_mod_lp,
+                         nu_offset_lp, nu_lp, spec_lp] if x is not None])
     # create a precomputed instruction generator
+    Tguard = ic.TemperatureGuard(loopy_opts)
     precompute = ic.PrecomputedInstructions(loopy_opts)
 
     extra_inames = [
@@ -2755,7 +2784,7 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
         kernel_data.extend([
             beta_lp, Ta_lp, rop_fwd_lp, rop_rev_lp, dB_lp])
 
-        pre_instructions = [precompute('Tinv', T_str, 'INV')]
+        pre_instructions = [precompute('Tinv', T_str, 'INV', guard=Tguard)]
         if rxn_type == reaction_type.plog:
             lo_ind = 'lo'
             hi_ind = 'hi'
@@ -2791,8 +2820,7 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
             kernel_data.extend([P_lp, plog_num_param_lp, plog_params_lp])
 
             # add plog instruction
-            pre_instructions.append(precompute(
-                'logP', P_str, 'LOG'))
+            pre_instructions.append(precompute('logP', P_str, 'LOG'))
 
             plog_preloads = ''
             if loopy_opts.is_simd:
@@ -2974,6 +3002,11 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
                 '<> dkf = (${beta_str} + ${Ta_str} * Tinv) * Tinv {id=dkf}'
             ).safe_substitute(**locals())
 
+        thd_mask_update = ic.get_update_instruction(
+            mapstore, namestore.thd_mask, Template(
+                'ci = ${pres_mod_str} {id=ci, dep=ci_init}').safe_substitute(
+            **locals()))
+
         # and put together instructions
         instructions = Template("""
         ${dkf_instructions}
@@ -2989,9 +3022,7 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
             dRopidT = dRopidT - ${rop_rev_str} * \
                 (dkf - dBk_sum) {id=rev, dep=init:up}
         end
-        if ${thd_mask_str} >= 0
-            ci = ${pres_mod_str} {id=ci, dep=ci_init}
-        end
+        ${thd_mask_update}
         dRopidT = dRopidT * ci * ${V_str} {id=Ropi_final, dep=rev:ci*}
         """).safe_substitute(**locals())
     else:
@@ -3313,11 +3344,12 @@ def dEdot_dnj(loopy_opts, namestore, test_size=None,
     T_lp, T_str = mapstore.apply_maps(
         namestore.T_arr, global_ind)
 
+    Tguard = ic.TemperatureGuard(loopy_opts)
     precompute = ic.PrecomputedInstructions(loopy_opts)
     T_inv = 'T_inv'
     T_val = 'T_val'
-    pre_instructions = [precompute(T_inv, T_str, 'INV'),
-                        precompute(T_val, T_str, 'VAL')]
+    pre_instructions = [precompute(T_inv, T_str, 'INV', guard=Tguard),
+                        precompute(T_val, T_str, 'VAL', guard=Tguard)]
 
     # dnk/dnj jacobian set
     dnkdnj_insn = Template(
@@ -3347,7 +3379,8 @@ def dEdot_dnj(loopy_opts, namestore, test_size=None,
         }, entry_exists=True, index_insn=False, warn=False)
 
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     kernel_data.extend([mw_lp, V_lp, P_lp, T_lp, jac_lp, nonzero_lp])
 
@@ -3457,7 +3490,8 @@ def dTdot_dnj(loopy_opts, namestore, test_size=None,
         }, entry_exists=True, insn=tdot_jac_insn, deps='sum')
 
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     kernel_data.extend([spec_heat_lp, energy_lp, spec_heat_tot_lp, mw_lp,
                         V_lp, T_dot_lp, jac_lp, nonzero_lp])
@@ -3520,11 +3554,13 @@ def total_specific_energy(loopy_opts, namestore, test_size=None,
         namestore.spec_heat_total, global_ind)
 
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     kernel_data.extend([spec_heat_lp, conc_lp, spec_heat_tot_lp])
 
-    barrier = ic.get_barrier(loopy_opts, local_memory=True, id='break', dep='init')
+    barrier = ic.get_barrier(
+        loopy_opts, local_memory=True, id='break', dep='init')
     pre_instructions = Template("""
         <>spec_tot = 0 {id=spec_init}
         ${spec_heat_total_str} = 0 {id=init}
@@ -3661,7 +3697,8 @@ def __dci_dnj(loopy_opts, namestore, do_ns=False, fall_type=falloff_form.none,
 
     # indicies
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     if fall_type != falloff_form.none:
         # the fall to third map depending on the reaction range
@@ -4227,7 +4264,8 @@ def __dropidnj(loopy_opts, namestore, allint, test_size=None,
 
     # indicies
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     rxn_range = namestore.num_reacs if not do_ns else namestore.rxn_has_ns
     if do_ns and rxn_range.initializer is None or not rxn_range.initializer.size:
@@ -4586,7 +4624,8 @@ def finite_difference_jacobian(reacs, specs, loopy_opts, conp=True, test_size=No
 
     # indicies
     kernel_data = []
-    kernel_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    kernel_data.extend(
+        arc.initial_condition_dimension_vars(loopy_opts, test_size))
 
     # need to loop over all non-zero phi entries
     mapstore = arc.MapStore(loopy_opts, namestore.phi_inds, test_size)
@@ -4626,8 +4665,8 @@ def finite_difference_jacobian(reacs, specs, loopy_opts, conp=True, test_size=No
         logger = logging.getLogger(__name__)
         logger.exception('{}-mode finite-difference of order {} not defined, '
                          'available orders are: {}'.format(
-                            str(mode).title(), order,
-                            ', '.join(str(x) for x in xcoeffs)))
+                             str(mode).title(), order,
+                             ', '.join(str(x) for x in xcoeffs)))
         sys.exit(-1)
     xcoeffs = xcoeffs[order]
     ycoeffs = ycoeffs[order]
@@ -4672,7 +4711,8 @@ def finite_difference_jacobian(reacs, specs, loopy_opts, conp=True, test_size=No
 
     # sum over all phi
     phi_lp, phi_isum = mapstore.apply_maps(namestore.n_arr, global_ind, i_sum)
-    dphi_lp, dphi_isum = mapstore.apply_maps(namestore.n_dot, global_ind, i_sum)
+    dphi_lp, dphi_isum = mapstore.apply_maps(
+        namestore.n_dot, global_ind, i_sum)
 
     # iterate over net non-zero phi (i.e. those w / non-zero derivatives)
     _, phi_str = mapstore.apply_maps(namestore.n_arr, global_ind, var_name)
@@ -4681,7 +4721,8 @@ def finite_difference_jacobian(reacs, specs, loopy_opts, conp=True, test_size=No
     jac_var_template = '{}'
     if not mapstore._is_contiguous(nnz_phi):
         # need to add a map
-        nnz_phi_lp, jac_var_template = mapstore.apply_maps(nnz_phi, jac_var_template)
+        nnz_phi_lp, jac_var_template = mapstore.apply_maps(
+            nnz_phi, jac_var_template)
         kernel_data.append(nnz_phi_lp)
 
     # dphi for the update instruction needs to be keyed on the same non-zero phi
@@ -4692,7 +4733,7 @@ def finite_difference_jacobian(reacs, specs, loopy_opts, conp=True, test_size=No
     # update the jacobian for this ycoeff * dphi
     jac_update_insn = Template('${jac_str} = ${jac_str} + ycoeffs[k] * ${dphi_copy} \
                        {id=update, dep=${deps}}').safe_substitute(
-                       dphi_copy=dphi_copy)
+        dphi_copy=dphi_copy)
     jac_lp, jac_update_insn = jac_create(
         mapstore, namestore.jac, global_ind, jac_var_template.format(i_copy),
         var_name, deps='call_barrier', insn=jac_update_insn)
@@ -5507,7 +5548,7 @@ def create_jacobian(lang, mech_name=None, therm_name=None, gas=None,
     # write the kernel
     gen.generate(build_path, data_filename=data_filename,
                  for_validation=for_validation, species_names=[
-                    x.name for x in specs], rxn_strings=[str(rxn) for rxn in reacs])
+                     x.name for x in specs], rxn_strings=[str(rxn) for rxn in reacs])
     return 0
 
 

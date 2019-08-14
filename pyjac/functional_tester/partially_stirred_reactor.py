@@ -964,7 +964,7 @@ def parse_input_file(input_file):
     """
 
     with open(input_file, 'r') as f:
-        pars = yaml.load(f)
+        pars = yaml.load(f, Loader=yaml.FullLoader)
 
     case = pars.get('case', None)
     if not case in ['premixed', 'non-premixed']:

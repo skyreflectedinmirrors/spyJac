@@ -989,8 +989,7 @@ def _get_oploop(owner, do_ratespec=False, do_ropsplit=False, do_conp=False,
 
     platforms = load_platforms(owner.store.test_platforms, langs=langs)
     oploop = [('order', ['C', 'F']),
-              ('auto_diff', [False])
-              ]
+              ('auto_diff', [False])]
     if do_ratespec:
         oploop += [
             ('rate_spec', [x for x in RateSpecialization]),
@@ -1015,7 +1014,10 @@ def _get_oploop(owner, do_ratespec=False, do_ropsplit=False, do_conp=False,
     else:
         oploop += [('jac_type', [JacobianType.exact])]
     if do_simd:
-        oploop += [('is_simd', [True, False])]
+        # check to see if is_simd is already populated
+        for p in platforms:
+            if not any(x[0] == 'is_simd' for x in p):
+                p += [('is_simd', [True, False])]
 
     if _get_test_input('unique_pointers', False):
         # allow specification of unique pointers via the ENV

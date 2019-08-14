@@ -231,7 +231,8 @@ class storage(object):
                 i, :] = gas.reverse_rates_of_progress[self.rev_inds]
             self.rxn_rates[i, :] = gas.net_rates_of_progress[:]
             self.species_rates[i, :] = gas.net_production_rates[:]
-            self.ref_thd[i, :] = np.dot(thd_eff_maps, self.concs[i, :])
+            if thd_eff_maps.size:
+                self.ref_thd[i, :] = np.dot(thd_eff_maps, self.concs[i, :])
             # species thermo props
             for j in range(gas.n_species):
                 cp = gas.species(j).thermo.cp(self.T[i])
