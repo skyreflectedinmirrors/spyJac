@@ -2148,14 +2148,14 @@ class NameStore(object):
                                            initializer=off,
                                            order=self.order)
         self.rxn_to_spec_reac_nu = creator('reac_to_spec_nu',
-                                           dtype=kint_type, shape=rate_info[
-                                               'net']['nu'].shape,
+                                           dtype=rate_info['net']['nu'].dtype, 
+                                           shape=rate_info['net']['nu'].shape,
                                            initializer=rate_info['net']['nu'],
                                            order=self.order,
                                            affine=1)
         self.rxn_to_spec_prod_nu = creator('reac_to_spec_nu',
-                                           dtype=kint_type, shape=rate_info[
-                                               'net']['nu'].shape,
+                                           dtype=rate_info['net']['nu'].dtype,
+                                           shape=rate_info['net']['nu'].shape,
                                            initializer=rate_info['net']['nu'],
                                            order=self.order)
 
@@ -2187,7 +2187,9 @@ class NameStore(object):
                                    dtype=kint_type),
             order=self.order)
 
-        self.spec_to_rxn = creator('spec_to_rxn', dtype=kint_type,
+        self.spec_to_rxn = creator('spec_to_rxn', 
+                                   dtype=rate_info['net_per_spec'][
+                                       'reacs'].dtype,
                                    shape=rate_info['net_per_spec'][
                                        'reacs'].shape,
                                    initializer=rate_info[
@@ -2200,7 +2202,9 @@ class NameStore(object):
                                            initializer=off,
                                            order=self.order)
         self.spec_to_rxn_nu = creator('spec_to_rxn_nu',
-                                      dtype=kint_type, shape=rate_info[
+                                      dtype=rate_info[
+                                          'net_per_spec']['nu'].dtype,
+                                      shape=rate_info[
                                           'net_per_spec']['nu'].shape,
                                       initializer=rate_info[
                                           'net_per_spec']['nu'],

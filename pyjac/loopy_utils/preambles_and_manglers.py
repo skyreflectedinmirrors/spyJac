@@ -57,7 +57,7 @@ class MangleGen(object):
         for i, (d1, d2) in enumerate(zip(self.arg_dtypes, arg_dtypes)):
             if not __compare(d1, d2) and self.raise_on_fail:
                 raise Exception('Argument at index {} for mangler {} does not match'
-                                'expected dtype.  Expected {}, got {}'.format(
+                                ' expected dtype.  Expected {}, got {}'.format(
                                     i, self.name, str(d1), str(d2)))
 
         # get target for creation

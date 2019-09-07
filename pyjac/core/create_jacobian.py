@@ -880,7 +880,7 @@ def dci_sri_dE(loopy_opts, namestore, test_size=None,
 
 
 @ic.with_conditional_jacobian
-def __dRopidE(loopy_opts, namestore, test_size=None,
+def __dRopidE(loopy_opts, namestore, allint, test_size=None,
               do_ns=False, rxn_type=reaction_type.elementary, maxP=None,
               maxT=None, conp=True, jac_create=None):
     """Generates instructions, kernel arguements, and data for calculating
@@ -896,6 +896,11 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
         A object containing all the loopy options to execute
     namestore : :class:`array_creator.NameStore`
         The namestore / creator for this method
+    allint : dict
+        Contains keys 'fwd', 'rev' and 'net', with booleans corresponding to
+        whether all nu values for that direction are integers.
+        If True, powers of concentrations will be evaluated using
+        multiplications 
     test_size : int
         If not none, this kernel is being used for testing.
         Hence we need to size the arrays accordingly
@@ -1335,9 +1340,8 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
         P_lp, P_str = mapstore.apply_maps(namestore.P_arr, global_ind)
         conc_lp, conc_str = mapstore.apply_maps(
             namestore.conc_arr, global_ind, 'net_spec')
-        # TODO: forward allint to this function
         # get the appropriate power function and calls
-        power_func = ic.power_function(loopy_opts, is_integer_power=True,
+        power_func = ic.power_function(loopy_opts, is_integer_power=allint['net'],
                                        guard_nonzero=True,
                                        is_vector=loopy_opts.is_simd)
         nu_fwd = 'nu_fwd'
@@ -1455,7 +1459,7 @@ def __dRopidE(loopy_opts, namestore, test_size=None,
     )
 
 
-def dRopidE(loopy_opts, namestore, test_size=None, conp=True):
+def dRopidE(loopy_opts, namestore, allint, test_size=None, conp=True):
     """Generates instructions, kernel arguements, and data for calculating
     the derivative of the rate of progress (for non-pressure dependent reaction
     types) with respect to the extra variable -- volume/pressure for constant
@@ -1472,6 +1476,11 @@ def dRopidE(loopy_opts, namestore, test_size=None, conp=True):
         A object containing all the loopy options to execute
     namestore : :class:`array_creator.NameStore`
         The namestore / creator for this method
+    allint : dict
+        Contains keys 'fwd', 'rev' and 'net', with booleans corresponding to
+        whether all nu values for that direction are integers.
+        If True, powers of concentrations will be evaluated using
+        multiplications
     test_size : int
         If not none, this kernel is being used for testing.
         Hence we need to size the arrays accordingly
@@ -1485,16 +1494,16 @@ def dRopidE(loopy_opts, namestore, test_size=None, conp=True):
         The generated infos for feeding into the kernel generator
     """
 
-    return [x for x in [__dRopidE(loopy_opts, namestore,
+    return [x for x in [__dRopidE(loopy_opts, namestore, allint, 
                                   test_size=test_size, do_ns=False,
                                   conp=conp),
-                        __dRopidE(loopy_opts, namestore,
+                        __dRopidE(loopy_opts, namestore, allint, 
                                   test_size=test_size, do_ns=True,
                                   conp=conp)]
             if x is not None]
 
 
-def dRopi_plog_dE(loopy_opts, namestore, test_size=None, conp=True,
+def dRopi_plog_dE(loopy_opts, namestore, allint, test_size=None, conp=True,
                   maxP=None):
     """Generates instructions, kernel arguements, and data for calculating
     the derivative of the rate of progress (for PLOG reactions)
@@ -1512,6 +1521,11 @@ def dRopi_plog_dE(loopy_opts, namestore, test_size=None, conp=True,
         A object containing all the loopy options to execute
     namestore : :class:`array_creator.NameStore`
         The namestore / creator for this method
+    allint : dict
+        Contains keys 'fwd', 'rev' and 'net', with booleans corresponding to
+        whether all nu values for that direction are integers.
+        If True, powers of concentrations will be evaluated using
+        multiplications
     test_size : int
         If not none, this kernel is being used for testing.
         Hence we need to size the arrays accordingly
@@ -1528,20 +1542,20 @@ def dRopi_plog_dE(loopy_opts, namestore, test_size=None, conp=True,
         The generated infos for feeding into the kernel generator
     """
 
-    ret = [__dRopidE(loopy_opts, namestore,
+    ret = [__dRopidE(loopy_opts, namestore, allint,
                      test_size=test_size, do_ns=False,
                      rxn_type=reaction_type.plog, conp=conp,
                      maxP=maxP)]
     if test_size == 'problem_size':
         # include the ns version for convenience in testing
-        ret.append(__dRopidE(loopy_opts, namestore,
+        ret.append(__dRopidE(loopy_opts, namestore, allint, 
                              test_size=test_size, do_ns=True,
                              rxn_type=reaction_type.plog, conp=conp,
                              maxP=maxP))
     return [x for x in ret if x is not None]
 
 
-def dRopi_cheb_dE(loopy_opts, namestore, test_size=None, conp=True,
+def dRopi_cheb_dE(loopy_opts, namestore, allint, test_size=None, conp=True,
                   maxP=None, maxT=None):
     """Generates instructions, kernel arguements, and data for calculating
     the derivative of the rate of progress (for CHEB reactions)
@@ -1559,6 +1573,11 @@ def dRopi_cheb_dE(loopy_opts, namestore, test_size=None, conp=True,
         A object containing all the loopy options to execute
     namestore : :class:`array_creator.NameStore`
         The namestore / creator for this method
+    allint : dict
+        Contains keys 'fwd', 'rev' and 'net', with booleans corresponding to
+        whether all nu values for that direction are integers.
+        If True, powers of concentrations will be evaluated using
+        multiplications 
     test_size : int
         If not none, this kernel is being used for testing.
         Hence we need to size the arrays accordingly
@@ -1578,13 +1597,13 @@ def dRopi_cheb_dE(loopy_opts, namestore, test_size=None, conp=True,
         The generated infos for feeding into the kernel generator
     """
 
-    ret = [__dRopidE(loopy_opts, namestore,
+    ret = [__dRopidE(loopy_opts, namestore, allint,
                      test_size=test_size, do_ns=False,
                      rxn_type=reaction_type.cheb, conp=conp,
                      maxP=maxP, maxT=maxT)]
     if not isinstance(test_size, int):
         # include the ns version for convenience in testing
-        ret.append(__dRopidE(loopy_opts, namestore,
+        ret.append(__dRopidE(loopy_opts, namestore, allint,
                              test_size=test_size, do_ns=True,
                              rxn_type=reaction_type.cheb, conp=conp,
                              maxP=maxP, maxT=maxT))
@@ -2586,7 +2605,7 @@ def dci_sri_dT(loopy_opts, namestore, test_size=None):
 
 
 @ic.with_conditional_jacobian
-def __dRopidT(loopy_opts, namestore, test_size=None,
+def __dRopidT(loopy_opts, namestore, allint, test_size=None,
               do_ns=False, rxn_type=reaction_type.elementary, maxP=None,
               maxT=None, jac_create=None):
     """Generates instructions, kernel arguements, and data for calculating
@@ -2601,6 +2620,11 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
         A object containing all the loopy options to execute
     namestore : :class:`array_creator.NameStore`
         The namestore / creator for this method
+    allint : dict
+        Contains keys 'fwd', 'rev' and 'net', with booleans corresponding to
+        whether all nu values for that direction are integers.
+        If True, powers of concentrations will be evaluated using
+        multiplications 
     test_size : int
         If not none, this kernel is being used for testing.
         Hence we need to size the arrays accordingly
@@ -3002,9 +3026,8 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
         conc_lp, conc_str = mapstore.apply_maps(
             namestore.conc_arr, global_ind, 'net_spec')
 
-        # TODO: forward allint to this function
         # create appropriate power functions
-        power_func = ic.power_function(loopy_opts, is_integer_power=True,
+        power_func = ic.power_function(loopy_opts, is_integer_power=allint['net'],
                                        guard_nonzero=True,
                                        is_vector=loopy_opts.is_simd)
         nu_fwd = 'nu_fwd'
@@ -3106,7 +3129,7 @@ def __dRopidT(loopy_opts, namestore, test_size=None,
     )
 
 
-def dRopidT(loopy_opts, namestore, test_size=None):
+def dRopidT(loopy_opts, namestore, allint, test_size=None):
     """Generates instructions, kernel arguements, and data for calculating
     the derivative of the rate of progress (for non-pressure dependent reaction
     types) with respect to temperature
@@ -3122,6 +3145,11 @@ def dRopidT(loopy_opts, namestore, test_size=None):
         A object containing all the loopy options to execute
     namestore : :class:`array_creator.NameStore`
         The namestore / creator for this method
+    allint : dict
+        Contains keys 'fwd', 'rev' and 'net', with booleans corresponding to
+        whether all nu values for that direction are integers.
+        If True, powers of concentrations will be evaluated using
+        multiplications 
     test_size : int
         If not none, this kernel is being used for testing.
         Hence we need to size the arrays accordingly
@@ -3138,14 +3166,14 @@ def dRopidT(loopy_opts, namestore, test_size=None):
         The generated infos for feeding into the kernel generator
     """
 
-    return [x for x in [__dRopidT(loopy_opts, namestore,
+    return [x for x in [__dRopidT(loopy_opts, namestore, allint,
                                   test_size=test_size, do_ns=False),
-                        __dRopidT(loopy_opts, namestore,
+                        __dRopidT(loopy_opts, namestore, allint,
                                   test_size=test_size, do_ns=True)]
             if x is not None]
 
 
-def dRopi_plog_dT(loopy_opts, namestore, test_size=None, maxP=None):
+def dRopi_plog_dT(loopy_opts, namestore, allint, test_size=None, maxP=None):
     """Generates instructions, kernel arguements, and data for calculating
     the derivative of the rate of progress for PLOG reactions
     with respect to temperature
@@ -3163,6 +3191,11 @@ def dRopi_plog_dT(loopy_opts, namestore, test_size=None, maxP=None):
         A object containing all the loopy options to execute
     namestore : :class:`array_creator.NameStore`
         The namestore / creator for this method
+    allint : dict
+        Contains keys 'fwd', 'rev' and 'net', with booleans corresponding to
+        whether all nu values for that direction are integers.
+        If True, powers of concentrations will be evaluated using
+        multiplications 
     test_size : int
         If not none, this kernel is being used for testing.
         Hence we need to size the arrays accordingly
@@ -3179,14 +3212,14 @@ def dRopi_plog_dT(loopy_opts, namestore, test_size=None, maxP=None):
         The generated infos for feeding into the kernel generator
     """
 
-    return [x for x in [__dRopidT(loopy_opts, namestore,
+    return [x for x in [__dRopidT(loopy_opts, namestore, allint,
                                   rxn_type=reaction_type.plog,
                                   test_size=test_size, do_ns=False,
                                   maxP=maxP)]
             if x is not None]
 
 
-def dRopi_cheb_dT(loopy_opts, namestore, test_size=None, maxP=None,
+def dRopi_cheb_dT(loopy_opts, namestore, allint, test_size=None, maxP=None,
                   maxT=None):
     """Generates instructions, kernel arguements, and data for calculating
     the derivative of the rate of progress for Chebyshev reactions
@@ -3205,6 +3238,11 @@ def dRopi_cheb_dT(loopy_opts, namestore, test_size=None, maxP=None,
         A object containing all the loopy options to execute
     namestore : :class:`array_creator.NameStore`
         The namestore / creator for this method
+    allint : dict
+        Contains keys 'fwd', 'rev' and 'net', with booleans corresponding to
+        whether all nu values for that direction are integers.
+        If True, powers of concentrations will be evaluated using
+        multiplications 
     test_size : int
         If not none, this kernel is being used for testing.
         Hence we need to size the arrays accordingly
@@ -3224,7 +3262,7 @@ def dRopi_cheb_dT(loopy_opts, namestore, test_size=None, maxP=None,
         The generated infos for feeding into the kernel generator
     """
 
-    return [x for x in [__dRopidT(loopy_opts, namestore,
+    return [x for x in [__dRopidT(loopy_opts, namestore, allint,
                                   rxn_type=reaction_type.cheb,
                                   test_size=test_size, do_ns=False,
                                   maxP=maxP, maxT=maxT)]
@@ -4343,7 +4381,7 @@ def __dropidnj(loopy_opts, namestore, allint, test_size=None,
             (ind, 'inner_offset <= {} < inner_offset_next'.format(ind)))
 
     # get the appropriate power function and calls
-    power_func = ic.power_function(loopy_opts, is_integer_power=allint,
+    power_func = ic.power_function(loopy_opts, is_integer_power=allint['net'],
                                    guard_nonzero=True,
                                    is_vector=loopy_opts.is_simd)
     nu_fwd = 'nu_fwd'
@@ -5019,7 +5057,7 @@ def get_jacobian_kernel(reacs, specs, loopy_opts, conp=True, test_size=None,
     __insert_at(kernels[-1].name)
 
     # temperature derivatives
-    __add_knl(dRopidT(loopy_opts, nstore, test_size=test_size))
+    __add_knl(dRopidT(loopy_opts, nstore, allint, test_size=test_size))
 
     # check for plog
     if rate_info['plog']['num']:
@@ -5029,7 +5067,7 @@ def get_jacobian_kernel(reacs, specs, loopy_opts, conp=True, test_size=None,
 
     # check for chebyshev
     if rate_info['cheb']['num']:
-        __add_knl(dRopi_cheb_dT(loopy_opts, nstore,
+        __add_knl(dRopi_cheb_dT(loopy_opts, nstore, allint,
                                 maxP=np.max(rate_info['cheb']['num_P']),
                                 maxT=np.max(rate_info['cheb']['num_T']),
                                 test_size=test_size))
@@ -5060,18 +5098,18 @@ def get_jacobian_kernel(reacs, specs, loopy_opts, conp=True, test_size=None,
     __insert_at(kernels[-1].name)
 
     # finally, do extra var derivatives
-    __add_knl(dRopidE(loopy_opts, nstore, conp=conp, test_size=test_size))
+    __add_knl(dRopidE(loopy_opts, nstore, allint, conp=conp, test_size=test_size))
 
     # check for plog
     if rate_info['plog']['num']:
         __add_knl(dRopi_plog_dE(
-            loopy_opts, nstore, maxP=rate_info['plog']['max_P'],
+            loopy_opts, nstore, allint, maxP=rate_info['plog']['max_P'],
             conp=conp, test_size=test_size))
 
     # check for cheb
     if rate_info['cheb']['num']:
         __add_knl(dRopi_cheb_dE(
-            loopy_opts, nstore,
+            loopy_opts, nstore, allint,
             maxP=np.max(rate_info['cheb']['num_P']),
             maxT=np.max(rate_info['cheb']['num_T']),
             conp=conp, test_size=test_size))
