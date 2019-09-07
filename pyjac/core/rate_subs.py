@@ -181,7 +181,7 @@ def assign_rates(reacs, specs, rate_spec):
     net_num_spec = np.array(net_num_spec, dtype=arc.kint_type)
     net_spec = np.array(net_spec, dtype=arc.kint_type)
 
-    # sometimes we need the net properties forumlated per species rather than
+    # sometimes we need the net properties formulated per species rather than
     # per reaction as above
     spec_to_reac = []
     spec_nu = []
