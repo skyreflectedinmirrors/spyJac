@@ -27,7 +27,7 @@ class MissingDeviceError(Exception):
         self.device_type = device_type
         self.platform = platform
         self.message = 'Cannot find devices of type {} on platform {}'.format(
-                        self.device_type, self.platform)
+            self.device_type, self.platform)
         super(MissingDeviceError, self).__init__(self.message)
 
 

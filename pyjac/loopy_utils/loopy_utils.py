@@ -74,7 +74,6 @@ def load_platform(codegen):
 
 
 class loopy_options(object):
-
     """
     Loopy Objects class
 
@@ -82,16 +81,16 @@ class loopy_options(object):
     ----------
     width : int
         If not None, the SIMD lane/SIMT block width.
-        Cannot be specified along with depth
+        Cannot be specified along with ``depth``
     depth : int
         If not None, the SIMD lane/SIMT block depth.
-        Cannot be specified along with width
+        Cannot be specified along with ``width``
     ilp : bool
         If True, use the ILP tag on the species loop.
-        Cannot be specified along with unr
+        Cannot be specified along with ``unr``
     unr : int
         If not None, the unroll length to apply to the species loop.
-        Cannot be specified along with ilp
+        Cannot be specified along with ``ilp``
     order : {'C', 'F'}
         The memory layout of the arrays, C (row major)
         or Fortran (column major)
@@ -106,11 +105,11 @@ class loopy_options(object):
         If True, break different ROP values (fwd / back / pdep) into different
         kernels
     platform : {'CPU', 'GPU', or other vendor specific name}
-        The OpenCL platform to run on.
-        *   If 'CPU' or 'GPU', the first available matching platform will be
-            used
-        *   If a vendor specific string, it will be passed to pyopencl to get
-            the platform
+        The OpenCL platform to run on:
+            * If 'CPU' or 'GPU', the first available matching platform will be
+              used
+            * If a vendor specific string, it will be passed to pyopencl to get
+              the platform
     use_atomic_doubles : bool [True]
         Use atomic updates where necessary for proper deep-vectorization
         If not, a sequential deep-vectorization (with only one thread/lane
@@ -122,7 +121,7 @@ class loopy_options(object):
     jac_format: :class:`JacobianFormat` [JacobianFormat.full]
         The format of Jacobian kernel (full or sparse) to generate
     is_simd: bool [None]
-        If supplied, override the user-specified flag :param:`explicit_simd`, used
+        If supplied, override the user-specified flag `explicit_simd`, used
         for testing.
     unique_pointers: bool [False]
         If specified, this indicates that the pointers passed to the generated pyJac
@@ -203,7 +202,7 @@ class loopy_options(object):
                             cl.platform_info.NAME).lower():
                         self.platform = p
                         break
-                except cl.cffi_cl.RuntimeError:
+                except cl.RuntimeError:
                     pass
             if not self.platform:
                 raise MissingPlatformError(platform)
@@ -513,7 +512,7 @@ def set_adept_editor(knl,
     knl : :class:`loopy.LoopKernel`
         The kernel to generate code for
     base_kernels : :class:`loopy.LoopKernel`
-        The kernel :param:`knl` and all dependencies required for Jacobian
+        The kernel `knl` and all dependencies required for Jacobian
         evaluation. These kernels, should be generated for a problem_size of 1
         to facilitate indexing in the wrapped kernel
     problem_size : int
@@ -652,7 +651,7 @@ def set_adept_editor(knl,
             size=size))
     setters = '\n'.join(setters)
 
-    jac_size = dep_size * indep_size
+    # jac_size = dep_size * indep_size
     # find the output name
     jac_base_offset = '&' + output.name + \
         '[ad_j * {dep_size} * {indep_size}]'.format(
@@ -762,24 +761,28 @@ def get_code(knl, opts=None):
 
 def not_is_close(arr1, arr2, **kwargs):
     """
-    A utility method that returns the result of:
+    A utility method that returns the result of::
+
         numpy.where(numpy.logical_not(numpy.isclose(arr1, arr2, **kwargs)))
-    Since I use if often in testing
+
+    which is often used in testing.
 
     Parameters
     ----------
-    arr1: :class:`np.ndarray`
+    arr1: :class:`numpy.ndarray`
         Array to compare
-    arr2: :class:`np.ndarray`
+    arr2: :class:`numpy.ndarray`
         Reference answer
-    **kwargs: dict
+    kwargs: dict
         Keyword args for :func:`numpy.isclose`
 
     Returns
     -------
     inds: tuple of :class:`numpy.ndarray`
-        result of:
-        `numpy.where(numpy.logical_not(numpy.isclose(arr1, arr2, **kwargs)))`
+        result of::
+
+            numpy.where(numpy.logical_not(numpy.isclose(arr1, arr2, **kwargs)))
+
     """
 
     return np.where(np.logical_not(np.isclose(arr1, arr2, **kwargs)))
@@ -818,11 +821,11 @@ class kernel_call(object):
             Same as the compare_mask, but for the reference answer.
             Necessary for some kernel tests, as the reference answer is not the same
             size as the output, which causes issues for split arrays.
-            If not supplied, the regular :param:`compare_mask` will be used
+            If not supplied, the regular `compare_mask` will be used
         tiling: bool, [True]
-            If True (default), the elements in the :param:`compare_mask` should be
+            If True (default), the elements in the `compare_mask` should be
             combined, e.g., if two arrays [[1, 2] and [3, 4]] are supplied to
-            :param:`compare_mask` with tiling turned on, four resulting indicies will
+            `compare_mask` with tiling turned on, four resulting indicies will
             be compared -- [1, 3], [1, 4], [2, 3], and [2, 4].  If tiling is turned
             of, the compare mask will be treated as a list of indicies, e.g., (for
             the previous example) -- [1, 3] and [2, 4].
@@ -954,11 +957,11 @@ class kernel_call(object):
             The memory layout of the arrays, C (row major) or
             Fortran (column major)
         namestore : :class:`NameStore`
-            Must be supplied if :param:`jac_format` is of type
+            Must be supplied if `jac_format` is of type
             :class:`JacobianFormat.sparse`, in order to pull row / column indicies
             for conversion to / from sparse matricies
         jac_format: :class:`JacobianFormat` [JacobianFormat.full]
-            If sparse, we are testing a sparse matrix (and :param:`namestore` must
+            If sparse, we are testing a sparse matrix (and `namestore` must
             be supplied)
         """
         self.current_order = order
@@ -1128,7 +1131,7 @@ def populate(knl, kernel_calls, device='0',
              editor=None):
     """
     This method runs the supplied :class:`loopy.LoopKernel` (or list thereof),
-    and is often used by :function:`auto_run`
+    and is often used by :func:`auto_run`
 
     Parameters
     ----------
@@ -1262,8 +1265,8 @@ def auto_run(knl, kernel_calls, device='0'):
         The masks / ref_answers, etc. to use in testing
     device : str
         The pyopencl string denoting the device to use, defaults to '0'
-    input_args : dict of `numpy.array`s
-        The arguements to supply to the kernel
+    input_args : dict of :class:`numpy.ndarray`'s
+        The arguments to supply to the kernel
 
     Returns
     -------

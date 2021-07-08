@@ -129,8 +129,8 @@ def generate_setup(lang, setupfile, pyxfile, home_dir, build_dir, out_dir, libna
         # and cogify
         try:
             Cog().callableMain([
-                        'cogapp', '-e', '-d', '-Dsetupgen={}'.format(setupgen),
-                        '-o', outfile, infile])
+                'cogapp', '-e', '-d', '-Dsetupgen={}'.format(setupgen),
+                '-o', outfile, infile])
         except Exception:
             logger = logging.getLogger(__name__)
             logger.error('Error generating python setup file: {}'.format(outfile))
@@ -160,7 +160,7 @@ def generate_wrapper(lang, pyxfile, build_dir, ktype=KernelType.jacobian,
     additional_outputs : list of str
         If supplied, treat these arguments as additional output variables
     nice_name: str [None]
-        If supplied, use this instead of :param:`ktype` to derive the kernel name
+        If supplied, use this instead of `ktype` to derive the kernel name
 
     Returns
     -------
@@ -212,8 +212,8 @@ def generate_wrapper(lang, pyxfile, build_dir, ktype=KernelType.jacobian,
         # and cogify
         try:
             Cog().callableMain([
-                        'cogapp', '-e', '-d', '-Dwrappergen={}'.format(wrappergen),
-                        '-o', outfile, infile])
+                'cogapp', '-e', '-d', '-Dwrappergen={}'.format(wrappergen),
+                '-o', outfile, infile])
         except Exception:
             logger = logging.getLogger(__name__)
             logger.error('Error generating python wrapper file: {}'.format(outfile))
@@ -275,11 +275,11 @@ def pywrap(lang, source_dir, build_dir=None, out_dir=None,
     Keyword Arguments
     -----------------
     file_base: str
-        Used for creation of libraries for :param:`ktype`==KernelType.dummy -- the
+        Used for creation of libraries for `ktype`==`KernelType.dummy` -- the
         base filename (generator name) for this library
     additional_inputs: list of str [[]]
         Use to supply additional input argument names to the generator process;
-        currently this is only used for :param:`ktype`==KernelType.dummy
+        currently this is only used for `ktype`==`KernelType.dummy`
 
 
     Returns

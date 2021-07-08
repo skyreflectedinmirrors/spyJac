@@ -1,5 +1,5 @@
 .. pyJac documentation master file, created by
-   sphinx-quickstart on Tue Apr 12 16:33:22 2016.
+   sphinx-quickstart on Sat Feb  9 15:23:28 2019.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
@@ -18,21 +18,24 @@ the `Cython`_ language and `Cantera`_ for functional and performance testing.
 .. _Cython: http://cython.org
 .. _Cantera: http://www.cantera.org
 
-Documentation
--------------
+Welcome to pyJac's documentation!
+=================================
 
 .. toctree::
-   :maxdepth: 1
+   :maxdepth: 2
+   :caption: Contents:
 
    overview
    faqs
    examples
    installing
-   src/index
+   data_ordering
+   driver_functions
+   src/modules
 
 
 Indices and tables
-------------------
+==================
 
 * :ref:`genindex`
 * :ref:`modindex`
@@ -49,11 +52,14 @@ Up-to-date information about citing **pyJac** can be found within the
 See also
 --------
 
+- The published `pyJac v2 paper`_, and corresponding `derivations`_
 - The published `pyJac v1 paper`_
 - Kyle Niemeyer, Nick Curtis, and Chih-Jen Sung's `WSSCI Fall 2015 paper`_ introducing
 - The associated `WSSCI Fall 2015 slides`_
 
 .. _pyJac v1 paper: https://arxiv.org/abs/1605.03262
+.. _pyJac v2 paper: https://arxiv.org/abs/1809.01029
+.. _derivations: https://arxiv.org/src/1809.01029v1/anc/derivations.pdf
 .. _WSSCI Fall 2015 paper: https://dx.doi.org/10.6084/m9.figshare.2075515.v1
 .. _WSSCI Fall 2015 slides: http://www.slideshare.net/kyleniemeyer/initial-investigation-of-pyjac-an-analytical-jacobian-generator-for-chemical-kinetics
 

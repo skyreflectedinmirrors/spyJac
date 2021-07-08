@@ -26,7 +26,7 @@ from pyjac.tests.test_utils import _run_mechanism_tests, runner
 from pyjac.tests import get_matrix_file
 
 
-class performance_runner(runner):
+class PerformanceRunner(runner):
     def __init__(self, rtype=KernelType.jacobian, repeats=10, steplist=[]):
         """
         Initialize the performance runner class
@@ -42,7 +42,7 @@ class performance_runner(runner):
         -------
         None
         """
-        super(performance_runner, self).__init__(filetype='.txt', rtype=rtype)
+        super(PerformanceRunner, self).__init__(filetype='.txt', rtype=rtype)
         self.repeats = repeats
         self.steplist = steplist
 
@@ -103,7 +103,7 @@ class performance_runner(runner):
             self.todo = {num_conditions: self.repeats - num_completed}
         return not any(self.todo[x] > 0 for x in self.todo)
 
-    def check_step_file(self, filename, _):
+    def check_step_file(self, filename, dummy):
         """checks file for existing data and returns number of runs left to do
         for each step in :attr:`steplist`
         Parameters
@@ -269,12 +269,12 @@ def species_performance_tester(work_dir='performance', test_matrix=None,
         raise_on_missing = False
 
     _run_mechanism_tests(work_dir, test_matrix, prefix,
-                         performance_runner(KernelType.species_rates),
+                         PerformanceRunner(KernelType.species_rates),
                          raise_on_missing=raise_on_missing)
 
 
 @nottest
-def jacobian_performance_tester(work_dir='performance',  test_matrix=None,
+def jacobian_performance_tester(work_dir='performance', test_matrix=None,
                                 prefix=''):
     """Runs performance testing of the jacobian kernel for pyJac
 
@@ -301,5 +301,5 @@ def jacobian_performance_tester(work_dir='performance',  test_matrix=None,
         raise_on_missing = False
 
     _run_mechanism_tests(work_dir, test_matrix, prefix,
-                         performance_runner(KernelType.jacobian),
+                         PerformanceRunner(KernelType.jacobian),
                          raise_on_missing=raise_on_missing)

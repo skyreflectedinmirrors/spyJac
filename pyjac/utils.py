@@ -148,7 +148,7 @@ def stringify_args(arglist, kwd=False, joiner=', ', use_quotes=False,
 
 def partition(tosplit, predicate):
     """
-    Splits the list :param:`tosplit` based on the :param:`predicate` applied to each
+    Splits the list `tosplit` based on the `predicate` applied to each
     list element and returns the two resulting lists
 
     Parameters
@@ -161,10 +161,10 @@ def partition(tosplit, predicate):
     Returns
     -------
     true_list: list
-        The list of elements in :param:`tosplit` for which :param:`predicate` were
+        The list of elements in `tosplit` for which `predicate` were
         True
     false_list: list
-        The list of elements in :param:`tosplit` for which :param:`predicate` were
+        The list of elements in `tosplit` for which `predicate` were
         False
     """
     return reduce(lambda x, y: x[not predicate(y)].append(y) or x, tosplit,
@@ -216,7 +216,7 @@ def kernel_argument_ordering(args, kernel_type, for_validation=False,
         If True, this kernel is being used for validation (affects which arguments
         are considered kernel arguments)
     dummy_args: list of str [None]
-        The kernel arguments to be used if :param:`kernel_type` == `KernelType.dummy`
+        The kernel arguments to be used if `kernel_type` == `KernelType.dummy`
 
     Returns
     -------
@@ -390,8 +390,8 @@ def enum_to_string(enum):
 
 def to_enum(enum, enum_type):
     """
-    Attempt to convert the :param:`enum` to type :param:`enum_type`.
-    If :param:`estr` is already an Enum, no effect.
+    Attempt to convert the `enum` to type `enum_type`.
+    If `estr` is already an Enum, no effect.
 
     Parameters
     ----------
@@ -410,8 +410,8 @@ def to_enum(enum, enum_type):
     argparse.ArgumentTypeError
         If an improper enum type is specified
     InvalidInputSpecificationException
-        If the :param:`enum` is an Enum but not of the same type as
-        :param:`enum_type`
+        If the `enum` is an Enum but not of the same type as
+        `enum_type`
     """
 
     try:
@@ -520,7 +520,7 @@ def get_nu(isp, rxn):
     ----------
     isp : int
         Species index
-    rxn : `ReacInfo`
+    rxn : :py:class:`ReacInfo`
         Reaction
 
     Returns
@@ -612,15 +612,15 @@ def create_dir(path):
 
 def reassign_species_lists(reacs, specs):
     """
-    Given a list of `ReacInfo`, and `SpecInfo`, this method will update the
-    `ReacInfo` reactants / products / third body list to integers
-    representing the species' index in the list.
+    Given a list of :py:class:`ReacInfo`, and :py:class:`SpecInfo`, this method will
+    update the :py:class:`ReacInfo` reactants / products / third body list to
+    integers representing the species' index in the list.
 
     Parameters
     ----------
-    reacs : list of `ReacInfo`
+    reacs : list of :class:`ReacInfo`
         List of reactions to be updated.
-    specs : list of `SpecInfo`
+    specs : list of :class:`SpecInfo`
         List of species
 
     Returns
@@ -673,7 +673,7 @@ def is_integer(val):
 
 def run_with_our_python(command):
     """
-    Run the given :param:`command` through subprocess, attempting as best as possible
+    Run the given `command` through subprocess, attempting as best as possible
     to utilize the same python intepreter as is currently running.
 
     Notes
@@ -713,7 +713,7 @@ def check_lang(lang):
 
 def check_order(order):
     """
-    Checks that the :param:`order` is valid
+    Checks that the `order` is valid
 
     Parameters
     ----------
@@ -727,7 +727,7 @@ def check_order(order):
 
     Notes
     -----
-    :class:`InvalidInputSpecificationException` raised if :param:`order` is not
+    :class:`InvalidInputSpecificationException` raised if `order` is not
         valid
     """
 
@@ -774,7 +774,7 @@ def _find_indent(template_str, key, value):
 
 def subs_at_indent(template_str, **kwargs):
     """
-    Substitutes keys of :params:`kwargs` for values in :param:`template_str`
+    Substitutes keys of :params:`kwargs` for values in `template_str`
     ensuring that the indentation of the value is the same as that of the key
     for all lines present in the value
 
@@ -798,8 +798,8 @@ def subs_at_indent(template_str, **kwargs):
 
 def copy_with_extension(lang, file, topath, frompath=None, header=False):
     """
-    Copies :param:`file` to :param:`topath`, while changing the extension to
-    match that of the given :param:`lang`
+    Copies `file` to `topath`, while changing the extension to
+    match that of the given `lang`
 
     Parameters
     ----------
@@ -810,8 +810,8 @@ def copy_with_extension(lang, file, topath, frompath=None, header=False):
     topath : str
         The path to copy the modified file to
     frompath : str [None]
-        If specified, :param:`file` is a filename, and is located at
-        :param:`frompath`
+        If specified, `file` is a filename, and is located at
+        `frompath`
     header : bool [False]
         If true, this file is a header (and we should use the header extensions)
 

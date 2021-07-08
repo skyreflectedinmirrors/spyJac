@@ -62,7 +62,7 @@ def get_driver(loopy_opts, namestore, inputs, outputs, driven,
     unit-tests).  Future versions will allow us to natively wrap test functions
     (i.e., once the new function calling interface is in place in Loopy)
 
-    :see:`driver-function` for more information
+    See :ref:`driver-function` for more information.
 
     Parameters
     ----------
@@ -106,9 +106,10 @@ def get_driver(loopy_opts, namestore, inputs, outputs, driven,
     # create mapping of array names
     array_names = {v.name: v for k, v in six.iteritems(vars(namestore))
                    if isinstance(v, arc.creator) and not (
-                    v.fixed_indicies or v.affine)}
+                   v.fixed_indicies or v.affine)}
     for arr in to_find:
-        arr_creator = next((array_names[x] for x in array_names if x == arr), None)
+        arr_creator = next((array_names[x]
+                            for x in array_names if x == arr), None)
         if arr_creator is None:
             continue
         arrays[arr] = arr_creator
@@ -134,9 +135,9 @@ def get_driver(loopy_opts, namestore, inputs, outputs, driven,
             logger.debug('{} array for driver kernel {} does not '
                          'match expected shape (from array {}).  '
                          'Expected: ({}), got: ({})'.format(
-                            desc, inp.name, nameref,
-                            stringify_args(inp.shape),
-                            stringify_args(shape))
+                             desc, inp.name, nameref,
+                             stringify_args(inp.shape),
+                             stringify_args(shape))
                          )
             raise InvalidInputSpecificationException(inp.name)
 
@@ -164,7 +165,8 @@ def get_driver(loopy_opts, namestore, inputs, outputs, driven,
             logger = logging.getLogger(__name__)
             logger.debug('No {} arrays supplied to driver that require '
                          'copying to working buffer!'.format(desc))
-            raise InvalidInputSpecificationException('Driver ' + desc + ' arrays')
+            raise InvalidInputSpecificationException(
+                'Driver ' + desc + ' arrays')
         return shape
 
     def create_interior_kernel(for_input):
@@ -220,7 +222,8 @@ def get_driver(loopy_opts, namestore, inputs, outputs, driven,
         buffers = []
         strs = []
         for arr in arrs:
-            arr_lp, arr_str = __build(arr, False, reshape_to_working_buffer=False)
+            arr_lp, arr_str = __build(
+                arr, False, reshape_to_working_buffer=False)
             buffers.append(arr_lp)
             strs.append(arr_str)
 
@@ -273,13 +276,13 @@ def get_driver(loopy_opts, namestore, inputs, outputs, driven,
                         var_name=arc.var_name,
                         extra_inames=extra_inames,
                         kernel_data=buffers + working_buffers + [
-                          arc.work_size, arc.problem_size, driver_offset],
+                            arc.work_size, arc.problem_size, driver_offset],
                         silenced_warnings=warnings,
                         vectorization_specializer=vec_spec,
                         split_specializer=split_spec,
                         unrolled_vector=True,
                         loop_priority=set([tuple(priorities + [
-                          iname[0] for iname in extra_inames])]),
+                            iname[0] for iname in extra_inames])]),
                         **kwargs)
 
     copy_in = create_interior_kernel(True)
@@ -394,7 +397,7 @@ def queue_driver(loopy_opts, namestore, inputs, outputs, driven,
     unit-tests).  Future versions will allow us to natively wrap test functions
     (i.e., once the new function calling interface is in place in Loopy)
 
-    :see:`driver-function` for more information
+    See :ref:`driver-function` for more information
 
     Parameters
     ----------

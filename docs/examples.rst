@@ -21,11 +21,28 @@ any cache optimization):
 
     python -m pyjac --lang c --input data/h2o2.inp
 
-CUDA source code can be generated similarly:
+OpenCL source code can be generated similarly:
 
 .. code-block:: bash
 
-    python -m pyjac --lang cuda --input data/h2o2.inp
+    python -m pyjac --lang opencl --input data/h2o2.inp
+
+============
+Unit Testing
+============
+
+The pyJac unit-tests can be run with ``nose``, via:
+
+.. code-block:: bash
+
+    nosetests
+
+To turn off long-running tests, you may insteady use
+
+.. code-block:: bash
+
+    nosetests -A 'not fullkernel and not verylong'
+
 
 ==================
 Functional testing
@@ -168,8 +185,8 @@ the GRI-Mech 3.0 model as:
     #evaluate the Jacobian
     pyjacob.py_eval_jacobian(0, P, y, jac)
 
-The above uses the state vector discussed in (:ref:`ordering`), as well as the
-reordering in (:ref:`cantera_comp`) to enable direct comparison to Cantera.
+The above uses the state vector discussed in (:ref:`state_vec`), as well as the
+reordering in (:ref:`array_ordering`) to enable direct comparison to Cantera.
 Also note that we can pass a dummy time of 0, as explained in
 (:ref:`param_names`).
 

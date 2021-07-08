@@ -152,7 +152,8 @@ class write_race_silencer(object):
     """
 
     def __init__(self, write_races=[]):
-        self.write_races = ['write_race({name})'.format(name=x) for x in write_races]
+        self.write_races = ['write_race({name})'.format(
+            name=x) for x in write_races]
 
     def __call__(self, knl):
         return knl.copy(silenced_warnings=knl.silenced_warnings + self.write_races)
@@ -166,6 +167,7 @@ class within_inames_specializer(write_race_silencer):
 
     This should _not_ be used for anything but deep-vectorizations
     """
+
     def __init__(self, var_name=var_name, **kwargs):
         self.var_name = var_name
         super(within_inames_specializer, self).__init__(**kwargs)
@@ -376,7 +378,8 @@ class TemperatureGuard(Guard):
     """
 
     def __init__(self, loopy_opts, T_min=100., T_max=10000.):
-        super(TemperatureGuard, self).__init__(loopy_opts, minv=T_min, maxv=T_max)
+        super(TemperatureGuard, self).__init__(
+            loopy_opts, minv=T_min, maxv=T_max)
 
 
 class VolumeGuard(Guard):
@@ -536,7 +539,8 @@ class PowerFunction(PreambleMangler):
             manglers.append(mangler_type())
             # 2) float and long integer
             if self.name == 'pown':
-                manglers.append(mangler_type(arg_dtypes=(np.float64, np.int64)))
+                manglers.append(mangler_type(
+                    arg_dtypes=(np.float64, np.int64)))
             if self.is_simd:
                 from loopy.target.opencl import vec
                 vfloat = vec.types[np.dtype(np.float64),
@@ -578,9 +582,9 @@ class PowerFunction(PreambleMangler):
 def power_function(loopy_opts, is_integer_power=False, is_positive_power=False,
                    guard_nonzero=False, is_vector=False):
     """
-    Returns the best power function to use for a given :param:`lang` and
-    choice of :param:`is_integer_power` / :param:`is_positive_power` and
-    the :param:`is_vector` status of the instruction in question
+    Returns the best power function to use for a given `lang` and
+    choice of `is_integer_power` / `is_positive_power` and
+    the `is_vector` status of the instruction in question
     """
 
     # 11/20/18 -> default to our unrolled power functions, when available
@@ -681,12 +685,12 @@ def get_update_instruction(mapstore, mask_arr, base_update_insn):
     mapstore: :class:`array_creator.MapStore`
         The base mapstore used in creation of this kernel
     mask_arr: :class:`array_creator.creator`
-        The array to use as a mask to determine whether the :param:`base_value`
+        The array to use as a mask to determine whether the `base_value`
         should be updated
     base_update_insn: str
         The update instruction to use as a base.  This may be surrounded by
         and if statement or possibly discarded altogether depending on the
-        :param:`mask_arr` and :param:`mapstore`
+        `mask_arr` and `mapstore`
 
     Returns
     -------
@@ -700,7 +704,7 @@ def get_update_instruction(mapstore, mask_arr, base_update_insn):
         _, _, line_number, function_name, _, _ = inspect.stack()[1]
         logger.warn('Call to get_update_instruction() from {0}:{1} '
                     'used non-finalized mapstore, finalizing now...'.format(
-                         function_name, line_number))
+                        function_name, line_number))
 
         mapstore.finalize()
 
@@ -736,28 +740,34 @@ def get_update_instruction(mapstore, mask_arr, base_update_insn):
 
 def wrap_instruction_on_condition(insn, condition, wrapper):
     """
-    Utility function to wrap the :param:`insn` in the supplied :param:`wrapper`
-    if :param:`condition` is True
+    Utility function to wrap the `insn` in the supplied `wrapper`
+    if `condition` is True
 
     Parameters
     ----------
     insn: str
         The instruction to execute
     condition: bool or Callable
-        If true, :param:`insn` will be wrapped in an if statement given by
-        :param:`wrapper`
+        If true, `insn` will be wrapped in an if statement given by
+        `wrapper`
     wrapper: str
-        The if statement condition to wrap :param:`insn` in if not :param:`condition`
+        The if statement condition to wrap `insn` in if not `condition`
 
     Returns
     -------
-    If condition:
-        `if wrapper
-            insn
-         end
-        `
-    else:
-        insn
+    wrapped_insn: str
+        If the condition evaluates as True, the instruction will be wrapped in the
+        condition, else the base instruction will be returned.
+
+        This roughly follows the psuedo-code::
+
+            If condition
+                if wrapper
+                    insn
+                 end
+            else:
+                insn
+
     """
 
     if condition:
@@ -864,7 +874,7 @@ def with_conditional_jacobian(func):
             If True, return the created :loopy:`GlobalArg`
         warn: bool [True]
             If True, warn if an indirect access will be made w/o supplying
-            :param:`index_insn`
+            `index_insn`
         **kwargs: dict
             Any other arguements will be passed to the :func:`mapstore.apply_maps`
             call
@@ -903,7 +913,8 @@ def with_conditional_jacobian(func):
                 jac, *jac_inds, plain_index=True, **kwargs)
             if index_insn:
                 # get the index
-                existing = sorted(_conditional_jacobian.id_namer.existing_names)
+                existing = sorted(
+                    _conditional_jacobian.id_namer.existing_names)
                 if existing or deps:
                     dep_str = 'dep={}'.format(':'.join(deps + existing))
                 else:
@@ -913,11 +924,11 @@ def with_conditional_jacobian(func):
                 name = _conditional_jacobian.id_namer(name)
                 index_insn = Template(
                     '${creation}jac_index = ${index_str} {id=${name}, ${dep_str}}'
-                    ).safe_substitute(
-                        creation='<> ' if not created_index else '',
-                        index_str=computed_ind,
-                        name=name,
-                        dep_str=dep_str)
+                ).safe_substitute(
+                    creation='<> ' if not created_index else '',
+                    index_str=computed_ind,
+                    name=name,
+                    dep_str=dep_str)
                 # add dependency to all before me (and just added)
                 # so that we don't get out of order
                 deps += [name]

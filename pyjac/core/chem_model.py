@@ -389,7 +389,7 @@ class ReacInfo(object):
     def get_type(self, reaction_enum_type):
         """
         Return all :class:`reaction_type` enums in our :attr:`types` that is
-        and instance of the given :param:`reaction_enum_type` class, or None if
+        and instance of the given `reaction_enum_type` class, or None if
         not found.
         """
         return [x for x in self.type if isinstance(x, reaction_enum_type)]
@@ -415,7 +415,7 @@ class ReacInfo(object):
         A match is made if this reaction matches all `reaction types` given
             with the repeat rule given above
 
-        An empty :param:`reac_types` will be matched by all reactions
+        An empty `reac_types` will be matched by all reactions
 
         """
 

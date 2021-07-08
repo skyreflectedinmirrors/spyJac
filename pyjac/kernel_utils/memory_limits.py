@@ -115,7 +115,7 @@ class memory_limits(object):
     Helps determine whether a kernel is using too much constant / shared memory,
     etc.
 
-    Properties
+    Attributes
     ----------
     arrays: dict
             A mapping of :class:`loopy.TemporaryVariable` or :class:`loopy.GlobalArg`
@@ -154,7 +154,7 @@ class memory_limits(object):
         result in an integer overflow in index (mainly, Intel OpenCL).
 
         This is calculated by determining the maximum index of the array, and then
-        dividing the maximum value of :param:`dtype` by this stride
+        dividing the maximum value of `dtype` by this stride
 
         Parameters
         ----------
@@ -194,8 +194,8 @@ class memory_limits(object):
     def arrays_with_type_changes(self, mtype=memory_type.m_constant,
                                  with_type_changes={}):
         """
-        Returns the list of :attr:`arrays` that are of :param:`mtype` with the
-        given :param:`with_type_changes`.  See :func:`can_fit`
+        Returns the list of :attr:`arrays` that are of `mtype` with the
+        given `with_type_changes`.  See :func:`can_fit`
         """
 
         # filter arrays by type
@@ -206,7 +206,7 @@ class memory_limits(object):
 
     def can_fit(self, mtype=memory_type.m_constant, with_type_changes={}):
         """
-        Determines whether the supplied :param:`arrays` of type :param:`type`
+        Determines whether the supplied `arrays` of type `type`
         can fit on the device
 
         Parameters
@@ -214,7 +214,7 @@ class memory_limits(object):
         type: :class:`memory_type`
             The type of memory to use
         with_type_changes: dict
-            Updates to apply to :prop:`arrays`
+            Updates to apply to :attr:`arrays`
 
         Returns
         -------
@@ -243,7 +243,7 @@ class memory_limits(object):
         def __calculate_integer_limit(limit):
             old = limit
             limit = np.minimum(limit, self.integer_limited_problem_size(
-                    array, self.dtype))
+                array, self.dtype))
             if old != limit:
                 stype = str(mtype)
                 stype = stype[stype.index('.') + 3:]
@@ -252,7 +252,7 @@ class memory_limits(object):
                     'may result in integer overflow in indexing, and '
                     'cause failure on execution, limiting per-run size to {}.'
                     .format(stype, array.name, int(limit))
-                    )
+                )
             return limit
 
         def __calculate_alloc_limit(limit):
@@ -309,9 +309,11 @@ class memory_limits(object):
             # also need to check the maximum allocation size for opencl
             if memory_type.m_alloc in self.limits:
                 if is_ic_dep:
-                    per_alloc_ic_limit = __calculate_alloc_limit(per_alloc_ic_limit)
+                    per_alloc_ic_limit = __calculate_alloc_limit(
+                        per_alloc_ic_limit)
                 elif is_ws_dep:
-                    per_alloc_ws_limit = __calculate_alloc_limit(per_alloc_ws_limit)
+                    per_alloc_ws_limit = __calculate_alloc_limit(
+                        per_alloc_ws_limit)
                 else:
                     if static >= self.limits[memory_type.m_alloc]:
                         logger.warn(
@@ -319,7 +321,7 @@ class memory_limits(object):
                             ' exceeds maximum allocation size, this will likely'
                             ' cause OpenCL to fail on execution.'
                             .format(array.name)
-                            )
+                        )
 
         # if no per_ic, just divide by 1
         if per_ic == 0:
@@ -399,7 +401,7 @@ class memory_limits(object):
                              'default memory-limits specification for all platforms '
                              'with specific overrides for a platform, or a '
                              'platform-specific memory-limits only.'.format(
-                                input_file, loopy_opts.platform_name))
+                                 input_file, loopy_opts.platform_name))
                 raise InvalidInputSpecificationException('memory-limits')
             assert len(user) <= 2
 
@@ -417,11 +419,11 @@ class memory_limits(object):
                     # update with enum
                     logger.debug('Overriding memory-limit for type {} from value '
                                  '({}) to value ({}) from {} limits.'.format(
-                                    key,
-                                    limits[mtype(key)] if mtype(key) in limits
-                                    else None, value,
-                                    'per-platform' if 'platforms' in lim else
-                                    'default'))
+                                     key,
+                                     limits[mtype(key)] if mtype(key) in limits
+                                     else None, value,
+                                     'per-platform' if 'platforms' in lim else
+                                     'default'))
                     user_limits[mtype(key)] = value
                 # and overwrite default limits w/ user
                 limits.update(user_limits)

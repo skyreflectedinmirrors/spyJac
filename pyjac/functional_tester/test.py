@@ -37,10 +37,10 @@ def getf(x):
     return os.path.basename(x)
 
 
-class hdf5_store(object):
+class HDF5Store(object):
     def __init__(self, chunk_size=_get_test_input('chunk_size', 10000)):
         """
-        Initialize :class:`hdf5_store`
+        Initialize :class:`HDF5Store`
 
         Parameters
         ----------
@@ -99,7 +99,7 @@ class hdf5_store(object):
 
     def open_for_chunked_write(self, filename, shape, num_conds):
         """
-        Opens a new file :param:`filename` and creates an :class:`pytables.EArray`
+        Opens a new file `filename` and creates an :class:`pytables.EArray`
         (extendable array) for writing
 
         Parameters
@@ -172,7 +172,7 @@ class hdf5_store(object):
                            filename=None, pytables_name=None,
                            num_conditions=None):
         """
-        Converts the binary output file in :param:`filename` to a HDF5 pytables file
+        Converts the binary output file in `filename` to a HDF5 pytables file
         in order to avoid memory errors
 
         Note
@@ -192,10 +192,10 @@ class hdf5_store(object):
             The storage order of the data in the binary file
         filename: str [None]
             The filename of the output, if not supplied it will be assumed to be
-            :param:`dir`/name.bin
+            `dir`/name.bin
         pytables_name: str [None]
             The filename of the pytables_output.  If not supplied, it will be the
-            same as :param:`filename` with the '.bin' prefix replaced with
+            same as `filename` with the '.bin' prefix replaced with
             '.hdf5'
         num_conditions: int [None]
             If specified, a limit on the number of conditions that were tested
@@ -276,7 +276,7 @@ class hdf5_store(object):
         return getattr(hdf5_file.root, name)
 
 
-class validation_runner(runner, hdf5_store):
+class ValidationRunner(runner, HDF5Store):
     def __init__(self, eval_class, rtype=KernelType.jacobian):
         """Runs validation testing for pyJac for a mechanism
 
@@ -290,13 +290,13 @@ class validation_runner(runner, hdf5_store):
         """
 
         runner.__init__(self, filetype='_err.npz', rtype=rtype)
-        hdf5_store.__init__(self)
+        HDF5Store.__init__(self)
         self.base_chunk_size = self.chunk_size
 
         self.eval_class = eval_class
         self.mod_test = test_utils.get_run_source()
 
-    def check_file(self, filename, _, __):
+    def check_file(self, filename, dummy1, dummy2):
         """Checks file for existing data, returns number of completed runs
 
         Parameters
@@ -311,10 +311,10 @@ class validation_runner(runner, hdf5_store):
 
         """
 
-        Ns = self.gas.n_species
-        Nr = self.gas.n_reactions
-        Nrev = len([x for x in self.gas.reactions() if x.reversible])
-        return self.helper.check_file(filename, Ns, Nr, Nrev, self.current_vecsize)
+        ns = self.gas.n_species
+        nr = self.gas.n_reactions
+        nrev = len([x for x in self.gas.reactions() if x.reversible])
+        return self.helper.check_file(filename, ns, nr, nrev, self.current_vecsize)
 
     def pre(self, gas, data, num_conditions, max_vec_width):
         """
@@ -336,20 +336,20 @@ class validation_runner(runner, hdf5_store):
 
         self.gas = gas
         self.gas.basis = 'molar'
-        T = data['T']
-        P = data['P']
-        V = data['V']
+        temperature = data['T']
+        pressure = data['P']
+        volume = data['V']
         moles = data['moles']
         # get phi vectors
-        self.phi_cp = self.get_phi(T, P, V, moles)
-        self.phi_cv = self.get_phi(T, V, P, moles)
+        self.phi_cp = self.get_phi(temperature, pressure, volume, moles)
+        self.phi_cv = self.get_phi(temperature, volume, pressure, moles)
         # convert to hdf
         self.phi_cp = self.to_file(self.phi_cp, 'phi_cp.hdf5')
         self.phi_cv = self.to_file(self.phi_cv, 'phi_cv.hdf5')
         # and free old data
-        del T
-        del P
-        del V
+        del temperature
+        del pressure
+        del volume
         del moles
         self.num_conditions = num_conditions
 
@@ -485,7 +485,7 @@ class validation_runner(runner, hdf5_store):
         np.savez(data_output, **err_dict)
 
 
-class eval(hdf5_store):
+class eval(HDF5Store):
     def eval_answer(self, phi, param, state):
         raise NotImplementedError
 
@@ -513,6 +513,7 @@ class spec_rate_eval(eval):
     """
     Helper class for the species rates tester
     """
+
     def __init__(self, gas, num_conditions, atol=1e-10, rtol=1e-6):
         self.atol = atol
         self.rtol = rtol
@@ -552,7 +553,8 @@ class spec_rate_eval(eval):
         self.pres_mod_test = np.zeros((num_conditions, self.thd_map.size))
 
         # molecular weight fraction
-        self.mw_frac = 1 - gas.molecular_weights[:-1] / gas.molecular_weights[-1]
+        self.mw_frac = 1 - \
+            gas.molecular_weights[:-1] / gas.molecular_weights[-1]
 
         # predefines
         self.specs = gas.species()[:]
@@ -577,27 +579,27 @@ class spec_rate_eval(eval):
         return self.outputs_cp if state['conp'] else self.outputs_cv
 
     def eval_answer(self, phi, state):
-        def __eval_cp(j, T):
-            return self.specs[j].thermo.cp(T)
+        def __eval_cp(j, temperature):
+            return self.specs[j].thermo.cp(temperature)
         eval_cp = np.vectorize(__eval_cp, cache=True)
 
-        def __eval_h(j, T):
-            return self.specs[j].thermo.h(T)
+        def __eval_h(j, temperature):
+            return self.specs[j].thermo.h(temperature)
         eval_h = np.vectorize(__eval_h, cache=True)
 
         if not self.evaled:
             ns_range = np.arange(self.gas.n_species)
 
-            T = phi[:, 0]
-            P = phi[:, 1] if state['conp'] else phi[:, 2]
-            V = phi[:, 2] if state['conp'] else phi[:, 1]
+            temperature = phi[:, 0]
+            pressure = phi[:, 1] if state['conp'] else phi[:, 2]
+            volume = phi[:, 2] if state['conp'] else phi[:, 1]
             # it's actually more accurate to set the density
             # (total concentration) due to the cantera internals
-            D = P / (ct.gas_constant * T)
+            conc = pressure / (ct.gas_constant * temperature)
 
-            # get the last species's concentrations as D - sum(other species)
-            concs = phi[:, 3:] / V[:, np.newaxis]
-            last_spec = np.expand_dims(D - np.sum(concs, axis=1), 1)
+            # get the last species's concentrations as conc - sum(other species)
+            concs = phi[:, 3:] / volume[:, np.newaxis]
+            last_spec = np.expand_dims(conc - np.sum(concs, axis=1), 1)
             concs = np.concatenate((concs, last_spec), axis=1)
 
             self.gas.basis = 'molar'
@@ -606,41 +608,43 @@ class spec_rate_eval(eval):
                     if not i % 10000:
                         print(i)
                     # first, set T / D
-                    self.gas.TD = T[i], D[i]
+                    self.gas.TD = temperature[i], conc[i]
                     # now set concentrations
                     self.gas.concentrations = concs[i]
                     # assert allclose
-                    assert np.allclose(self.gas.T, T[i], atol=1e-12)
-                    assert np.allclose(self.gas.density, D[i], atol=1e-12)
-                    assert np.allclose(self.gas.concentrations, concs[i], atol=1e-12)
+                    assert np.allclose(self.gas.T, temperature[i], atol=1e-12)
+                    assert np.allclose(self.gas.density, conc[i], atol=1e-12)
+                    assert np.allclose(
+                        self.gas.concentrations, concs[i], atol=1e-12)
                     # get molar species rates
                     spec_rates = self.gas.net_production_rates[:]
-                    self.molar_rates[i, :] = spec_rates[:-1] * V[i]
+                    self.molar_rates[i, :] = spec_rates[:-1] * volume[i]
                     # info vars
-                    self.rop_fwd_test[i, :] = self.gas.forward_rates_of_progress[:]
+                    self.rop_fwd_test[i,
+                                      :] = self.gas.forward_rates_of_progress[:]
                     self.rop_rev_test[i, :] = self.gas.reverse_rates_of_progress[:][
                         self.rev_map]
                     self.rop_net_test[i, :] = self.gas.net_rates_of_progress[:]
 
                     # find temperature rates
-                    cp = eval_cp(ns_range, T[i])
-                    h = eval_h(ns_range, T[i])
+                    cp = eval_cp(ns_range, temperature[i])
+                    h = eval_h(ns_range, temperature[i])
                     cv = cp - ct.gas_constant
-                    u = h - T[i] * ct.gas_constant
+                    u = h - temperature[i] * ct.gas_constant
                     np.divide(-np.dot(h, spec_rates), np.dot(cp, concs[i]),
                               out=self.conp_temperature_rates[i, :])
                     np.divide(-np.dot(u, spec_rates), np.dot(cv, concs[i]),
                               out=self.conv_temperature_rates[i, :])
 
                     # finally find extra variable rates
-                    self.conp_extra_rates[i] = V[i] * (
-                        T[i] * ct.gas_constant * np.sum(
-                            self.mw_frac * spec_rates[:-1]) / P[i] +
-                        self.conp_temperature_rates[i, :] / T[i])
+                    self.conp_extra_rates[i] = volume[i] * (
+                        temperature[i] * ct.gas_constant * np.sum(
+                            self.mw_frac * spec_rates[:-1]) / pressure[i] +
+                        self.conp_temperature_rates[i, :] / temperature[i])
                     self.conv_extra_rates[i] = (
-                        P[i] / T[i]) * self.conv_temperature_rates[i, :] + \
-                        T[i] * ct.gas_constant * np.sum(
-                            self.mw_frac * spec_rates[:-1])
+                        pressure[i] / temperature[i]) * \
+                        self.conv_temperature_rates[i, :] + temperature[i] * \
+                        ct.gas_constant * np.sum(self.mw_frac * spec_rates[:-1])
 
             def _dphi(conp):
                 temperature_rates = self.conp_temperature_rates if conp \
@@ -648,17 +652,21 @@ class spec_rate_eval(eval):
                 extra_rates = self.conp_extra_rates if conp else\
                     self.conv_extra_rates
                 return np.concatenate((temperature_rates, extra_rates,
-                                      self.molar_rates), axis=1)
+                                       self.molar_rates), axis=1)
 
             # finally convert to HDF5
             self.dphi_cp = _dphi(True)
             self.dphi_cp = self.to_file(self.dphi_cp, 'dphi_cp.hdf5')
             self.dphi_cv = _dphi(False)
             self.dphi_cv = self.to_file(self.dphi_cp, 'dphi_cv.hdf5')
-            self.molar_rates = self.to_file(self.molar_rates, 'molar_rates.hdf5')
-            self.rop_fwd_test = self.to_file(self.rop_fwd_test, 'rop_fwd_test.hdf5')
-            self.rop_rev_test = self.to_file(self.rop_rev_test, 'rop_rev_test.hdf5')
-            self.rop_net_test = self.to_file(self.rop_net_test, 'rop_net_test.hdf5')
+            self.molar_rates = self.to_file(
+                self.molar_rates, 'molar_rates.hdf5')
+            self.rop_fwd_test = self.to_file(
+                self.rop_fwd_test, 'rop_fwd_test.hdf5')
+            self.rop_rev_test = self.to_file(
+                self.rop_rev_test, 'rop_rev_test.hdf5')
+            self.rop_net_test = self.to_file(
+                self.rop_net_test, 'rop_net_test.hdf5')
             self.conp_extra_rates = self.to_file(
                 self.conp_extra_rates, 'conp_extra_rates.hdf5')
             self.conv_extra_rates = self.to_file(
@@ -852,6 +860,7 @@ class jacobian_eval(eval):
     """
     Helper class for the Jacobian tester
     """
+
     def __init__(self, gas, num_conditions, atol=1e-2, rtol=1e-6):
         self.atol = atol
         self.rtol = rtol
@@ -867,7 +876,8 @@ class jacobian_eval(eval):
         self.gas = gas
         self.evaled = False
         self.name = 'jac'
-        ret = determine_jac_inds(self.reacs, self.specs, RateSpecialization.fixed)
+        ret = determine_jac_inds(
+            self.reacs, self.specs, RateSpecialization.fixed)
         self.inds = ret['jac_inds']
         self.non_zero_specs = ret['net_per_spec']['map']
         if self.gas.n_species - 1 in self.non_zero_specs:
@@ -932,7 +942,8 @@ class jacobian_eval(eval):
             # convert nan's or inf's to some non-zero number
             check[np.where(~np.isfinite(check))] = 1
             # get masked where > 0
-            mask = np.asarray(np.where(ma.masked_where(check != 0, check).mask)).T
+            mask = np.asarray(
+                np.where(ma.masked_where(check != 0, check).mask)).T
             # and check that all our non-zero entries are in the sparse indicies
             if inNd(mask, inds).size != mask.shape[0]:
                 logger = logging.getLogger(__name__)
@@ -992,7 +1003,8 @@ class jacobian_eval(eval):
         return jac
 
     def eval_answer(self, phi, state):
-        jac = self.__fast_jac(state['conp'], state['jac_format'], state['order'])
+        jac = self.__fast_jac(
+            state['conp'], state['jac_format'], state['order'])
         if jac is not None:
             return jac
 
@@ -1009,8 +1021,8 @@ class jacobian_eval(eval):
         phi_mask = np.array([0] + list(range(2, phi.shape[1])))
         # note that we have to do this piecewise in order to avoid memory overflows
         # eval jacobian
-        P = phi[:, 1] if state['conp'] else phi[:, 2]
-        V = phi[:, 2] if state['conp'] else phi[:, 1]
+        pressure = phi[:, 1] if state['conp'] else phi[:, 2]
+        volume = phi[:, 2] if state['conp'] else phi[:, 1]
 
         def __get_state(offset, end):
             end = np.minimum(end, num_conds)
@@ -1021,10 +1033,10 @@ class jacobian_eval(eval):
                            else None),
                 'phi_cv': (phi[offset:end, phi_mask].copy() if not state['conp']
                            else None),
-                'P': P[offset:end],
-                'V': V[offset:end],
+                'P': pressure[offset:end],
+                'V': volume[offset:end],
                 'test_size': end - offset
-                })
+            })
             # seed all 'zero' concentrations with a tiny epsilon to avoid NaN's
             # and enable valid comparison
             if retval.phi_cp is not None:
@@ -1160,9 +1172,9 @@ class jacobian_eval(eval):
                 # next check that the answer is similarly either huge here or
                 # isn't finite
                 assert np.all(np.logical_or(
-                        np.logical_or(ans[bad_locs] <= -inf_cutoff,
-                                      ans[bad_locs] >= inf_cutoff),
-                        ~np.isfinite(ans[bad_locs]))), (
+                    np.logical_or(ans[bad_locs] <= -inf_cutoff,
+                                  ans[bad_locs] >= inf_cutoff),
+                    ~np.isfinite(ans[bad_locs]))), (
                     "Effectively infinite values in pyJac jacobian do not "
                     "correspond to Inf's / NaN's / or huge values in the "
                     "autodifferentiated Jacobian...")
@@ -1173,9 +1185,9 @@ class jacobian_eval(eval):
                                    out > -inf_cutoff),
                     np.isfinite(out)))
                 assert not np.any(np.logical_or(
-                        np.logical_or(ans[good_locs] <= -inf_cutoff,
-                                      ans[good_locs] >= inf_cutoff),
-                        ~np.isfinite(ans[good_locs]))), (
+                    np.logical_or(ans[good_locs] <= -inf_cutoff,
+                                  ans[good_locs] >= inf_cutoff),
+                    ~np.isfinite(ans[good_locs]))), (
                     "Infinite (or effectively infinite) values found in "
                     "autodifferentiated Jacobian in locations non-considered "
                     "infinite in pyJac...")
@@ -1194,7 +1206,8 @@ class jacobian_eval(eval):
             # regular frobenieus norm, have to filter out zero entries for our
             # norm here
             non_zero = np.where(denom > 0)
-            __update_key('jac', np.linalg.norm(err[non_zero] / denom[non_zero]))
+            __update_key('jac', np.linalg.norm(
+                err[non_zero] / denom[non_zero]))
             del non_zero
             zero = np.where(denom == 0)
             __update_key('jac_zero', np.linalg.norm(err[zero]))
@@ -1209,8 +1222,10 @@ class jacobian_eval(eval):
             amax = np.argmax(thresholded_err)
             __update_key('jac_thresholded_20', np.linalg.norm(thresholded_err))
             del thresholded_err
-            __update_key('jac_thresholded_20_PJ_amax', out[locs][amax], op='max')
-            __update_key('jac_thresholded_20_AD_amax', denom[locs][amax], op='max')
+            __update_key('jac_thresholded_20_PJ_amax',
+                         out[locs][amax], op='max')
+            __update_key('jac_thresholded_20_AD_amax',
+                         denom[locs][amax], op='max')
             del locs
 
             locs = np.where(out > threshold / 1.e15)
@@ -1218,15 +1233,18 @@ class jacobian_eval(eval):
             amax = np.argmax(thresholded_err)
             __update_key('jac_thresholded_15', np.linalg.norm(thresholded_err))
             del thresholded_err
-            __update_key('jac_thresholded_15_PJ_amax', out[locs][amax], op='max')
-            __update_key('jac_thresholded_15_AD_amax', denom[locs][amax], op='max')
+            __update_key('jac_thresholded_15_PJ_amax',
+                         out[locs][amax], op='max')
+            __update_key('jac_thresholded_15_AD_amax',
+                         denom[locs][amax], op='max')
 
             # largest relative errors for different absolute toleratnces
             denom = self.rtol * denom
             for mul in [1, 10, 100, 1000]:
                 atol = self.atol * mul
                 err_weighted = err / (atol + denom)
-                amax = np.unravel_index(np.argmax(err_weighted), err_weighted.shape)
+                amax = np.unravel_index(
+                    np.argmax(err_weighted), err_weighted.shape)
                 __update_key('jac_weighted_{}'.format(atol), np.linalg.norm(
                              err_weighted))
                 del err_weighted
@@ -1278,7 +1296,8 @@ class jacobian_eval(eval):
             # check that we have all expected keys, and there is no nan's, etc.
             allclear = allclear and self._check_file(err, names, mods)
             # check that we have the weighted jacobian error
-            names = ['jac_weighted_' + x for x in ['0.01', '0.1', '1.0', '10.0']]
+            names = ['jac_weighted_' +
+                     x for x in ['0.01', '0.1', '1.0', '10.0']]
             mods = ['', '_PJ_amax', '_AD_amax']
             allclear = allclear and self._check_file(err, names, mods)
             # check for max / threshold value
@@ -1306,7 +1325,7 @@ class jacobian_eval(eval):
 @nottest
 def species_rate_tester(work_dir='error_checking', test_matrix=None, prefix=''):
     """Runs validation testing on pyJac's species_rate kernel, reading a series
-    of mechanisms and datafiles from the :param:`work_dir`, and outputting
+    of mechanisms and datafiles from the `work_dir`, and outputting
     a numpy zip file (.npz) with the error of various outputs (rhs vector, ROP, etc.)
     as compared to Cantera, for each configuration tested.
 
@@ -1330,7 +1349,7 @@ def species_rate_tester(work_dir='error_checking', test_matrix=None, prefix=''):
         # and let the tester know we can pull default opencl values if not found
         raise_on_missing = False
 
-    valid = validation_runner(spec_rate_eval, KernelType.species_rates)
+    valid = ValidationRunner(spec_rate_eval, KernelType.species_rates)
     _run_mechanism_tests(work_dir, test_matrix, prefix, valid,
                          raise_on_missing=raise_on_missing)
 
@@ -1338,7 +1357,7 @@ def species_rate_tester(work_dir='error_checking', test_matrix=None, prefix=''):
 @nottest
 def jacobian_tester(work_dir='error_checking', test_matrix=None, prefix=''):
     """Runs validation testing on pyJac's jacobian kernel, reading a series
-    of mechanisms and datafiles from the :param:`work_dir`, and outputting
+    of mechanisms and datafiles from the `work_dir`, and outputting
     a numpy zip file (.npz) with the error of Jacobian as compared to a
     autodifferentiated reference answer, for each configuration tested.
 
@@ -1362,6 +1381,6 @@ def jacobian_tester(work_dir='error_checking', test_matrix=None, prefix=''):
         # and let the tester know we can pull default opencl values if not found
         raise_on_missing = False
 
-    valid = validation_runner(jacobian_eval, KernelType.jacobian)
+    valid = ValidationRunner(jacobian_eval, KernelType.jacobian)
     _run_mechanism_tests(work_dir, test_matrix, prefix, valid,
                          raise_on_missing=raise_on_missing)

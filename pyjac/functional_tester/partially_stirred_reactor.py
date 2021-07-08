@@ -23,7 +23,6 @@ except ImportError:
     raise
 try:
     import cantera as ct
-    from cantera import ck2cti
 except ImportError:
     print('Error: Cantera must be installed.')
     raise
@@ -41,6 +40,7 @@ except ImportError:
     print('Warning: multiprocessing not installed')
     parallel = False
 
+
 class Stream(object):
     """Class for inlet flow stream into reactor.
     """
@@ -50,7 +50,7 @@ class Stream(object):
 
         Parameters
         ----------
-        gas : `cantera.Solution`
+        gas : :class:`cantera.Solution`
             Constant thermochemical state of this stream.
         flow : float
             Flow rate of this stream.
@@ -86,14 +86,14 @@ class Particle(object):
     """Class for particle in reactor.
     """
 
-    particle_mass = 0.1 #kg
+    particle_mass = 0.1  # kg
 
     def __init__(self, gas):
         """Initialize particle object with thermochemical state.
 
         Parameters
         ----------
-        gas : `cantera.Solution`
+        gas : :class:`cantera.Solution`
             Initial thermochemical state of particle
 
         Returns
@@ -119,13 +119,13 @@ class Particle(object):
         if comp is not None:
             if isinstance(comp, Particle):
                 h = comp.gas.enthalpy_mass
-                Y = comp.gas.Y
+                mass_frac = comp.gas.Y
             elif isinstance(comp, np.ndarray):
                 h = comp[0]
-                Y = comp[1:]
+                mass_frac = comp[1:]
             else:
                 return NotImplemented
-            self.gas.HPY = h, self.gas.P, Y
+            self.gas.HPY = h, self.gas.P, mass_frac
         else:
             return np.hstack((self.gas.enthalpy_mass, self.gas.Y))
 
@@ -134,27 +134,27 @@ class Particle(object):
 
         Parameters
         ----------
-        other : `Particle`, `numpy.array`, `int`, `float`
+        other : `Particle`, :class:`numpy.ndarray`, `int`, `float`
             Thermochemical state (enthalpy + mass fractions) to add to current state.
 
         Returns
         -------
-        comp : numpy.array
+        comp : :class:`numpy.ndarray`
             Thermochemical composition of particle (enthalpy + mass fractions).
 
         """
         if isinstance(other, Particle):
             h = self.gas.enthalpy_mass + other.gas.enthalpy_mass
-            Y = self.gas.Y + other.gas.Y
-            return np.hstack((h, Y))
+            mass_frac = self.gas.Y + other.gas.Y
+            return np.hstack((h, mass_frac))
         elif isinstance(other, np.ndarray):
             h = self.gas.enthalpy_mass + other[0]
-            Y = self.gas.Y + other[1:]
-            return np.hstack((h, Y))
+            mass_frac = self.gas.Y + other[1:]
+            return np.hstack((h, mass_frac))
         elif isinstance(other, (int, float)):
             h = self.gas.enthalpy_mass + other
-            Y = self.gas.Y + other
-            return np.hstack((h, Y))
+            mass_frac = self.gas.Y + other
+            return np.hstack((h, mass_frac))
         else:
             return NotImplemented
 
@@ -163,7 +163,7 @@ class Particle(object):
 
         Parameters
         ----------
-        other : `Particle`, `numpy.array`, `int`, `float`
+        other : `Particle`, :class:`numpy.ndarray`, `int`, `float`
             Thermochemical state (enthalpy + mass fractions) to add to current state.
 
         Returns
@@ -192,8 +192,9 @@ class Particle(object):
 
         Parameters
         ----------
-        other : `Particle`, `numpy.array`, `int`, `float`
-            Thermochemical state (enthalpy + mass fractions) to subtract from current state.
+        other : `Particle`, :class:`numpy.ndarray`, `int`, `float`
+            Thermochemical state (enthalpy + mass fractions) to subtract from
+            current state.
 
         Returns
         -------
@@ -203,16 +204,16 @@ class Particle(object):
         """
         if isinstance(other, Particle):
             h = self.gas.enthalpy_mass - other.gas.enthalpy_mass
-            Y = self.gas.Y - other.gas.Y
-            return np.hstack((h, Y))
+            mass_frac = self.gas.Y - other.gas.Y
+            return np.hstack((h, mass_frac))
         elif isinstance(other, np.ndarray):
             h = self.gas.enthalpy_mass - other[0]
-            Y = self.gas.Y - other[1:]
-            return np.hstack((h, Y))
+            mass_frac = self.gas.Y - other[1:]
+            return np.hstack((h, mass_frac))
         elif isinstance(other, (int, float)):
             h = self.gas.enthalpy_mass - other
-            Y = self.gas.Y - other
-            return np.hstack((h, Y))
+            mass_frac = self.gas.Y - other
+            return np.hstack((h, mass_frac))
         else:
             return NotImplemented
 
@@ -221,7 +222,7 @@ class Particle(object):
 
         Parameters
         ----------
-        other : `Particle`, `numpy.array`, `int`, `float`
+        other : `Particle`, :class:`numpy.ndarray`, `int`, `float`
             Thermochemical state from which to subract Particle state.
 
         Returns
@@ -288,7 +289,7 @@ class Particle(object):
 
         Parameters
         ----------
-        other : `Particle`, `numpy.array`, `int`, `float`
+        other : `Particle`, :class:`numpy.ndarray`, `int`, `float`
             Thermochemical state (enthalpy + mass fractions) to add to current state.
 
         Returns
@@ -316,8 +317,9 @@ class Particle(object):
 
         Parameters
         ----------
-        other : `Particle`, `numpy.array`, `int`, `float`
-            Thermochemical state (enthalpy + mass fractions) to subtract from current state.
+        other : `Particle`, :class:`numpy.ndarray`, `int`, `float`
+            Thermochemical state (enthalpy + mass fractions) to subtract from
+            current state.
 
         Returns
         -------
@@ -327,16 +329,16 @@ class Particle(object):
         """
         if isinstance(other, Particle):
             h = self.gas.enthalpy_mass - other.gas.enthalpy_mass
-            Y = self.gas.Y - other.gas.Y
+            mass_frac = self.gas.Y - other.gas.Y
         elif isinstance(other, np.ndarray):
             h = self.gas.enthalpy_mass - other[0]
-            Y = self.gas.Y - other[1:]
+            mass_frac = self.gas.Y - other[1:]
         elif isinstance(other, (int, float)):
             h = self.gas.enthalpy_mass - other
-            Y = self.gas.Y - other
+            mass_frac = self.gas.Y - other
         else:
             return NotImplemented
-        self.gas.HPY = h, self.gas.P, Y
+        self.gas.HPY = h, self.gas.P, mass_frac
         return self
 
     def __imul__(self, other):
@@ -374,8 +376,8 @@ class Particle(object):
         None
 
         """
-        reac = ct.IdealGasConstPressureReactor(self.gas,
-            volume=Particle.particle_mass/self.gas.density)
+        reac = ct.IdealGasConstPressureReactor(
+            self.gas, volume=Particle.particle_mass / self.gas.density)
         netw = ct.ReactorNet([reac])
         netw.advance(netw.time + dt)
 
@@ -436,7 +438,7 @@ def equivalence_ratio(gas, eq_ratio, fuel, oxidizer, complete_products):
     num_H_cprod = sum(list(cprod_elems.get('H', {0: 0}).values()))
     num_O_cprod = sum(list(cprod_elems.get('O', {0: 0}).values()))
 
-    oxid_state = 4*num_C_cprod + num_H_cprod - 2*num_O_cprod
+    oxid_state = 4 * num_C_cprod + num_H_cprod - 2 * num_O_cprod
     if oxid_state != 0:
         print('Warning: One or more products of incomplete combustion '
               'were specified.')
@@ -467,11 +469,8 @@ def equivalence_ratio(gas, eq_ratio, fuel, oxidizer, complete_products):
         if ((sum(list(cprod_elems[el].values())) > 0 and
              fuel_elems[el] == 0 and
              oxid_elems[el] == 0
-             ) or
-            (sum(list(cprod_elems[el].values())) == 0 and
-             (fuel_elems[el] > 0 or oxid_elems[el] > 0)
-             )
-            ):
+             ) or (sum(list(cprod_elems[el].values())) == 0 and
+                   (fuel_elems[el] > 0 or oxid_elems[el] > 0))):
             print('Error: Must specify all elements in the fuel + oxidizer '
                   'in the complete products and vice-versa')
             sys.exit(1)
@@ -481,7 +480,7 @@ def equivalence_ratio(gas, eq_ratio, fuel, oxidizer, complete_products):
     if num_C_cprod > 0:
         spec = cprod_elems['C'].keys()
         ox = sum([cprod_elems['O'][sp]
-                 for sp in spec if cprod_elems['C'][sp] > 0]
+                  for sp in spec if cprod_elems['C'][sp] > 0]
                  )
         C_multiplier = ox / num_C_cprod
     else:
@@ -490,7 +489,7 @@ def equivalence_ratio(gas, eq_ratio, fuel, oxidizer, complete_products):
     if num_H_cprod > 0:
         spec = cprod_elems['H'].keys()
         ox = sum([cprod_elems['O'][sp]
-                 for sp in spec if cprod_elems['H'][sp] > 0]
+                  for sp in spec if cprod_elems['H'][sp] > 0]
                  )
         H_multiplier = ox / num_H_cprod
     else:
@@ -511,12 +510,12 @@ def equivalence_ratio(gas, eq_ratio, fuel, oxidizer, complete_products):
     # given that a certain portion of the mixture will have been taken
     # up by the additional species, if any.
     for species, ox_amt in oxidizer.items():
-        molefrac = ox_amt * O_mult/total_reactant_moles
+        molefrac = ox_amt * O_mult / total_reactant_moles
         add_spec = ':'.join([species, str(molefrac)])
         reactants = ','.join([reactants, add_spec])
 
     for species, fuel_amt in fuel.items():
-        molefrac = fuel_amt*eq_ratio/total_reactant_moles
+        molefrac = fuel_amt * eq_ratio / total_reactant_moles
         add_spec = ':'.join([species, str(molefrac)])
         reactants = ','.join([reactants, add_spec])
 
@@ -582,17 +581,18 @@ def reaction_worker(part_tup):
     Parameters
     ----------
     part_tup : tuple
-        Tuple with mechanism file, temperature, pressure, mass fractions, and time step.
+        Tuple with mechanism file, temperature, pressure, mass fractions, and
+        time step.
 
     Returns
     -------
-    p : `numpy.array`
+    p : :class:`numpy.ndarray`
         Thermochemical composition of particle following reaction.
 
     """
     mech, T, P, Y, dt = part_tup
     gas = ct.Solution(mech)
-    gas.TPY = T,P,Y
+    gas.TPY = T, P, Y
     p = Particle(gas)
     p.react(dt)
     return p()
@@ -622,7 +622,7 @@ def reaction_substep(particles, dt, mech):
         pool = multiprocessing.Pool()
         jobs = []
 
-        #set up a new particle runner for each
+        # set up a new particle runner for each
         for p in particles:
             jobs.append([mech, p.gas.T, p.gas.P, p.gas.Y, dt])
         jobs = tuple(jobs)
@@ -630,8 +630,8 @@ def reaction_substep(particles, dt, mech):
 
         pool.close()
         pool.join()
-        #and finally update the states of our particles on the main
-        #thread
+        # and finally update the states of our particles on the main
+        # thread
         for i, p in enumerate(particles):
             p(comp=results[i])
 
@@ -723,7 +723,7 @@ def save_data(idx, time, particles, data):
         Current time [s].
     particles : list of `Particle`
         List of `Particle` objects.
-    data : `numpy.ndarray`
+    data : :class:`numpy.ndarray`
         ndarray of particle data for all timesteps.
 
     Returns
@@ -743,9 +743,9 @@ def save_data(idx, time, particles, data):
 
 
 def run_simulation(mech, case, init_temp, pres, eq_ratio, fuel, oxidizer,
-                   complete_products=['CO2','H2O','N2'],
-                   num_part=100, tau_res=(10./1000.), tau_mix=(1./1000.),
-                   tau_pair=(1./1000.), num_res=10
+                   complete_products=['CO2', 'H2O', 'N2'],
+                   num_part=100, tau_res=(10. / 1000.), tau_mix=(1. / 1000.),
+                   tau_pair=(1. / 1000.), num_res=10
                    ):
     """Perform partially stirred reactor (PaSR) simulation.
 
@@ -811,10 +811,10 @@ def run_simulation(mech, case, init_temp, pres, eq_ratio, fuel, oxidizer,
     # Inlet streams
     if case.lower() == 'premixed':
         # Premixed
-        flow_rates = dict(fuel_air = 0.95, pilot = 0.05)
+        flow_rates = dict(fuel_air=0.95, pilot=0.05)
     elif case.lower() == 'non-premixed':
         # Non-premixed
-        flow_rates = dict(air = 0.85, fuel = 0.05, pilot = 0.1)
+        flow_rates = dict(air=0.85, fuel=0.05, pilot=0.1)
     else:
         print('Error: case needs to be either premixed or non-premixed.')
         sys.exit(1)
@@ -879,16 +879,16 @@ def run_simulation(mech, case, init_temp, pres, eq_ratio, fuel, oxidizer,
 
     print('Time [ms]  Temperature [K]')
     temp_mean[i_step] = np.mean([p.gas.T for p in particles])
-    print('{:6.2f}  {:9.1f}'.format(time*1000., temp_mean[i_step]))
+    print('{:6.2f}  {:9.1f}'.format(time * 1000., temp_mean[i_step]))
 
     while time < time_end:
         if i_step + 1 >= num_steps:
-            #need to resize arrays
+            # need to resize arrays
             times = np.hstack((times, np.zeros(num_steps + 1)))
             temp_mean = np.hstack((temp_mean, np.zeros(num_steps + 1)))
-            particle_data = np.concatenate((particle_data,
-                np.empty([num_steps + 1, num_part, gas.n_species + 3])),
-                axis=0)
+            particle_data = np.concatenate((
+                particle_data, np.empty([
+                    num_steps + 1, num_part, gas.n_species + 3])), axis=0)
             num_steps *= 2
 
         if (time + dt_max) > time_end:
@@ -908,7 +908,7 @@ def run_simulation(mech, case, init_temp, pres, eq_ratio, fuel, oxidizer,
         # Set alternate particles to inflow properties
         for i in range(npart_out):
             i_str = inflow(inlet_streams)
-            particles[1 - 2 * (i+1)](inlet_streams[i_str]())
+            particles[1 - 2 * (i + 1)](inlet_streams[i_str]())
 
         # Now perform pairing
         part_pair += 0.5 * num_part * dt / tau_pair
@@ -918,9 +918,9 @@ def run_simulation(mech, case, init_temp, pres, eq_ratio, fuel, oxidizer,
 
         # Rotate particles
         temp_comp = particles[-1]()
-        for i in [i*2 + 1 for i in range(num_pairs - 1)]:
-            #particles[-i] = particles[-(i+2)]
-            particles[-i](particles[-(i+2)])
+        for i in [i * 2 + 1 for i in range(num_pairs - 1)]:
+            # particles[-i] = particles[-(i+2)]
+            particles[-i](particles[-(i + 2)])
         particles[-(num_pairs * 2 - 1)](temp_comp)
 
         # Now loop over mix-react substeps
@@ -939,7 +939,7 @@ def run_simulation(mech, case, init_temp, pres, eq_ratio, fuel, oxidizer,
         # Save full data
         save_data(i_step, time, particles, particle_data)
 
-        print('{:6.2f}  {:9.1f}'.format(time*1000., temp_mean[i_step]))
+        print('{:6.2f}  {:9.1f}'.format(time * 1000., temp_mean[i_step]))
 
     times = times[:i_step + 1]
     temp_mean = temp_mean[:i_step + 1]
@@ -967,7 +967,7 @@ def parse_input_file(input_file):
         pars = yaml.load(f)
 
     case = pars.get('case', None)
-    if not case in ['premixed', 'non-premixed']:
+    if case not in ['premixed', 'non-premixed']:
         print('Error: case needs to be one of '
               '"premixed" or "non-premixed".')
         sys.exit(1)
@@ -1043,5 +1043,5 @@ if __name__ == "__main__":
         inputs['complete products'], inputs['number of particles'],
         inputs['residence time'], inputs['mixing time'],
         inputs['pairing time'], inputs['number of residence times']
-        )
+    )
     np.save(args.output, particle_data)

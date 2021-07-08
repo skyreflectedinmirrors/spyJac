@@ -76,9 +76,8 @@ def test_stride_limiter(dtype):
                               {0} B
                            global:
                               {0} B
-                       """.format(
-                        str(np.iinfo(dtype).max * dtype().itemsize),
-                        str(np.iinfo(dtype).max * dtype().itemsize)))
+                       """.format(str(np.iinfo(dtype).max * dtype().itemsize),
+                                  str(np.iinfo(dtype).max * dtype().itemsize)))
             temp.seek(0)
             limits = memory_limits.get_limits(
                 opt, {memory_type.m_global: [ary]}, temp.name,

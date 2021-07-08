@@ -60,8 +60,8 @@ def inputs_and_outputs(conp, ktype=KernelType.species_rates, output_full_rop=Fal
         output_args = utils.kernel_argument_ordering(
             [arc.enthalpy_array, arc.constant_pressure_specific_heat,
              arc.rate_const_thermo_coeff_array] if conp else [
-             arc.internal_energy_array, arc.constant_volume_specific_heat,
-             arc.rate_const_thermo_coeff_array], ktype)
+                arc.internal_energy_array, arc.constant_volume_specific_heat,
+                arc.rate_const_thermo_coeff_array], ktype)
     else:
         raise NotImplementedError()
 
@@ -77,11 +77,11 @@ def assign_rates(reacs, specs, rate_spec):
 
     Parameters
     ----------
-    reacs : list of `ReacInfo`
+    reacs : list of :class:`ReacInfo`
         The reactions in the mechanism
-    specs : list of `SpecInfo`
+    specs : list of :class:`SpecInfo`
         The species in the mechanism
-    rate_spec : `RateSpecialization` enum
+    rate_spec : :class:`RateSpecialization` enum
         The specialization option specified
 
     Notes
@@ -89,23 +89,24 @@ def assign_rates(reacs, specs, rate_spec):
 
     For simple Arrhenius evaluations, the rate type keys are:
 
-    if rate_spec == RateSpecialization.full
+    if rate_spec == RateSpecialization.full::
         0 -> kf = A
         1 -> kf = A * T * T * T ...
         2 -> kf = exp(logA + b * logT)
         3 -> kf = exp(logA - Ta / T)
         4 -> kf = exp(logA + b * logT - Ta / T)
 
-    if rate_spec = RateSpecialization.hybrid
+    if rate_spec = RateSpecialization.hybrid::
         0 -> kf = A
         1 -> kf = A * T * T * T ...
         2 -> kf = exp(logA + b * logT - Ta / T)
 
-    if rate_spec == RateSpecialization.fixed
+    if rate_spec == RateSpecialization.fixed::
         0 -> kf = exp(logA + b * logT - Ta / T)
 
-    Note that the reactions in 'fall', 'chem' and 'thd' are also in
-            'simple'
+    .. note::
+        The reactions in 'fall', 'chem' and 'thd' are also in 'simple'.
+
         Further, there are duplicates between 'thd' and 'fall' / 'chem'
 
     Returns
@@ -658,7 +659,8 @@ def get_concentrations(loopy_opts, namestore, conp=True,
 
     precompute = ic.PrecomputedInstructions(loopy_opts)
     V_inv = 'V_inv'
-    V_inv_insn = precompute(V_inv, V_str, 'INV', guard=ic.VolumeGuard(loopy_opts))
+    V_inv_insn = precompute(V_inv, V_str, 'INV',
+                            guard=ic.VolumeGuard(loopy_opts))
     T_val = 'T_val'
     T_val_insn = precompute(T_val, T_str, 'VAL', guard=ic.TemperatureGuard(
         loopy_opts))
@@ -708,9 +710,9 @@ def get_concentrations(loopy_opts, namestore, conp=True,
 
 def get_molar_rates(loopy_opts, namestore, conp=True,
                     test_size=None):
-    """Generates instructions, kernel arguements, and data for the
-       molar derivatives
-    kernel
+    """
+    Generates instructions, kernel arguements, and data for the
+    molar derivatives.
 
     Parameters
     ----------
@@ -797,10 +799,10 @@ def get_molar_rates(loopy_opts, namestore, conp=True,
 
 def get_extra_var_rates(loopy_opts, namestore, conp=True,
                         test_size=None):
-    """Generates instructions, kernel arguements, and data for the
-       derivative of the "extra" variable -- P or V depending on conV/conP
-       assumption respectively
-    kernel
+    """
+    Generates instructions, kernel arguements, and data for the
+    derivative of the "extra" variable -- P or V depending on conV/conP
+    assumption respectively
 
     Parameters
     ----------
@@ -861,11 +863,12 @@ def get_extra_var_rates(loopy_opts, namestore, conp=True,
     precompute = ic.PrecomputedInstructions(loopy_opts)
     T_val = 'T'
     pre.append(precompute(T_val, T_str, 'VAL', guard=ic.TemperatureGuard(
-            loopy_opts)))
+        loopy_opts)))
 
     if conp:
         V_val = 'V_val'
-        pre.append(precompute(V_val, V_str, 'VAL', guard=ic.VolumeGuard(loopy_opts)))
+        pre.append(precompute(V_val, V_str, 'VAL',
+                              guard=ic.VolumeGuard(loopy_opts)))
         pre_instructions = [
             Template('${Edot_str} = ${V_val} * ${Tdot_str} / ${T_val} \
                      {id=init, dep=precompute*}').safe_substitute(
@@ -962,9 +965,9 @@ def get_extra_var_rates(loopy_opts, namestore, conp=True,
 
 def get_temperature_rate(loopy_opts, namestore, conp=True,
                          test_size=None):
-    """Generates instructions, kernel arguements, and data for the
-       temperature derivative
-    kernel
+    """
+    Generates instructions, kernel arguements, and data for the
+    temperature derivative.
 
     Parameters
     ----------
@@ -1078,9 +1081,9 @@ def get_temperature_rate(loopy_opts, namestore, conp=True,
 
 def get_spec_rates(loopy_opts, namestore, conp=True,
                    test_size=None):
-    """Generates instructions, kernel arguements, and data for the
-       temperature derivative
-    kernel
+    """
+    Generates instructions, kernel arguements, and data for the
+    temperature derivative.
 
     Parameters
     ----------
@@ -1197,10 +1200,12 @@ def get_rop_net(loopy_opts, namestore, test_size=None):
     separated_kernels = loopy_opts.rop_net_kernels
     if separated_kernels:
         kernel_data['rev'] = []
-        maps['rev'] = arc.MapStore(loopy_opts, namestore.num_rev_reacs, test_size)
+        maps['rev'] = arc.MapStore(
+            loopy_opts, namestore.num_rev_reacs, test_size)
         transforms['rev'] = namestore.rev_map
         kernel_data['pres_mod'] = []
-        maps['pres_mod'] = arc.MapStore(loopy_opts, namestore.num_thd, test_size)
+        maps['pres_mod'] = arc.MapStore(
+            loopy_opts, namestore.num_thd, test_size)
         transforms['pres_mod'] = namestore.thd_map
     else:
         transforms['rev'] = namestore.rev_mask
@@ -1364,7 +1369,7 @@ def get_rop_net(loopy_opts, namestore, test_size=None):
                                         kernel_data=kernel_data[kernel],
                                         mapstore=maps[kernel],
                                         silenced_warnings=['write_race(rop_net_{})'
-                                        .format(kernel)]))
+                                                           .format(kernel)]))
         return infos
 
 
@@ -2022,7 +2027,8 @@ def get_cheb_arrhenius_rates(loopy_opts, namestore, maxP, maxT,
                                           poly_compute_ind,
                                           affine=-2)
 
-    eguard = ic.GuardedExp(loopy_opts, exptype=utils.exp_10_fun[loopy_opts.lang])
+    eguard = ic.GuardedExp(
+        loopy_opts, exptype=utils.exp_10_fun[loopy_opts.lang])
     exp10fun = eguard('kf_temp')
 
     instructions = Template("""
@@ -2459,8 +2465,8 @@ def get_troe_kernel(loopy_opts, namestore, test_size=None):
 
     return [k_gen.knl_info('fall_troe',
                            pre_instructions=[
-                            precompute('T', T_str, 'VAL',
-                                       guard=ic.TemperatureGuard(loopy_opts))],
+                               precompute('T', T_str, 'VAL',
+                                          guard=ic.TemperatureGuard(loopy_opts))],
                            instructions=troe_instructions,
                            var_name=var_name,
                            kernel_data=kernel_data,
@@ -2537,12 +2543,14 @@ def get_sri_kernel(loopy_opts, namestore, test_size=None):
                                     is_vector=loopy_opts.is_simd)
     possible_int_power = ic.power_function(loopy_opts,
                                            is_integer_power=isinstance(
-                                            sri_e_lp.dtype, np.integer),
+                                               sri_e_lp.dtype, np.integer),
                                            is_vector=loopy_opts.is_simd)
     # guarded exponential
     expg = ic.GuardedExp(loopy_opts)
-    sri_b_exp = expg(Template('-${sri_b_str} * ${Tinv}').safe_substitute(**locals()))
-    sri_c_exp = expg(Template('-${Tval} / ${sri_c_str}').safe_substitute(**locals()))
+    sri_b_exp = expg(
+        Template('-${sri_b_str} * ${Tinv}').safe_substitute(**locals()))
+    sri_c_exp = expg(
+        Template('-${Tval} / ${sri_c_str}').safe_substitute(**locals()))
 
     # perform power evaluations
     sri_power_base = Template('(${sri_a_str} * ${sri_b_exp} + '
@@ -2802,7 +2810,7 @@ def get_simple_arrhenius_rates(loopy_opts, namestore, test_size=None,
         # get rate equations
         rate_eqn_pre = Template(
             "${A_str} + ${logT} * ${b_str} - ${Ta_str} * ${Tinv}"
-            ).safe_substitute(**locals())
+        ).safe_substitute(**locals())
         rate_eqn_pre_noTa = Template(
             "${A_str} + ${logT} * ${b_str}").safe_substitute(**locals())
         rate_eqn_pre_nobeta = Template(
@@ -2838,7 +2846,8 @@ def get_simple_arrhenius_rates(loopy_opts, namestore, test_size=None,
         # otherwise check type and return appropriate instructions with
         # array strings substituted in
         elif rtype == 0:
-            retv = kf_assign.safe_substitute(rate=A_str, deps=__deps(kf_assign))
+            retv = kf_assign.safe_substitute(
+                rate=A_str, deps=__deps(kf_assign))
         elif rtype == 1:
             power_func = ic.power_function(
                 loopy_opts, is_integer_power=True,
@@ -3307,11 +3316,13 @@ def polyfit_kernel_gen(nicename, loopy_opts, namestore, test_size=None):
     param_ind = 'dummy'
     loop_index = 'k'
     # create mapper
-    mapstore = arc.MapStore(loopy_opts, namestore.num_specs, test_size, loop_index)
+    mapstore = arc.MapStore(
+        loopy_opts, namestore.num_specs, test_size, loop_index)
 
     knl_data = []
     # add problem size
-    knl_data.extend(arc.initial_condition_dimension_vars(loopy_opts, test_size))
+    knl_data.extend(arc.initial_condition_dimension_vars(
+        loopy_opts, test_size))
 
     # get correctly ordered arrays / strings
     a_lo_lp, _ = mapstore.apply_maps(namestore.a_lo, loop_index, param_ind)

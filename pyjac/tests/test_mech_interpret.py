@@ -114,7 +114,7 @@ def test_mechanism_sorting():
                 # all matches
                 this_end = end
 
-            check(this_start, this_end, depth+1)
+            check(this_start, this_end, depth + 1)
 
     check()
 

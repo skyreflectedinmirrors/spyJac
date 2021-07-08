@@ -57,7 +57,7 @@ elem_wt = chem.get_elem_wt()
 
 def sort_reactions(reacs, sort_type, return_order=False):
     """
-    reacs : list of `ReacInfo`
+    reacs : list of :class:`ReacInfo`
         List of reactions in mechanism to be sorted.
     sort_type : :class:`enum_types.reaction_sorting`
         If not None, sort the reactions in this mechanism according to the supplied
@@ -120,9 +120,9 @@ def read_mech(mech_filename, therm_filename, sort_type=None):
     -------
     elems : list of str
         List of elements in mechanism.
-    specs : list of `SpecInfo`
+    specs : list of :class:`SpecInfo`
         List of species in mechanism.
-    reacs : list of `ReacInfo`
+    reacs : list of :class:`ReacInfo`
         List of reactions in mechanism.
     units : str
         Units of reactions' Arrhenius coefficients
@@ -822,7 +822,7 @@ def read_thermo(filename, elems, specs):
         Name of thermo database file.
     elems : list of str
         List of element names in mechanism.
-    specs : list of `SpecInfo`
+    specs : list of :class:`SpecInfo`
         List of species in mechanism.
 
     Returns
@@ -976,7 +976,7 @@ def read_mech_ct(filename=None, gas=None, sort_type=None):
     ----------
     filename : str
         Reaction mechanism filename (e.g. 'mech.cti'). Optional.
-    gas : `cantera.Solution` object
+    gas : :class:`cantera.Solution` object
         Existing Cantera Solution object to be used. Optional.
     sort_type : :class:`enum_types.reaction_sorting`
         If not None, sort the reactions in this mechanism according to the supplied
@@ -986,9 +986,9 @@ def read_mech_ct(filename=None, gas=None, sort_type=None):
     -------
     elems : list of str
         List of elements in mechanism.
-    specs : list of `SpecInfo`
+    specs : list of :class:`SpecInfo`
         List of species in mechanism.
-    reacs : list of `ReacInfo`
+    reacs : list of :class:`ReacInfo`
         List of reactions in mechanism.
     units : str
         Units of reactions' Arrhenius coefficients
@@ -1058,14 +1058,14 @@ def read_mech_ct(filename=None, gas=None, sort_type=None):
 
         Parameters
         ----------
-        reac : `ReacInfo`
+        reac : :class:`ReacInfo`
             The pyJac reaction to update
         ct_rxn : `Reaction` object
             Corresponding cantera reaction to pull the third bodies from
 
         Returns
         -------
-        updated_reac: `ReacInfo`
+        updated_reac: :class:`ReacInfo`
             The updated pyjac reaction with appropriate third body efficiencies
         """
 
@@ -1166,7 +1166,7 @@ def read_mech_ct(filename=None, gas=None, sort_type=None):
                     do_warn = True
                 if do_warn:
                     logging.warn('Troe parameters in reaction {} modified to avoid'
-                                    ' division by zero!.'.format(len(reacs)))
+                                 ' division by zero!.'.format(len(reacs)))
             elif rxn.falloff.type == 'SRI':
                 reac.sri = True
                 reac.sri_par = rxn.falloff.parameters.tolist()

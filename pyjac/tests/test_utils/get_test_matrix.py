@@ -35,8 +35,11 @@ def load_models(work_dir, matrix):
     Returns
     -------
     models : dict
-        A dictionary indicating which models are available for testing,
-        The structure is as follows:
+        A dictionary indicating which models are available for testing, as well
+        as the the limits on the number of conditions that can be evaluated for
+        this mechanism for various eval-types due to memory constraints.
+        The structure is as follows::
+
             mech_name : {'mech' : file path to the Cantera mechanism
                          'ns' : number of species in the mechanism
                          'limits' : {
@@ -44,10 +47,9 @@ def load_models(work_dir, matrix):
                                 'jacobian': {
                                     'sparse': XXX
                                     'full' : XXX}
-                                }
-                            A dictionary of limits on the number of conditions that
-                            can be evaluated for this mechanism for various
-                            eval-types due to memory constraints
+                                    }
+                        }
+
     """
 
     models = matrix[model_key]
@@ -82,7 +84,7 @@ def load_models(work_dir, matrix):
 
 def load_platforms(matrix, langs=get_test_langs(), raise_on_empty=False):
     """
-    Loads test platforms from the :param:`matrix` file, for the :param:`langs`
+    Loads test platforms from the `matrix` file, for the `langs`
 
     Parameters
     ----------
@@ -260,7 +262,7 @@ def load_tests(matrix, filename):
             try:
                 EnumType(KernelType)(ttype)
                 return KernelType
-            except:
+            except ArgumentTypeError:
                 EnumType(JacobianFormat)(ttype)
                 return JacobianFormat
 
@@ -270,9 +272,9 @@ def load_tests(matrix, filename):
         descriptors = [test['test-type'] + ' - ' + test['eval-type']]
         if test['eval-type'] == 'both':
             descriptors = [test['test-type'] + ' - ' + enum_to_string(
-                                KernelType.jacobian),
-                           test['test-type'] + ' - ' + enum_to_string(
-                                KernelType.species_rates)]
+                KernelType.jacobian),
+                test['test-type'] + ' - ' + enum_to_string(
+                KernelType.species_rates)]
         if set(descriptors) & dupes:
             raise DuplicateTestException(test['test-type'], test['eval-type'],
                                          filename)
@@ -317,7 +319,7 @@ def load_tests(matrix, filename):
                                     dupes[override], path + override)
 
         # overrides only need to be checked within a test
-        nesteddict = lambda: defaultdict(nesteddict)  # noqa
+        def nesteddict(): return defaultdict(nesteddict)  # noqa
         roverride_check(test, allowed_override_keys, nesteddict())
 
     return tests
@@ -414,21 +416,18 @@ def get_test_matrix(work_dir, test_type, test_matrix, for_validation,
         If determines which test type to load from the test matrix,
         validation or performance
     raise_on_missing: bool
-        Raise an exception of the specified :param:`test_matrix` file is not found
+        Raise an exception of the specified `test_matrix` file is not found
     langs: list of str
         The allowed languages, modifiable by the :envvar:`TEST_LANGS` or test_langs
         in :file:`test_setup.py`
     Returns
     -------
     mechanisms : dict
-        A dictionary indicating which mechanism are available for testing,
-        The structure is as follows:
-            mech_name : {'mech' : file path to the Cantera mechanism
-                         'ns' : number of species in the mechanism
-                         'limits' : {'full': XXX, 'sparse': XXX}}: a dictionary of
-                            limits on the number of conditions that can be evaluated
-                            for this mechanism (full & sparse jacobian respectively)
-                            due to memory constraints
+        A dictionary indicating which models are available for testing, as well
+        as the the limits on the number of conditions that can be evaluated for
+        this mechanism for various eval-types due to memory constraints.
+        See :func:`load_models` for the expected structure.
+
     params  : OrderedDict
         The parameters to put in an oploop
     max_vec_width : int
@@ -462,7 +461,7 @@ def get_test_matrix(work_dir, test_type, test_matrix, for_validation,
     if not tests:
         raise Exception('No tests found in matrix {} for {} test of {}, '
                         'exiting...'.format(matrix_name, valid_str, enum_to_string(
-                         test_type)))
+                            test_type)))
 
     # get defaults we haven't migrated to schema yet
     rate_spec = ['fixed', 'hybrid'] if test_type != KernelType.jacobian \
@@ -470,11 +469,11 @@ def get_test_matrix(work_dir, test_type, test_matrix, for_validation,
     sparse = ([enum_to_string(JacobianFormat.sparse),
                enum_to_string(JacobianFormat.full)]
               if test_type == KernelType.jacobian else [
-               enum_to_string(JacobianFormat.full)])
+        enum_to_string(JacobianFormat.full)])
     jac_types = [enum_to_string(JacobianType.exact),
                  enum_to_string(JacobianType.finite_difference)] if (
-                    test_type == KernelType.jacobian and not for_validation) else [
-                 enum_to_string(JacobianType.exact)]
+        test_type == KernelType.jacobian and not for_validation) else [
+        enum_to_string(JacobianType.exact)]
     rop_net_kernels = [False]
 
     # and default # of cores, this may be overriden
@@ -494,7 +493,8 @@ def get_test_matrix(work_dir, test_type, test_matrix, for_validation,
                      if plat['platform'] in test['platforms']]
             if len(plats) < len(platforms):
                 logger.debug('Platforms ({}) filtered out for test type: {}'.format(
-                    ', '.join([p['platform'] for p in platforms if p not in plats]),
+                    ', '.join([p['platform']
+                               for p in platforms if p not in plats]),
                     ' - '.join([test['test-type'], test['eval-type']])))
         if not len(plats):
             logger.warn('No platforms found for test {}, skipping...'.format(
@@ -529,14 +529,14 @@ def get_test_matrix(work_dir, test_type, test_matrix, for_validation,
                 def override_log(key, old, new):
                     logging.debug('Replacing {} for test type: {}. Old value:'
                                   ' ({}), New value: ({})'.format(
-                                    key,
-                                    stringify_args([
-                                        ttype, test['eval-type'],
-                                        jtype, stype],
-                                        joiner='.'),
-                                    stringify_args(listify(old)),
-                                    stringify_args(listify(new))
-                                    ))
+                                      key,
+                                      stringify_args([
+                                          ttype, test['eval-type'],
+                                          jtype, stype],
+                                          joiner='.'),
+                                      stringify_args(listify(old)),
+                                      stringify_args(listify(new))
+                                  ))
                 # copy defaults
                 icores = cores[:]
                 iorder = order[:]

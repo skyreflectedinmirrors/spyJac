@@ -77,14 +77,13 @@ def test_listify(value, expected):
 
 @parameterized([param(
     (1024, 4, 4), lambda y, z: y + z <= 4, [np.arange(4), np.arange(4)], (1, 2)),
-                param(
-    (1024, 6, 6), lambda x, y: (x + y) % 3 != 0, [np.arange(3), np.arange(6)],
-                    (1, 2)), param(
-    (1024, 10, 10), lambda x, y: x == 0, [np.array([0], kint_type), np.arange(6)],
-                    (1, 2)), param(
-    (1024, 10, 10), lambda x, y: (x & y) != 0, [np.arange(4, 10), np.arange(6)],
-                    (1, 2), tiling=False)
-    ])
+    param((1024, 6, 6),
+          lambda x, y: (x + y) % 3 != 0, [np.arange(3), np.arange(6)],
+          (1, 2)),
+    param((1024, 10, 10), lambda x, y: x == 0,
+          [np.array([0], kint_type), np.arange(6)], (1, 2)),
+    param((1024, 10, 10), lambda x, y: (x & y) != 0,
+          [np.arange(4, 10), np.arange(6)], (1, 2), tiling=False)])
 @skipif(csr_matrix is None, 'scipy missing')
 def test_dense_to_sparse_indicies(shape, sparse, mask, axes, tiling=True):
     for order in ['C', 'F']:
@@ -167,16 +166,15 @@ def opts_loop(langs=['opencl'],
          ('is_simd', [True, False] if simd else [False]),
          ('jac_format', [JacobianFormat.sparse, JacobianFormat.full] if sparse else
                         [JacobianFormat.full])]),
-         skip_deep_simd=True)
+        skip_deep_simd=True)
 
 
-@parameterized([param(
-    (1024, 4, 4), [np.arange(4), np.arange(4)], (1, 2)),
-                param(
-    (1024, 6, 6), [np.arange(3), np.arange(6)], (1, 2)), param(
-    (1024, 10, 10), [np.array([0], kint_type), np.arange(6)], (1, 2)), param(
-    (1024, 10, 10), [np.arange(4, 10), np.arange(6)], (1, 2), tiling=False)
-    ])
+@parameterized([param((1024, 4, 4), [np.arange(4), np.arange(4)], (1, 2)),
+                param((1024, 6, 6), [np.arange(3), np.arange(6)], (1, 2)),
+                param((1024, 10, 10), [np.array([0], kint_type), np.arange(6)],
+                      (1, 2)),
+                param((1024, 10, 10), [np.arange(4, 10), np.arange(6)], (1, 2),
+                      tiling=False)])
 def test_select_elements(shape, mask, axes, tiling=True):
     # create array
     arr = np.arange(1, np.prod(shape) + 1).reshape(shape)

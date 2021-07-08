@@ -4,9 +4,14 @@ pyjac.libgen package
 Submodules
 ----------
 
-.. toctree::
+pyjac.libgen.libgen module
+--------------------------
 
-   pyjac.libgen.libgen
+.. automodule:: pyjac.libgen.libgen
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

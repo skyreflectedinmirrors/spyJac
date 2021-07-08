@@ -89,11 +89,11 @@ class FakeCall(object):
 
     def match(self, kernel, kernel_body):
         """
-        Return true IFF :param:`kernel` matches :attr:`replace_in`
+        Return true IFF `kernel` matches :attr:`replace_in`
 
-        Params
-        ------
-        kernel: class:`loopy.LoopKernel`
+        Parameters
+        ----------
+        kernel: :class:`loopy.LoopKernel`
             The kernel to test
         kernel_body: str
             The generated kernel body
@@ -136,7 +136,7 @@ def make_kernel_generator(loopy_opts, *args, **kwargs):
     """
     Factory generator method to return the appropriate
     :class:`kernel_generator` type based on the target language in the
-    :param:`loopy_opts`
+    `loopy_opts`
 
     Parameters
     ----------
@@ -357,7 +357,7 @@ class DocumentingRecord(object):
 
     def get_docs(self, arg):
         """
-        Returns the :attr:`docs` matching this :param:`arg`'s :attr:`name`,
+        Returns the :attr:`docs` matching this `arg`'s :attr:`name`,
         if available, or else a default place-holder string.
 
         Parameters
@@ -761,7 +761,7 @@ class kernel_generator(object):
     @property
     def name(self):
         """
-        Return the name of this kernel generator, based on :attr:`kernel_type
+        Return the name of this kernel generator, based on :attr:`kernel_type`
         """
 
         if self.kernel_type == KernelType.dummy:
@@ -924,17 +924,16 @@ class kernel_generator(object):
             inames[-1] = (gind, lind)
             domains[-1] = ('0 <= {lind} < {vw} and '
                            '0 <= {gind} < {end}'.format(
-                            lind=lind, gind=gind, end=test_size,
-                            vw=self.vec_width))
+                               lind=lind, gind=gind, end=test_size,
+                               vw=self.vec_width))
 
         return inames, domains
 
     def add_depencencies(self, k_gens):
         """
-        Adds the supplied :class:`kernel_generator`s to this
-        one's dependency list.  Functionally this means that this kernel
-        generator will know how to compile and execute functions
-        from the dependencies
+        Adds the supplied :class:`kernel_generator` to this one's dependency list.
+        Functionally this means that this kernel generator will know how to compile
+        and execute functions from the dependencies.
 
         Parameters
         ----------
@@ -946,7 +945,7 @@ class kernel_generator(object):
 
     def _with_target(self, kernel_arg, for_atomic=False):
         """
-        Returns a copy of :param:`kernel_arg` with it's :attr:`dtype.target` set
+        Returns a copy of `kernel_arg` with it's :attr:`dtype.target` set
         for proper pickling
 
         Parameters
@@ -1143,8 +1142,8 @@ class kernel_generator(object):
             # cogify
             try:
                 Cog().callableMain([
-                            'cogapp', '-e', '-d', '-Dreadgen={}'.format(readout),
-                            '-o', output, input])
+                    'cogapp', '-e', '-d', '-Dreadgen={}'.format(readout),
+                    '-o', output, input])
             except Exception:
                 logger = logging.getLogger(__name__)
                 logger.error('Error generating initial conditions reader:'
@@ -1190,13 +1189,13 @@ class kernel_generator(object):
 
         infile = os.path.join(script_dir, 'common', 'kernel.hpp.in')
         filename = os.path.join(path, self.name + '_main' + utils.header_ext[
-                self.lang])
+            self.lang])
 
         # cogify
         try:
             Cog().callableMain([
-                        'cogapp', '-e', '-d', '-Dcallgen={}'.format(callout),
-                        '-o', filename, infile])
+                'cogapp', '-e', '-d', '-Dcallgen={}'.format(callout),
+                '-o', filename, infile])
         except Exception:
             logger = logging.getLogger(__name__)
             logger.error('Error generating calling header {}'.format(filename))
@@ -1291,13 +1290,13 @@ class kernel_generator(object):
 
         infile = os.path.join(script_dir, 'common', 'kernel.cpp.in')
         filename = os.path.join(path, self.name + '_main' + utils.file_ext[
-                self.lang])
+            self.lang])
 
         # cogify
         try:
             Cog().callableMain([
-                        'cogapp', '-e', '-d', '-Dcallgen={}'.format(callout),
-                        '-o', filename, infile])
+                'cogapp', '-e', '-d', '-Dcallgen={}'.format(callout),
+                '-o', filename, infile])
         except Exception:
             logger = logging.getLogger(__name__)
             logger.error('Error generating calling file {}'.format(filename))
@@ -1329,7 +1328,7 @@ class kernel_generator(object):
     def _temporary_to_arg(cls, temp):
         """
         Returns the :class:`loopy.ArrayArg` version of the
-        :class:`loopy.TemporaryVariable` :param:`temp`
+        :class:`loopy.TemporaryVariable` `temp`
         """
 
         assert isinstance(temp, lp.TemporaryVariable)
@@ -1340,8 +1339,8 @@ class kernel_generator(object):
 
     def _migrate_locals(self, kernel, ldecls):
         """
-        Migrates local variables in :param:`ldecls` to the arguements of the
-        given :param:`kernel`
+        Migrates local variables in `ldecls` to the arguements of the
+        given `kernel`
 
         Parameters
         ----------
@@ -1413,10 +1412,10 @@ class kernel_generator(object):
 
     def _get_kernel_call(self, knl=None, passed_locals=[]):
         """
-        Returns a function call for the given kernel :param:`knl` to be used
+        Returns a function call for the given kernel `knl` to be used
         as an instruction.
 
-        If :param:`knl` is None, returns the kernel call for
+        If `knl` is None, returns the kernel call for
         this :class:`kernel_generator`
 
         Parameters
@@ -1457,13 +1456,13 @@ class kernel_generator(object):
         return Template("${name}(${args});\n").substitute(
             name=name,
             args=', '.join(args)
-            )
+        )
 
     def _compare_args(self, arg1, arg2, allow_shape_mismatch=False):
         """
         Convenience method to test equality of :class:`loopy.KernelArgument`s
 
-        Returns true IFF :param:`arg1` == :param:`arg2`, OR they differ only in
+        Returns true IFF `arg1` == `arg2`, OR they differ only in
         their atomicity
         """
 
@@ -1492,7 +1491,7 @@ class kernel_generator(object):
         - The list of local arguments in the returned :class:`MemoryGenerationResult`
         `record` will be non-empty IFF the kernel generator's :attr:`hoist_locals`
         is true
-        - If :param:`allowed_conflicts` is supplied, we are assumed to be in a driver
+        - If `allowed_conflicts` is supplied, we are assumed to be in a driver
         kernel, and only the 'global' (i.e., `problem_size`'d) variable will be kept,
         as the `work_size`'d variable is assumed to be a local copy
 
@@ -1506,7 +1505,7 @@ class kernel_generator(object):
         Returns
         -------
         record: :class:`MemoryGenerationResult`
-            A record of the processed arguments, :see:`MemoryGenerationResult`
+            A record of the processed arguments, see :ref:`MemoryGenerationResult`.
             The list of global arguments for the top-level wrapping kernel
         kernels: list of :class:`loopy.LoopKernel`
             The (potentially) updated kernels w/ local definitions hoisted as
@@ -1542,7 +1541,7 @@ class kernel_generator(object):
                 # find the version of same name that contains the work size,
                 # as this is the 'local' version
                 work_sized = next((x for x in same_name
-                                  if any(w_size.name in str(y) for y in x.shape)),
+                                   if any(w_size.name in str(y) for y in x.shape)),
                                   None)
                 if not work_sized:
                     __raise()
@@ -1587,10 +1586,10 @@ class kernel_generator(object):
 
         # get list of arguments on readonly
         readonly = set(
-                arg.name for dummy in kernels for arg in dummy.args
-                if not any(arg.name in d.get_written_variables()
-                           for d in kernels)
-                and not isinstance(arg, lp.ValueArg))
+            arg.name for dummy in kernels for arg in dummy.args
+            if not any(arg.name in d.get_written_variables()
+                       for d in kernels)
+            and not isinstance(arg, lp.ValueArg))
 
         # check (non-private) temporary variable duplicates
         temps = [arg for dummy in kernels
@@ -1650,7 +1649,7 @@ class kernel_generator(object):
         Parameters
         ----------
         record: :class:`MemoryGenerationResult`
-            A record of the processed arguments, :see:`MemoryGenerationResult`
+            A record of the processed arguments, see :ref:`MemoryGenerationResult`.
             The list of global arguments for the top-level wrapping kernel
 
         Returns
@@ -1694,9 +1693,11 @@ class kernel_generator(object):
             # to loopy preambles
             gtemps = constants[:]
             if self.jacobian_lookup:
-                gtemps = [x for x in constants if self.jacobian_lookup not in x.name]
+                gtemps = [
+                    x for x in constants if self.jacobian_lookup not in x.name]
             # sort by largest size
-            gtemps = sorted(gtemps, key=lambda x: np.prod(x.shape), reverse=True)
+            gtemps = sorted(gtemps, key=lambda x: np.prod(
+                x.shape), reverse=True)
             type_changes[memory_type.m_global].append(gtemps[0])
             gtemps = gtemps[1:]
             while not all(x >= 0 for x in mem_limits.can_fit(
@@ -1724,7 +1725,8 @@ class kernel_generator(object):
                 mem_types[memory_type.m_global].append(x)
 
             mem_limits = memory_limits.get_limits(
-                self.loopy_opts, mem_types, string_strides=get_string_strides()[0],
+                self.loopy_opts, mem_types, string_strides=get_string_strides()[
+                    0],
                 input_file=self.mem_limits,
                 limit_int_overflow=self.loopy_opts.limit_int_overflow)
 
@@ -1837,7 +1839,7 @@ class kernel_generator(object):
 
     def _specialize_pointers(self, record, result):
         """
-        Specialize the base pointers in the :param:`result` such that:
+        Specialize the base pointers in the `result` such that:
             1. The pointer unpacks only contain arrays that correspond to the kernels
                in the calling :class:`kernel_generator`
             2. The pointer unpacks do not contain any of the calling
@@ -1858,7 +1860,8 @@ class kernel_generator(object):
         """
 
         args = set(self.in_arrays + self.out_arrays)
-        data = set([x.name for x in record.args] + [x.name for x in record.local])
+        data = set([x.name for x in record.args] +
+                   [x.name for x in record.local])
 
         unpacks = []
         offsets = {}
@@ -1918,8 +1921,8 @@ class kernel_generator(object):
 
         # domains
         domains = ['{{[{iname}]: 0 <= {iname} < {size}}}'.format(
-                iname='i',
-                size=self.vec_width)]
+            iname='i',
+            size=self.vec_width)]
 
         knl = lp.make_kernel(domains, insns, kdata, name=name,
                              target=self.target)
@@ -1970,7 +1973,7 @@ class kernel_generator(object):
 
     def _get_working_buffer(self, args):
         """
-        Determine the size of the working buffer required to store the :param:`args`
+        Determine the size of the working buffer required to store the `args`
         in a global working array, and return offsets for determing array indexing
 
         Parameters
@@ -1981,10 +1984,10 @@ class kernel_generator(object):
         Returns
         -------
         size_per_work_item: int
-            The size (in number of values of dtype of :param:`args`)
+            The size (in number of values of dtype of `args`)
             of the working buffer per work-group item
         static_size: int
-            The size (in number of values of dtype of :param:`args`) of the working
+            The size (in number of values of dtype of `args`) of the working
             buffer (independent of # of work-group items)
         offsets: dict of str -> (dtype, size, offset)
             A mapping of kernel argument names to:
@@ -2023,7 +2026,8 @@ class kernel_generator(object):
             buffer_size = None
             offset = None
             # split the shape into the work-item and other dimensions
-            isizes, ssizes = utils.partition(arg.shape, lambda x: isinstance(x, int))
+            isizes, ssizes = utils.partition(
+                arg.shape, lambda x: isinstance(x, int))
             if len(ssizes) >= 1:
                 # check we have a work size in ssizes
                 buffer_size = int(np.prod(isizes) * _get_size(ssizes[0]))
@@ -2045,7 +2049,8 @@ class kernel_generator(object):
                     static_size += buffer_size
 
             # store offset and increment size
-            offsets[arg.name] = (arg.dtype, buffer_size, offset, arg.address_space)
+            offsets[arg.name] = (arg.dtype, buffer_size,
+                                 offset, arg.address_space)
 
         return size_per_work_item, static_size, offsets
 
@@ -2087,11 +2092,11 @@ class kernel_generator(object):
     def _remove_const_array(cls, text, arry):
         """
         Similar to :func:`_remove_work_array_consts`, but for removing const defn
-        of the given :param:`array`
+        of the given `array`
         """
 
         replacers = [(re.compile(r'(double(?:\d+)?)\s*const\s*\*__restrict__\s*{}'.
-                      format(re.escape(arry))),
+                                 format(re.escape(arry))),
                       r'\1 *__restrict__ {}'.format(re.escape(arry)))]
         for r, s in replacers:
             text = r.sub(s, text)
@@ -2105,14 +2110,16 @@ class kernel_generator(object):
         """
 
         replacers = [(
-            re.compile(r'(double const \*__restrict__ {})'.format(rhs_work_name)),
+            re.compile(
+                r'(double const \*__restrict__ {})'.format(rhs_work_name)),
             r'double *__restrict__ {}'.format(rhs_work_name)), (
             re.compile(r'(__local volatile double const \*__restrict__ {})'.format(
                 local_work_name)),
             r'__local volatile double *__restrict__ {}'.format(local_work_name)), (
             re.compile(r'(int const \*__restrict__ {})'.format(int_work_name)),
             r'int *__restrict__ {}'.format(int_work_name)), (
-            re.compile(r'(long int const \*__restrict__ {})'.format(int_work_name)),
+            re.compile(
+                r'(long int const \*__restrict__ {})'.format(int_work_name)),
             r'long int *__restrict__ {}'.format(int_work_name))]
         for r, s in replacers:
             text = r.sub(s, text)
@@ -2120,7 +2127,7 @@ class kernel_generator(object):
 
     def deconstify(self, text, readonly=None):
         """
-        Convenience method to run :param:`text` through :func:`_remove_const_array`
+        Convenience method to run `text` through :func:`_remove_const_array`
         for all of :attr`in_arrays`and :attr:`out_arrays`
         """
         if readonly is None:
@@ -2138,14 +2145,14 @@ class kernel_generator(object):
         """
 
         replacers = [  # full replacement
-                     (re.compile(r'(, int const work_size, )'), r', '),
-                     # rhs )
-                     (re.compile(r'(, int const work_size\))'), r')'),
-                     # lhs (
-                     (re.compile(r'(\(int const work_size, )'), r'('),
-                     (re.compile(r'(\(work_size, )'), '('),
-                     (re.compile(r'(, work_size, )'), ', '),
-                     (re.compile(r'(, work_size\))'), ')')]
+            (re.compile(r'(, int const work_size, )'), r', '),
+            # rhs )
+            (re.compile(r'(, int const work_size\))'), r')'),
+            # lhs (
+            (re.compile(r'(\(int const work_size, )'), r'('),
+            (re.compile(r'(\(work_size, )'), '('),
+            (re.compile(r'(, work_size, )'), ', '),
+            (re.compile(r'(, work_size\))'), ')')]
         for r, s in replacers:
             text = r.sub(s, text)
         return text
@@ -2301,7 +2308,8 @@ class kernel_generator(object):
                 extra_kernels.append(extra)
                 if fake_calls:
                     # check to see if this kernel has a fake call to replace
-                    fk = next((x for x in fake_calls if x.match(k, extra)), None)
+                    fk = next(
+                        (x for x in fake_calls if x.match(k, extra)), None)
                     if fk:
                         # replace call in instructions to call to kernel
                         knl_call = self._remove_work_size(self._get_kernel_call(
@@ -2386,7 +2394,7 @@ class kernel_generator(object):
         -------
         results: list of :class:`CodegenResult`
             The code-generation results for sub-kernels, with constants & preambles
-            deduplicated. Note that the modified version of :param:`result` is
+            deduplicated. Note that the modified version of `result` is
             stored in results[0]
         """
 
@@ -2436,7 +2444,7 @@ class kernel_generator(object):
 
     def _set_kernel_data(self, record, for_driver=False):
         """
-        Updates the :param:`record` to contain the correct :param:`kernel_data`
+        Updates the `record` to contain the correct `kernel_data`
 
         Parameters
         ----------
@@ -2666,7 +2674,8 @@ class kernel_generator(object):
 
         # include the preambles as well, such that they can be
         # included into other files to avoid duplications
-        preambles = '\n'.join(result.preambles + sorted(list(result.inits.values())))
+        preambles = '\n'.join(
+            result.preambles + sorted(list(result.inits.values())))
         preambles = preambles.split('\n')
         preambles.extend([
             self.__get_kernel_defn(result.kernel, remove_work_const=True) +
@@ -2687,7 +2696,7 @@ class kernel_generator(object):
 
     def _get_local_unpacks(self, wrapper, args, null_args=[]):
         """
-        Converts pointer unpacks from :param:`wrapper` to '_local' versions
+        Converts pointer unpacks from `wrapper` to '_local' versions
         for the driver kernel
 
         Parameters
@@ -2723,7 +2732,7 @@ class kernel_generator(object):
                 self._get_pointer_unpack(k, size, offset, dtype, scope,
                                          set_null=any(k == null.name for null
                                                       in null_args), for_driver=True)
-                )
+            )
 
         return CodegenResult(pointer_unpacks=local_unpacks)
 
@@ -2734,7 +2743,7 @@ class kernel_generator(object):
         set of initial conditions for testing / execution.  This is useful so that
         an external program can easily link to the wrapper kernel generated by this
         :class:`kernel_generator` and handle their own iteration over conditions
-        (e.g., as in an ODE solver). :see:`driver-function` for more
+        (e.g., as in an ODE solver). See :ref:`driver-function` for more info.
 
         Parameters
         ----------
@@ -2757,8 +2766,8 @@ class kernel_generator(object):
 
         # make driver kernels
         knl_info = drivers.get_driver(
-                self.loopy_opts, self.namestore, self.in_arrays,
-                self.out_arrays, self, test_size=self.test_size)
+            self.loopy_opts, self.namestore, self.in_arrays,
+            self.out_arrays, self, test_size=self.test_size)
 
         if self.driver_type == DriverType.lockstep:
             template = drivers.lockstep_driver_template(self.loopy_opts, self)
@@ -2903,7 +2912,8 @@ class kernel_generator(object):
 
         filename = self._to_file(path, result, for_driver=True)
 
-        max_ic_per_run, max_ws_per_run = mem_limits.can_fit(memory_type.m_global)
+        max_ic_per_run, max_ws_per_run = mem_limits.can_fit(
+            memory_type.m_global)
         # normalize to divide evenly into vec_width
         if self.vec_width != 0:
             max_ic_per_run = np.floor(
@@ -2918,13 +2928,14 @@ class kernel_generator(object):
                                max_ic_per_run=int(max_ic_per_run),
                                max_ws_per_run=int(max_ws_per_run),
                                input_args={self.name: [
-                                x for x in record.args if x.name in self.in_arrays]},
+                                   x for x in record.args
+                                   if x.name in self.in_arrays]},
                                output_args={self.name: [
-                                x for x in record.args
-                                if x.name in self.out_arrays]},
+                                   x for x in record.args
+                                   if x.name in self.out_arrays]},
                                work_arrays=work_arrays,
                                host_constants={
-                                self.name: wrapper_memory.host_constants[:]})
+                                   self.name: wrapper_memory.host_constants[:]})
         return callgen
 
     def remove_unused_temporaries(self, knl):
@@ -3028,7 +3039,8 @@ class kernel_generator(object):
         iname_range.extend(our_iname_domains)
 
         assumptions = []
-        assumptions.extend(self.get_assumptions(test_size, for_driver=for_driver))
+        assumptions.extend(self.get_assumptions(
+            test_size, for_driver=for_driver))
 
         for iname, irange in info.extra_inames:
             inames.append(iname)
@@ -3159,7 +3171,7 @@ class kernel_generator(object):
 
         iname_map: dict
             A dictionary mapping inames -> tags, only returned if
-            :param:`get_specialization` is True
+            `get_specialization` is True
         """
 
         # before doing anything, find vec width
@@ -3221,7 +3233,8 @@ class kernel_generator(object):
             if get_specialization:
                 specialization[i_tag + '_inner'] = 'unr'
             else:
-                knl = lp.split_iname(knl, i_tag, loopy_opts.unr, inner_tag='unr')
+                knl = lp.split_iname(
+                    knl, i_tag, loopy_opts.unr, inner_tag='unr')
         elif loopy_opts.ilp:
             if get_specialization:
                 specialization[i_tag] = 'ilp'
@@ -3271,7 +3284,7 @@ class c_kernel_generator(kernel_generator):
         if not self.for_testing:
             test_size = p_size.name
 
-        return [global_ind],  ['0 <= {} < {}'.format(global_ind, test_size)]
+        return [global_ind], ['0 <= {} < {}'.format(global_ind, test_size)]
 
     def _get_pointer_unpack(self, array, size, offset, dtype, scope=scopes.GLOBAL,
                             set_null=False, for_driver=False):
@@ -3350,7 +3363,7 @@ class c_kernel_generator(kernel_generator):
 
     def _special_kernel_subs(self, path, callgen):
         """
-        An override of the :method:`kernel_generator._special_wrapping_subs`
+        An override of the :func:`kernel_generator._special_wrapping_subs`
         that implements C-specific wrapping kernel arguement passing
 
         Parameters
@@ -3549,7 +3562,7 @@ class opencl_kernel_generator(kernel_generator):
 
     def _special_kernel_subs(self, path, callgen):
         """
-        An override of the :method:`kernel_generator._special_kernel_subs`
+        An override of the :func:`kernel_generator._special_kernel_subs`
         that implements OpenCL specific kernel substitutions
 
         Parameters
@@ -3573,7 +3586,7 @@ class opencl_kernel_generator(kernel_generator):
             dev_mem_type=(DeviceMemoryType.pinned if self.use_pinned else
                           DeviceMemoryType.mapped),
             device_type=self.loopy_opts.device_type
-            )
+        )
 
         return callgen
 
@@ -3671,8 +3684,8 @@ class opencl_kernel_generator(kernel_generator):
         # call cog
         try:
             Cog().callableMain([
-                    'cogapp', '-e', '-d', '-Dcompgen={}'.format(compout),
-                    '-o', filename, infile])
+                'cogapp', '-e', '-d', '-Dcompgen={}'.format(compout),
+                '-o', filename, infile])
         except Exception:
             logger = logging.getLogger(__name__)
             logger.error('Error generating compiling file {}'.format(filename))
@@ -3683,7 +3696,7 @@ class opencl_kernel_generator(kernel_generator):
 
     def apply_barriers(self, instructions, barriers=None):
         """
-        An override of :method:`kernel_generator.apply_barriers` that
+        An override of :func:`kernel_generator.apply_barriers` that
         applies synchronization barriers to OpenCL kernels
 
         Parameters
@@ -3737,7 +3750,6 @@ class opencl_kernel_generator(kernel_generator):
 
 
 class knl_info(object):
-
     """
     A composite class that contains the various parameters, etc.
     needed to create a simple kernel
@@ -3775,7 +3787,7 @@ class knl_info(object):
         kernel splits are applied
     unrolled_vector : bool [False]
         If true, apply 'unr' instead of 'vec' to any resulting explicit-SIMD iname
-    **kwargs: dict
+    kwargs: dict
         Any other keyword args to pass to :func:`loopy.make_kernel`
     """
 
@@ -3845,7 +3857,7 @@ def create_function_mangler(kernel, return_dtypes=()):
         Most likely an empty list
     Returns
     -------
-    func : :method:`MangleGen`.__call__
+    func : :func:`MangleGen`.__call__
         A function that will return a :class:`loopy.kernel.data.CallMangleInfo` to
         interface with the calling :class:`loopy.LoopKernel`
     """

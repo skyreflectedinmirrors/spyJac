@@ -200,9 +200,9 @@ class SubTest(TestClass):
 
         # create generators
         gen0 = make_kernel_generator(
-             opts, KernelType.dummy, [knl0],
-             namestore,
-             name=knl0.name, input_arrays=['arg'], output_arrays=['arg0'])
+            opts, KernelType.dummy, [knl0],
+            namestore,
+            name=knl0.name, input_arrays=['arg'], output_arrays=['arg0'])
 
         # include
         knl1_data = [arg1_lp, arg0_lp, arc.work_size, pun2_lp]
@@ -236,9 +236,9 @@ class SubTest(TestClass):
             mapstore, kernel_data=knl1_data,
             silenced_warnings=['write_race(insn1)', 'write_race(insn)'])
         gen1 = make_kernel_generator(
-             opts, KernelType.dummy, [knl0, knl1],
-             namestore, depends_on=[gen0],
-             name=knl1.name, input_arrays=['arg0'], output_arrays=['arg1'])
+            opts, KernelType.dummy, [knl0, knl1],
+            namestore, depends_on=[gen0],
+            name=knl1.name, input_arrays=['arg0'], output_arrays=['arg1'])
         return gen1
 
     def test_process_memory(self):
@@ -442,13 +442,13 @@ class SubTest(TestClass):
                                 kernel_data=[arg_lp, arc.work_size])
                 # create generators
                 gen0 = make_kernel_generator(
-                     opts, KernelType.dummy, [knl0],
-                     type('', (object,), {'jac': ''}),
-                     name=knl0.name, output_arrays=['arg'])
+                    opts, KernelType.dummy, [knl0],
+                    type('', (object,), {'jac': ''}),
+                    name=knl0.name, output_arrays=['arg'])
                 gen1 = make_kernel_generator(
-                     opts, KernelType.dummy, [knl0, knl1],
-                     type('', (object,), {'jac': ''}), depends_on=[gen0],
-                     name=knl1.name, output_arrays=['arg'])
+                    opts, KernelType.dummy, [knl0, knl1],
+                    type('', (object,), {'jac': ''}), depends_on=[gen0],
+                    name=knl1.name, output_arrays=['arg'])
                 return gen0, gen1
 
             # create a species rates kernel generator for this state
@@ -590,15 +590,15 @@ class SubTest(TestClass):
                             manglers=pre)
             # create generators
             gen0 = make_kernel_generator(
-                 opts, KernelType.dummy, [knl0],
-                 type('', (object,), {'jac': ''}),
-                 input_arrays=['arg'], output_arrays=['arg'],
-                 name=knl0.name)
+                opts, KernelType.dummy, [knl0],
+                type('', (object,), {'jac': ''}),
+                input_arrays=['arg'], output_arrays=['arg'],
+                name=knl0.name)
             gen1 = make_kernel_generator(
-                 opts, KernelType.dummy, [knl1],
-                 type('', (object,), {'jac': ''}), depends_on=[gen0],
-                 input_arrays=['arg'], output_arrays=['arg'],
-                 name=knl1.name)
+                opts, KernelType.dummy, [knl1],
+                type('', (object,), {'jac': ''}), depends_on=[gen0],
+                input_arrays=['arg'], output_arrays=['arg'],
+                name=knl1.name)
 
             def __get_result(gen, record=None):
                 # make kernels
@@ -739,17 +739,17 @@ class SubTest(TestClass):
 
         # create generators
         chem_gen = make_kernel_generator(
-             opts, KernelType.chem_utils, [chem_info],
-             namestore,
-             output_arrays=['chem'])
+            opts, KernelType.chem_utils, [chem_info],
+            namestore,
+            output_arrays=['chem'])
         spec_gen = make_kernel_generator(
-             opts, KernelType.species_rates, [spec_info],
-             namestore, depends_on=[chem_gen],
-             input_arrays=['chem'], output_arrays=[spec_name])
+            opts, KernelType.species_rates, [spec_info],
+            namestore, depends_on=[chem_gen],
+            input_arrays=['chem'], output_arrays=[spec_name])
         jac_gen = make_kernel_generator(
-             opts, KernelType.jacobian, [jac_info],
-             namestore, depends_on=[spec_gen],
-             input_arrays=[spec_name], output_arrays=['jac'])
+            opts, KernelType.jacobian, [jac_info],
+            namestore, depends_on=[spec_gen],
+            input_arrays=[spec_name], output_arrays=['jac'])
 
         return jac_gen
 
@@ -948,13 +948,13 @@ class SubTest(TestClass):
                 silenced_warnings=['write_race(1)'])
             # create generators
             param_gen = make_kernel_generator(
-                 opts, KernelType.chem_utils, [param_info],
-                 namestore,
-                 output_arrays=[param.name])
+                opts, KernelType.chem_utils, [param_info],
+                namestore,
+                output_arrays=[param.name])
             spec_gen = make_kernel_generator(
-                 opts, KernelType.species_rates, [spec_info],
-                 namestore, depends_on=[param_gen],
-                 input_arrays=[spec.name, param.name], output_arrays=[spec.name])
+                opts, KernelType.species_rates, [spec_info],
+                namestore, depends_on=[param_gen],
+                input_arrays=[spec.name, param.name], output_arrays=[spec.name])
 
             # get the record
             with temporary_directory() as tdir:

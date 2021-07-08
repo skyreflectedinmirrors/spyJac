@@ -21,7 +21,7 @@ asserts = {'c': Template('cassert(${call}, "${message}");'),
 
 def guarded_call(lang, call, message='Error'):
     """
-    Returns a call guarded by error checking for the given :param:`lang`
+    Returns a call guarded by error checking for the given `lang`
     """
     return asserts[lang].safe_substitute(call=call, message=message)
 
@@ -202,7 +202,7 @@ class MemoryManager(object):
 
     def get_signature(self, device, arr):
         """
-        Returns the stringified version of :param:`arg`, for a use in a function
+        Returns the stringified version of `arg`, for a use in a function
         signature definition.
         """
 
@@ -252,7 +252,7 @@ class MemoryManager(object):
 
     def alloc(self, device, arr, readonly=False, num_ics='per_run', **kwargs):
         """
-        Return an allocation for a buffer in the given :param:`lang`
+        Return an allocation for a buffer in the given `lang`
 
         Parameters
         ----------
@@ -302,8 +302,8 @@ class MemoryManager(object):
         num_ics: str ['per_run']
             The number of initial conditions to evaluated per prun
         num_ics_this_run: str ['this_run']
-            The number of initial conditions to evaluated _in this run_,
-            should be <= :param:`num_ics`.
+            The number of initial conditions to evaluated *in this run*,
+            should be <= `num_ics`.
         offset: str ['offset']
             The initial condition offset
         Returns
@@ -452,7 +452,8 @@ class MappedMemory(MemoryManager):
             rect_copy_template = Template(
                 '{\n' +
                 indent('const size_t buffer_origin[3] = {0, 0, 0};\n', stdindent) +
-                indent('const size_t host_origin[3] = ${host_origin};\n', stdindent)
+                indent(
+                    'const size_t host_origin[3] = ${host_origin};\n', stdindent)
                 + indent('const size_t region[3] = ${region};\n', stdindent) +
                 indent(guarded_call(
                     lang,
@@ -470,7 +471,8 @@ class MappedMemory(MemoryManager):
         elif lang == 'c':
             rect_copy_template = Template(
                 '{\n' +
-                indent('const size_t host_origin[3] = ${host_origin};\n', stdindent)
+                indent(
+                    'const size_t host_origin[3] = ${host_origin};\n', stdindent)
                 + indent('const size_t region[3] = ${region};\n', stdindent) +
                 indent('memcpy2D_${ctype}(${host_name}, ${dev_name}, '
                        '&host_origin[0], '  # host origin
@@ -498,7 +500,7 @@ class MappedMemory(MemoryManager):
                 host_slice_pitch='VECWIDTH * {problem_size} * ${{itemsize}}'.format(
                     problem_size=problem_size.name),
                 ctype=ctype
-                ))
+            ))
 
         def __f_unsplit(ctype):
             # this is a regular F-ordered array, which only requires a 2D copy
@@ -511,7 +513,7 @@ class MappedMemory(MemoryManager):
                     problem_size=problem_size.name),
                 host_slice_pitch='0',
                 ctype=ctype
-                ))
+            ))
 
         if lang == 'opencl':
             # determine operation type
@@ -555,7 +557,7 @@ class MappedMemory(MemoryManager):
                 arrays = __combine(host_arrays, dev_arrays)
                 return Template(Template(
                     'memcpy(${arrays}, ${this_run_size});'
-                    ).safe_substitute(arrays=arrays))
+                ).safe_substitute(arrays=arrays))
             elif order == 'F':
                 if not isinstance(self, PinnedMemory):
                     # not pinned memory -> no vectorized data ordering
@@ -567,8 +569,8 @@ class MappedMemory(MemoryManager):
                     return Template(Template(
                         'memcpy2D_${ctype}(${arrays}, ${offset}, '
                         '${this_run} * ${itemsize}, ${non_ic_size});'
-                                             ).safe_substitute(
-                                             ctype=ctype, arrays=arrays))
+                    ).safe_substitute(
+                        ctype=ctype, arrays=arrays))
                 if have_split:
                     return __f_split(ctype)
                 else:
@@ -587,14 +589,14 @@ class MappedMemory(MemoryManager):
                 overrides[key] = val
 
         alloc = {'opencl': Template(Template(
-                    '${name} = clCreateBuffer(context, ${memflag}, '
-                    '${buff_size}, NULL, &return_code);\n'
-                    '${guard}\n').safe_substitute(guard=guarded_call(
-                        'opencl', 'return_code'))),
-                 'c': Template(Template(
-                    '${name} = (${dtype}*)malloc(${buff_size});\n'
-                    '${guard}').safe_substitute(guard=guarded_call(
-                        'c', '${name} != NULL', 'malloc failed')))}
+            '${name} = clCreateBuffer(context, ${memflag}, '
+            '${buff_size}, NULL, &return_code);\n'
+            '${guard}\n').safe_substitute(guard=guarded_call(
+                'opencl', 'return_code'))),
+            'c': Template(Template(
+                '${name} = (${dtype}*)malloc(${buff_size});\n'
+                '${guard}').safe_substitute(guard=guarded_call(
+                    'c', '${name} != NULL', 'malloc failed')))}
         __update('alloc', alloc)
 
         # we use blocking read / writes here, so no need to sync currently
@@ -621,8 +623,8 @@ class MappedMemory(MemoryManager):
             lang, to_device=True, use_full=True)
         __update('host_const_in', host_constant_template)
         free = {'opencl': Template(guarded_call(
-                         'opencl', 'clReleaseMemObject(${name})')),
-                'c': Template('free(${name});')}
+            'opencl', 'clReleaseMemObject(${name})')),
+            'c': Template('free(${name});')}
         __update('free', free)
         memset = {'opencl': Template(Template(
             """
@@ -632,12 +634,12 @@ class MappedMemory(MemoryManager):
                 ${write_call}
             #endif
             """
-            ).safe_substitute(fill_call=guarded_call(
-                            'opencl', 'clEnqueueFillBuffer(queue, ${name}, &zero, '
-                            'sizeof(double), 0, ${buff_size}, 0, NULL, NULL)'),
-                              write_call=guarded_call(
-                            'opencl', 'clEnqueueWriteBuffer(queue, ${name}, CL_TRUE,'
-                            ' 0, ${buff_size}, zero, 0, NULL, NULL)'))),
+        ).safe_substitute(fill_call=guarded_call(
+            'opencl', 'clEnqueueFillBuffer(queue, ${name}, &zero, '
+            'sizeof(double), 0, ${buff_size}, 0, NULL, NULL)'),
+            write_call=guarded_call(
+            'opencl', 'clEnqueueWriteBuffer(queue, ${name}, CL_TRUE,'
+            ' 0, ${buff_size}, zero, 0, NULL, NULL)'))),
             'c': Template('memset(${name}, 0, ${buff_size});')
         }
         __update('memset', memset)
@@ -687,7 +689,7 @@ class PinnedMemory(MappedMemory):
             'CL_TRUE, ${map_flags}, 0, ${per_run_size}, 0, NULL, NULL, '
             '&return_code);\n'
             '${check}'
-            ).safe_substitute(check=guarded_call(lang, 'return_code'))}
+        ).safe_substitute(check=guarded_call(lang, 'return_code'))}
         self.unmap_template = {'opencl': guarded_call(
             lang, 'clEnqueueUnmapMemObject(queue, ${dev_name}, ${temp_name}, 0, '
                   'NULL, NULL)')}
@@ -737,7 +739,7 @@ class PinnedMemory(MappedMemory):
     def alloc(self, device, arr, readonly=False, num_ics='per_run',
               namer=None, **kwargs):
         """
-        Return an allocation for a buffer in the given :param:`lang`
+        Return an allocation for a buffer in the given `lang`
 
         Parameters
         ----------
@@ -749,7 +751,7 @@ class PinnedMemory(MappedMemory):
             Changes memory flags / allocation type (e.g., for OpenCL)
         namer: :class:`six.Callable` [None]
             A callable function to generate the name of the buffer to be allocated.
-            If not specified, simply use :param:`arr.name`.
+            If not specified, simply use `arr.name`.
 
         Returns
         -------
@@ -812,7 +814,7 @@ class PinnedMemory(MappedMemory):
             The number of initial conditions to evaluated per prun
         namer: :class:`six.Callable` [None]
             A callable function to generate the name of the buffer to be allocated.
-            If not specified, simply use :param:`arr.name`.
+            If not specified, simply use `arr.name`.
 
         Note
         ----
@@ -828,7 +830,8 @@ class PinnedMemory(MappedMemory):
         map_flags = self.map_flags[self.lang(True)][device]
         dtype = self.type_map[arr.dtype]
         return super(PinnedMemory, self).memset(
-            device, arr, *args, dtype=dtype, temp_name=self.get_temp_name(dtype),
+            device, arr, *
+            args, dtype=dtype, temp_name=self.get_temp_name(dtype),
             map_flags=map_flags, **kwargs)
 
 

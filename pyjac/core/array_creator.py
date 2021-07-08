@@ -23,7 +23,7 @@ class array_splitter(object):
 
     Can handle reshaping of both loopy and numpy arrays to the desired shape
 
-    Properties
+    Attributes
     ----------
     depth: int [None]
         If is not None, the vector-width to use for deep-vectorization
@@ -350,14 +350,15 @@ class array_splitter(object):
             return expr.aggregate.index(tuple(idx))
 
         rule_mapping_context = SubstitutionRuleMappingContext(
-                kernel.substitutions, var_name_gen)
+            kernel.substitutions, var_name_gen)
         aash = ArrayAxisSplitHelper(rule_mapping_context,
                                     set([array_name]), split_access_axis)
         kernel = rule_mapping_context.finish_kernel(aash.map_kernel(kernel))
 
         if vec:
             achng = ArrayChanger(kernel, array_name)
-            new_strides = [t.layout_nesting_level for t in achng.get().dim_tags]
+            new_strides = [
+                t.layout_nesting_level for t in achng.get().dim_tags]
             tag = ['N{}'.format(s) if i != dest_axis else 'vec'
                    for i, s in enumerate(new_strides)]
             kernel = lp.tag_array_axes(kernel, [array_name], tag)
@@ -420,11 +421,11 @@ class array_splitter(object):
                 if get_dependencies(insn.assignee) & names:
                     insn = insn.copy(assignee=mapper(insn.assignee),
                                      within_inames=insn.within_inames | set([
-                                        new_var]))
+                                         new_var]))
                 if get_dependencies(insn.expression) & names:
                     insn = insn.copy(expression=mapper(insn.expression),
                                      within_inames=insn.within_inames | set([
-                                        new_var]))
+                                         new_var]))
             except AttributeError:
                 pass
             insns.append(insn)
@@ -568,8 +569,8 @@ work_size = lp.ValueArg('work_size', dtype=kint_type)
 """
     The global work size of the generated kernel.
     Roughly speaking, this corresponds to:
-        - The number of cores to utilize on the CPU
-        - The number of blocks to launch on the GPU
+    * The number of cores to utilize on the CPU
+    * The number of blocks to launch on the GPU
     This may be specified at run-time or during kernel-generation.
 """
 
@@ -584,7 +585,7 @@ global_ind = 'j'
 """str: The global initial condition index
 
 This is the string index for the global condition loop in generated kernels
-of :module:`rate_subs`
+of :mod:`rate_subs`
 """
 
 
@@ -592,15 +593,15 @@ var_name = 'i'
 """str: The inner loop index
 
 This is the string index for the inner loops in generated kernels of
-:module:`rate_subs`
+:mod:`rate_subs`
 """
 
 
 default_inds = (global_ind, var_name)
-"""str: The default indicies used in main loops of :module:`rate_subs`
+"""str: The default indicies used in main loops of :mod:`rate_subs`
 
 This is the string indicies for the main loops for generated kernels in
-:module:`rate_subs`
+:mod:`rate_subs`
 """
 
 
@@ -665,7 +666,7 @@ class tree_node(object):
         self.owner = owner
         try:
             self.children = set(children)
-        except:
+        except TypeError:
             self.children = set([children])
         self.parent = parent
         self.transform = None
@@ -1231,7 +1232,7 @@ class MapStore(object):
             assert node.domain.initializer is not None, (
                 "Can't use non-initialized creator {} as a transform domain".
                 format(node.domain.name))
-        except:
+        except KeyError:
             # add the domain to the base of the tree
             node = self.tree.add_child(domain)
 
@@ -1589,7 +1590,7 @@ class creator(object):
     def __call__(self, *indicies, **kwargs):
         """
         Create a loopy array and corresponding string based on the supplied
-        :param:`indicies` and :param:`kwargs`
+        `indicies` and `kwargs`
 
         Parameters
         ----------
@@ -1603,12 +1604,13 @@ class creator(object):
         working_buffer_index: str
             If supplied, the :class:`creator` will replace access to the global index
             with the result of the vector specialization to enable pre-splitting of
-            the loopy arrays / indicies (and avoid index hell). :see:`working-buffer`
+            the loopy arrays / indicies (and avoid index hell).
+            See :ref:`working-buffer`.
         use_local_name: bool [False]
             If True, append '_local" to the created variable to avoid duplicate
             argument names in the driver functions.
         reshape_to_working_buffer: str [None]
-            If True, and :param:`working_buffer_index` is supplied, the created array
+            If True, and `working_buffer_index` is supplied, the created array
             will be reshaped to the working buffer size.
             If False, the created array will not be reshaped (but the indicies may
             be changed).
@@ -1634,7 +1636,8 @@ class creator(object):
 
         # find the global ind if there
         if not self.is_temporary:
-            glob_ind = next((i for i, ind in enumerate(inds) if match(ind)), None)
+            glob_ind = next(
+                (i for i, ind in enumerate(inds) if match(ind)), None)
         if glob_ind is not None:
             if wbi:
                 # convert index string to parallel iname only
@@ -1691,8 +1694,8 @@ class jac_creator(creator):
 
     def __get_offset_and_lookup(self, *indicies):
         """
-        Returns the correct sparse offset and lookup based on :param:`indicies` and
-        our own :param:`order`
+        Returns the correct sparse offset and lookup based on `indicies` and
+        our own `order`
         """
 
         def __lookups(arr, lookup, match):
@@ -2086,7 +2089,8 @@ class NameStore(object):
 
         if self.jac_format == JacobianFormat.sparse and 'jac_inds' in rate_info:
             self.jac = jac_creator(jacobian_array,
-                                   shape=(test_size, self.num_nonzero_jac_inds.size),
+                                   shape=(
+                                       test_size, self.num_nonzero_jac_inds.size),
                                    order=self.order,
                                    dtype=np.float64,
                                    row_inds=self.jac_row_inds,

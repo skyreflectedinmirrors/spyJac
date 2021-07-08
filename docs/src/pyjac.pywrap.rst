@@ -4,10 +4,14 @@ pyjac.pywrap package
 Submodules
 ----------
 
-.. toctree::
+pyjac.pywrap.pywrap\_gen module
+-------------------------------
 
-   pyjac.pywrap.parallel_compiler
-   pyjac.pywrap.pywrap_gen
+.. automodule:: pyjac.pywrap.pywrap_gen
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 
 Module contents
 ---------------

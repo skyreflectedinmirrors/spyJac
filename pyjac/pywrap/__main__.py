@@ -8,8 +8,7 @@ from pyjac.core.enum_types import KernelType
 
 if __name__ == '__main__':
     parser = ArgumentParser(
-        description='Generates a python wrapper for pyJac via Cython'
-        )
+        description='Generates a python wrapper for pyJac via Cython')
     parser.add_argument('-l', '--lang',
                         type=str,
                         choices=utils.langs,

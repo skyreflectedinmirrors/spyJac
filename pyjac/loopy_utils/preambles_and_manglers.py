@@ -3,8 +3,6 @@ import textwrap
 
 import numpy as np
 
-from pyjac import utils as utils
-from pyjac.core import array_creator as arc
 from loopy import to_loopy_type
 
 

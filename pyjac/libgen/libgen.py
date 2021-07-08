@@ -68,8 +68,9 @@ def get_toolchain(lang, shared=True, executable=True, **kwargs):
         If true, build a shared library
     executable: bool [True]
         If true, build a _executable_ shared library; note: requires
-        :param:`shared`=True
-    **kwargs:
+        ``shared==True``
+    kwargs: dict
+        Dictionary arguments to pass to the generated toolchain
     """
 
     # compilation flags
@@ -136,7 +137,7 @@ def get_file_list(source_dir, lang, ktype, file_base=None):
     ktype: :class:`KernelType`
         The type of library being built
     file_base : str [None]
-        If :param:`ktype` == KernelType.dummy, use this as the base filename.
+        If `ktype` == KernelType.dummy, use this as the base filename.
 
     Returns
     -------
@@ -190,7 +191,7 @@ def compile(lang, toolchain, files, source_dir='', obj_dir=''):
     toolchain: :class:`codepy.Toolchain`
         The toolchain to build the files with
     files: list of str
-        The list of source files.  If :param:`source_dir` is not specified, these
+        The list of source files.  If `source_dir` is not specified, these
         should be a absolute path to the file.
     source_dir: str ['']
         If specified, the base directory the source files are located in
@@ -226,7 +227,7 @@ def compile(lang, toolchain, files, source_dir='', obj_dir=''):
 
             # compile
             toolchain.build_object(obj_files[-1], [file])
-        except CompileError as e:
+        except CompileError:
             logger = logging.getLogger(__name__)
             logger.error('Error compiling file: {}'.format(file))
             raise CompilationError(file)
@@ -252,8 +253,8 @@ def link(toolchain, obj_files, libname, lib_dir=''):
     Returns
     -------
     libname: str
-        The full path to the library, this is just :param:`libname` if
-        :param:`lib_dir` is unspecified
+        The full path to the library, this is just `libname` if
+        `lib_dir` is unspecified
 
     Raises
     ------
@@ -301,13 +302,13 @@ def generate_library(lang, source_dir, obj_dir=None, out_dir=None, shared=None,
     ktype: :class:`KernelType` [KernelType.jacobian]
         The type of library being built
     as_executable: bool [False]
-        If true, the generated library should use the '-fPIE' flag (or equivalent)
-        to be executable
+        If ``True``, the generated library should use the '-fPIE' flag
+        (or equivalent) to be executable
 
     Keyword Arguments
     -----------------
     file_base: str
-        Used for creation of libraries for :param:`ktype`==KernelType.dummy -- the
+        Used for creation of libraries for ``ktype == KernelType.dummy`` -- the
         base filename (generator name) for this library
 
     Returns
